@@ -1,0 +1,185 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+}
+
+.topBar {
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    color: white;
+    padding: 5px 20px; /* Reduced padding for a slimmer top bar */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.topBar .title {
+    font-size: 18px; /* Slightly smaller font size */
+    font-weight: bold;
+}
+
+.topBar button {
+    background-color: #fff;
+    color: #4CAF50;
+    border: none;
+    padding: 3px 10px; /* Reduced padding for a smaller button */
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px; /* Smaller font size */
+    margin-right: 10px; /* Add margin to avoid touching the border */
+}
+
+.topBar button:hover {
+    background-color: #45a049;
+    color: white;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left */
+    padding: 60px 20px 20px; /* Adjust padding to avoid overlap with fixed top bar */
+}
+
+.announcementBoard, .timetable {
+    background-color: #fff;
+    padding: 20px;
+    margin: 10px 0; /* Stack elements vertically */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+}
+
+.announcementBoard h2, .timetable h2 {
+    text-align: center;
+}
+
+.timetable table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.timetable th, .timetable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.timetable th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.loginPage {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    text-align: center; /* Center the content inside the div */
+    position: absolute;
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the form elements */
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    width: 100%; /* Make inputs take full width */
+    max-width: 300px; /* Limit the maximum width */
+}
+
+button {
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%; /* Make buttons take full width */
+    max-width: 300px; /* Limit the maximum width */
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+    .topBar {
+        padding: 5px 10px; /* Adjust padding for smaller screens */
+    }
+
+    .topBar .title {
+        font-size: 16px; /* Smaller font size for mobile */
+    }
+
+    .topBar button {
+        padding: 3px 8px; /* Smaller padding for mobile */
+        font-size: 10px; /* Smaller font size for mobile */
+        margin-right: 5px; /* Adjust margin for mobile */
+    }
+
+    .content {
+        padding: 70px 10px 10px; /* Adjust padding for smaller screens */
+        flex-direction: column; /* Stack elements vertically on mobile */
+    }
+
+    .announcementBoard, .timetable {
+        padding: 15px;
+    }
+
+    .timetable th, .timetable td {
+        padding: 6px;
+    }
+
+    .loginPage {
+        position: static;
+        transform: none;
+        margin-top: 20px;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 601px) {
+    .content {
+        flex-direction: column;
+        align-items: flex-start; /* Align items to the left */
+    }
+
+    .announcementBoard, .timetable {
+        margin-right: 20px;
+    }
+
+    .loginPage {
+        position: absolute;
+        top: 50%;
+        right: 10%;
+        transform: translateY(-50%);
+    }
+}

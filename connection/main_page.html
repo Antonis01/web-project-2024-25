@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/main_page.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/login.css">
+</head>
+<body>
+    <div class="topBar">
+        <div class="title">My Website</div>
+        <button onclick="toggleLoginForm()">Login</button>
+    </div>
+    <div class="content">
+        <div class="announcementBoard">
+            <h2>Announcement Board</h2>
+            <ul>
+                <li>Announcement 1</li>
+                <li>Announcement 2</li>
+                <li>Announcement 3</li>
+            </ul>
+        </div>
+        <div class="timetable">
+            <h2>Timetable</h2>
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>Event</th>
+                </tr>
+                <tr>
+                    <td>09:00 - 10:00</td>
+                    <td>Event 1</td>
+                </tr>
+                <tr>
+                    <td>10:00 - 11:00</td>
+                    <td>Event 2</td>
+                </tr>
+                <tr>
+                    <td>11:00 - 12:00</td>
+                    <td>Event 3</td>
+                </tr>
+            </table>
+        </div>
+        <div class="loginPage" id="loginForm" style="display: none;">
+            <form action="/login" method="post">
+                <input type="text" name="usrname" size="30" id="username" placeholder="username" required> <br> <br>
+                <input type="password" name="psword" size="30" id="password" placeholder="password" required> <br> <br> 
+                <button type="submit" name="Login" id="Login">Login</button>
+            </form>
+            <br>
+            <form action="/register.html" method="get">
+                <button type="submit" name="Register" id="Register">Register</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function toggleLoginForm() {
+            var loginForm = document.getElementById('loginForm');
+            if (loginForm.style.display === 'none' || loginForm.style.display === '') {
+                loginForm.style.display = 'block';
+            } else {
+                loginForm.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
