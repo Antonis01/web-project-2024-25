@@ -10,6 +10,42 @@
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
         <button onclick="window.location.href='/logout'">Logout</button>
+        <button onclick="toggleLoginForm()">Login</button>
+        <button onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
     </div>
+    
+</div>
+    
+<div id="assignmentForm" style="display:none;">
+    <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
+    <form>
+        <label for="studentId">ΑΜ Φοιτητή:</label>
+        <input type="text" id="studentId" name="studentId" required><br><br>
+        <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
+        <input type="text" id="studentName" name="studentName" required><br><br>
+        <label for="subject">Θέμα:</label>
+        <input type="text" id="subject" name="subject" required><br><br>
+        <button type="submit">Ανάθεση</button>
+        <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
+    </form>
+</div>
+</body>
+
+    <script>
+        function toggleAssignmentForm() {
+            var form = document.getElementById("assignmentForm");
+            if (form.style.display === "none" || form.style.display === "") {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        }
+
+        function cancelAssignment() {
+            // Logic to cancel the assignment
+            alert("Η ανάθεση ακυρώθηκε.");
+            document.getElementById("assignmentForm").reset();
+        }
+    </script>
 </body>
 </html>
