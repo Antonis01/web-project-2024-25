@@ -8,9 +8,9 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // Use bodyParser to parse JSON data
 
-// Create a connection to the MySQL database
+// Create connection to the localhost database 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -36,6 +36,7 @@ const sessionStore = new MySQLStore({
     database: 'university'
 });
 
+// Use the session middleware
 app.use(session({
     secret: 'your_secret_key',
     resave: false,
@@ -45,23 +46,20 @@ app.use(session({
 
 // Check if user is authenticated and authorized
 function isAuthenticated(req, res, next) {
+    const roleUrlMap = {
+        teacher: '/private/teacher',
+        student: '/private/student',
+        secretary: '/private/secretary'
+    };
+
     if (req.session.user) {
         const role = req.session.user.role;
         const url = req.originalUrl;
-
-        if (role === 'teacher' && url.startsWith('/private/teacher')) {
-            return next();
-        } else if (role === 'student' && url.startsWith('/private/student')) {
+        
+        if (roleUrlMap[role] && url.startsWith(roleUrlMap[role])) {
             return next();
         } else {
-            // Redirect to the correct URL based on the role
-            if (role === 'teacher') {
-                res.redirect('/private/teacher/teacher_main_page.html');
-            } else if (role === 'student') {
-                res.redirect('/private/student/student_main_page.html');
-            } else {
-                res.redirect('/');
-            }
+            res.redirect(roleUrlMap[role] ? `${roleUrlMap[role]}/${role}_main_page.html` : '/');
         }
     } else {
         res.redirect('/');
@@ -72,33 +70,40 @@ function isAuthenticated(req, res, next) {
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    // Check teacher credentials
-    db.query('SELECT * FROM teacher WHERE teacher_username = ? AND teacher_password = ?', [username, password], (err, teacherResults) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            res.status(500).send('Internal Server Error');
+    const roles = [
+        { table: 'teacher', role: 'teacher', redirect: '/private/teacher/teacher_main_page.html' },
+        { table: 'student', role: 'student', redirect: '/private/student/student_main_page.html' },
+        { table: 'secretary', role: 'secretary', redirect: '/private/secretary/secretary_main_page.html' }
+    ];
+
+    const checkCredentials = (index) => {
+        if (index >= roles.length) {
+            res.status(401).json({ message: 'Invalid username or password' });
             return;
         }
-        if (teacherResults.length > 0) {
-            req.session.user = { username: username, role: 'teacher' };
-            res.redirect('/private/teacher/teacher_main_page.html');
-        } else {
-            // Check student credentials
-            db.query('SELECT * FROM student WHERE student_username = ? AND student_password = ?', [username, password], (err, studentResults) => {
-                if (err) {
-                    console.error('Error executing query:', err);
-                    res.status(500).send('Internal Server Error');
-                    return;
-                }
-                if (studentResults.length > 0) {
-                    req.session.user = { username: username, role: 'student' };
-                    res.redirect('/private/student/student_main_page.html');
-                } else {
-                    res.status(401).send('Invalid username or password');
-                }
-            });
-        }
-    });
+
+        const { table, role, redirect } = roles[index];
+        db.query(`SELECT * FROM ${table} WHERE ${table}_username = ? AND ${table}_password = ?`, [username, password], (err, results) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                res.status(500).json({ message: 'Internal Server Error' });
+                // print the ajax response
+                //console.log(res);
+                return;
+            }
+            if (results.length > 0) {
+                req.session.user = { username: username, role: role };
+                console.log(`User ${username} logged in with role ${role} and session ID: ${req.sessionID}`);
+                res.json({ redirect });
+                // print the ajax response
+                console.log(res);
+            } else {
+                checkCredentials(index + 1);
+            }
+        });
+    };
+
+    checkCredentials(0);
 });
 
 // Dynamic route handler for any HTML file inside private/teacher directory
@@ -112,6 +117,8 @@ app.get('/private/teacher/:filename', isAuthenticated, (req, res) => {
             return;
         }
         res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(req.params.filename);
+        console.log(filePath);
         res.end(data);
     });
 });
@@ -127,6 +134,25 @@ app.get('/private/student/:filename', isAuthenticated, (req, res) => {
             return;
         }
         res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(req.params.filename);
+        console.log(filePath);
+        res.end(data);
+    });
+});
+
+// Dynamic route handler for any HTML file inside private/secretary directory
+app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
+    const filePath = path.join(__dirname, 'private/secretary', req.params.filename);
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.error(`Error reading ${req.params.filename}:`, err);
+            res.writeHead(500, {'Content-Type': 'text/plain'});
+            res.end('Internal Server Error');
+            return;
+        }
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(req.params.filename);
+        console.log(filePath);
         res.end(data);
     });
 });
@@ -142,6 +168,7 @@ app.get('/', (req, res) => {
             return;
         }
         res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(filePath);
         res.end(data);
     });
 });
@@ -157,18 +184,35 @@ app.get('/public/css/:filename', (req, res) => {
             return;
         }
         res.writeHead(200, {'Content-Type': 'text/css'});
+        console.log(cssPath);
         res.end(data);
     });
 });
 
 app.get('/logout', (req, res) => {
+    console.log(`User ${req.session.user.username} logged out with session ID: ${req.sessionID}`);
     req.session.destroy((err) => {
         if (err) {
             console.error('Error destroying session:', err);
             res.status(500).send('Internal Server Error');
             return;
         }
+        console.log('Session destroyed');
         res.redirect('/');
+    });
+});
+
+app.post('/logout', (req, res) => {
+    console.log(`User ${req.session.user.username} logged out with session ID: ${req.sessionID}`);
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            res.status(500).json({ message: 'Internal Server Error' });
+            return;
+        }
+        console.log('Session destroyed');
+        res.json({ message: 'Logout successful', redirect: '/' });
+        console.log(res);
     });
 });
 

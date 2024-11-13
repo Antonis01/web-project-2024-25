@@ -25,7 +25,13 @@ body {
     font-weight: bold;
 }
 
-.topBar button {
+.buttonContainer {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.leftButton {
     background-color: #fff;
     color: #4CAF50;
     border: none;
@@ -33,9 +39,25 @@ body {
     cursor: pointer;
     border-radius: 10px;
     font-size: 10px;
-    margin-right: 50px;
     align-self: center;
-    width: 60px;
+    width: auto;
+    text-align: center;
+    margin-right: 10px;
+    margin-left: 20px;
+}
+
+.rightButton {
+    background-color: #fff;
+    color: #4CAF50;
+    border: none;
+    padding: 5px 20px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 10px;
+    margin-left: auto;
+    margin-right: 40px;
+    align-self: center;
+    width: auto;
     text-align: center;
 }
 
@@ -49,6 +71,7 @@ body {
     flex-direction: column;
     align-items: flex-start;
     padding: 60px 20px 20px;
+    padding-top: 60px; 
 }
 
 .announcementBoard, .timetable {
@@ -146,6 +169,10 @@ button:hover {
         padding: 3px 8px;
         font-size: 10px;
         margin-right: 5px;
+    }
+
+    .topBar .rightButton {
+        margin-right: 20px;
     }
 
     .content {

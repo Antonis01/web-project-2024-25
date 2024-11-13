@@ -2,33 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=2.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Main Page</title>
     <link rel="stylesheet" type="text/css" href="/public/css/main_page.css">
 </head>
 <body>
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
-        <button onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
-        <button onclick="window.location.href='/logout'">Logout</button>
+        <div class="buttonContainer">
+            <button class="leftButton" onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
+            <button class="rightButton" onclick="logout()">Logout</button>
+        </div>
     </div>
     
-</div>
-    
-<div id="assignmentForm" style="display:none;">
-    <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
-    <form>
-        <label for="studentId">ΑΜ Φοιτητή:</label>
-        <input type="text" id="studentId" name="studentId" required><br><br>
-        <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
-        <input type="text" id="studentName" name="studentName" required><br><br>
-        <label for="subject">Θέμα:</label>
-        <input type="text" id="subject" name="subject" required><br><br>
-        <button type="submit">Ανάθεση</button>
-        <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
-    </form>
-</div>
-</body>
+    <div id="assignmentForm" style="display:none;">
+        <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
+        <form>
+            <label for="studentId">ΑΜ Φοιτητή:</label>
+            <input type="text" id="studentId" name="studentId" required><br><br>
+            <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
+            <input type="text" id="studentName" name="studentName" required><br><br>
+            <label for="subject">Θέμα:</label>
+            <input type="text" id="subject" name="subject" required><br><br>
+            <button type="submit">Ανάθεση</button>
+            <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
+        </form>
+    </div>
 
     <script>
         function toggleAssignmentForm() {
@@ -44,6 +43,24 @@
             // Logic to cancel the assignment
             alert("H ανάθεση ακυρώθηκε.");
             document.getElementById("assignmentForm").reset();
+        }
+
+        function logout() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/logout', true);
+            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        alert(response.message);
+                        window.location.href = response.redirect;
+                    } else {
+                        alert('Error logging out');
+                    }
+                }
+            };
+            xhr.send();
         }
     </script>
 </body>
