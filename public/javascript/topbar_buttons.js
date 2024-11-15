@@ -1,3 +1,34 @@
+function toggleLoginForm() {
+    var form = document.getElementById("loginForm");
+    if (form.style.display === "none" || form.style.display === "") {
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
+
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/login', true);
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                window.location.href = response.redirect;
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+    };
+    xhr.send(JSON.stringify({ username, password }));
+});
+
 function toggleAssignmentForm() {
     var form = document.getElementById("assignmentForm");
     if (form.style.display === "none" || form.style.display === "") {
