@@ -9,24 +9,44 @@
 <body>
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
-        <div class="buttonContainer">
-            <button class="leftButton" onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
-            <button class="rightButton" onclick="logout()">Logout</button>
-        </div>
+        <button onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
+        <button onclick="toggleDiplomaList()">Προβολή λίστας διπλωματικών</button>
+        <button class="logout-button" onclick="window.location.href='/logout'">Logout</button>
     </div>
     
-    <div id="assignmentForm" style="display:none;">
+    <div id="assignmentForm" class="form-container" style="display:none;">
         <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
         <form>
             <label for="studentId">ΑΜ Φοιτητή:</label>
-            <input type="text" id="studentId" name="studentId" required><br><br>
+            <input type="text" id="studentId" name="studentId" required>
             <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
-            <input type="text" id="studentName" name="studentName" required><br><br>
+            <input type="text" id="studentName" name="studentName" required>
             <label for="subject">Θέμα:</label>
-            <input type="text" id="subject" name="subject" required><br><br>
+            <input type="text" id="subject" name="subject" required>
             <button type="submit">Ανάθεση</button>
             <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
         </form>
+    </div>
+
+    <div id="diplomaList" class="diploma-list" style="display:none;">
+        <h2>Λίστα Διπλωματικών</h2>
+        <label for="statusFilter">Κατάσταση:</label>
+        <select id="statusFilter" onchange="filterDiplomas()">
+            <option value="all">Όλες</option>
+            <option value="under_assignment">Υπό ανάθεση</option>
+            <option value="active">Ενεργή</option>
+            <option value="completed">Περατωμένη</option>
+            <option value="canceled">Ακυρωμένη</option>
+        </select>
+        <label for="roleFilter">Ρόλος:</label>
+        <select id="roleFilter" onchange="filterDiplomas()">
+            <option value="all">Όλοι</option>
+            <option value="supervisor">Επιβλέπων</option>
+            <option value="committee_member">Μέλος Τριμελούς</option>
+        </select>
+        <ul id="diplomaListItems">
+            <!-- Dynamically populated list of diplomas -->
+        </ul>
     </div>
 
     <script>
@@ -39,9 +59,25 @@
             }
         }
 
+        function toggleDiplomaList() {
+            var list = document.getElementById("diplomaList");
+            if (list.style.display === "none" || list.style.display === "") {
+                list.style.display = "block";
+            } else {
+                list.style.display = "none";
+            }
+        }
+
+        function filterDiplomas() {
+            // Logic to filter diplomas based on status and role
+        }
+
+        function viewDiplomaDetails(diplomaId) {
+            // Logic to view detailed information about a specific diploma
+        }
+
         function cancelAssignment() {
-            // Logic to cancel the assignment
-            alert("H ανάθεση ακυρώθηκε.");
+            alert("Η ανάθεση ακυρώθηκε.");
             document.getElementById("assignmentForm").reset();
         }
 
