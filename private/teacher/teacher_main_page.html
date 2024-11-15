@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Main Page</title>
-    <link rel="stylesheet" type="text/css" href="/public/css/main_page.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/global.css">
 </head>
 <body>
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
-        <button onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
-        <button onclick="toggleDiplomaList()">Προβολή λίστας διπλωματικών</button>
-        <button class="logout-button" onclick="window.location.href='/logout'">Logout</button>
+        <div class="buttonContainer">
+            <button class="leftButton" onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
+            <button class="leftButton" onclick="toggleDiplomaList()">Προβολή λίστας διπλωματικών</button>
+            <button class="rightButton" onclick="logout()">Logout</button>
+        </div>
     </div>
     
     <div id="assignmentForm" class="form-container" style="display:none;">
@@ -49,55 +51,6 @@
         </ul>
     </div>
 
-    <script>
-        function toggleAssignmentForm() {
-            var form = document.getElementById("assignmentForm");
-            if (form.style.display === "none" || form.style.display === "") {
-                form.style.display = "block";
-            } else {
-                form.style.display = "none";
-            }
-        }
-
-        function toggleDiplomaList() {
-            var list = document.getElementById("diplomaList");
-            if (list.style.display === "none" || list.style.display === "") {
-                list.style.display = "block";
-            } else {
-                list.style.display = "none";
-            }
-        }
-
-        function filterDiplomas() {
-            // Logic to filter diplomas based on status and role
-        }
-
-        function viewDiplomaDetails(diplomaId) {
-            // Logic to view detailed information about a specific diploma
-        }
-
-        function cancelAssignment() {
-            alert("Η ανάθεση ακυρώθηκε.");
-            document.getElementById("assignmentForm").reset();
-        }
-
-        function logout() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/logout', true);
-            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        alert(response.message);
-                        window.location.href = response.redirect;
-                    } else {
-                        alert('Error logging out');
-                    }
-                }
-            };
-            xhr.send();
-        }
-    </script>
+    <script src="/public/javascript/topbar_buttons.js"></script>
 </body>
 </html>
