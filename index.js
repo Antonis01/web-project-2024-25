@@ -90,8 +90,6 @@ app.post('/login', (req, res) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.status(500).json({ message: 'Internal Server Error' });
-                // print the ajax response
-                //console.log(res);
                 return;
             }
             if (results.length > 0) {
@@ -173,35 +171,6 @@ app.get('/', (req, res) => {
         res.writeHead(200, {'Content-Type': 'text/html'});
         console.log(filePath);
         res.end(data);
-    });
-});
-
-// Route handler for the CSS file
-app.get('/public/css/:filename', (req, res) => {
-    const cssPath = path.join(__dirname, 'public/css', req.params.filename);
-    fs.readFile(cssPath, (err, data) => {
-        if (err) {
-            console.error('Error reading CSS file:', err);
-            res.writeHead(404, {'Content-Type': 'text/plain'});
-            res.end('Not Found');
-            return;
-        }
-        res.writeHead(200, {'Content-Type': 'text/css'});
-        console.log(cssPath);
-        res.end(data);
-    });
-});
-
-app.get('/logout', (req, res) => {
-    console.log(`User ${req.session.user.username} logged out with session ID: ${req.sessionID}`);
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Error destroying session:', err);
-            res.status(500).send('Internal Server Error');
-            return;
-        }
-        console.log('Session destroyed');
-        res.redirect('/');
     });
 });
 
