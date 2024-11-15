@@ -29,78 +29,42 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     xhr.send(JSON.stringify({ username, password }));
 });
 
-function toggleBurgerMenu() {
-    var menu = document.getElementById("dropdownMenu");
-    if (menu.style.display === "none" || menu.style.display === "") {
-        menu.style.display = "flex";
-    } else {
-        menu.style.display = "none";
-    }
-}
-
-function toggleAssignmentForm() {
-    var form = document.getElementById("assignmentForm");
-    if (form.style.display === "none" || form.style.display === "") {
-        form.style.display = "block";
-    } else {
-        form.style.display = "none";
-    }
-}
-
-function toggleDiplomaList() {
-    var list = document.getElementById("diplomaList");
-    if (list.style.display === "none" || list.style.display === "") {
-        list.style.display = "block";
-    } else {
-        list.style.display = "none";
-    }
-}
-
-function filterDiplomas() {
-    // Logic to filter diplomas based on status and role
-}
-
-function viewDiplomaDetails(diplomaId) {
-    // Logic to view detailed information about a specific diploma
-}
-
-function cancelAssignment() {
-    alert("Η ανάθεση ακυρώθηκε.");
-    document.getElementById("assignmentForm").reset();
-}
-
 function logout() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/logout', true);
-    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-                alert(response.message);
-                window.location.href = response.redirect;
-            } else {
-                alert('Error logging out');
+    if (confirm("Are you sure you want to logout?")) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/logout', true);
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    window.location.href = response.redirect;
+                } else {
+                    alert('Error logging out');
+                }
             }
+        };
+        xhr.send();
+    }
+}
+
+function toggleElementDisplay(elementId, displayStyle = "block") {
+    var element = document.getElementById(elementId);
+    if (element.style.display === "none" || element.style.display === "") {
+        element.style.display = displayStyle;
+    } else {
+        element.style.display = "none";
+    }
+
+    if (elementId !== "dropdownMenu") {
+        var menu = document.getElementById("dropdownMenu");
+        if (menu.style.display === "none" || menu.style.display === "") {
+            menu.style.display = "flex";
+        } else {
+            menu.style.display = "none";
         }
-    };
-    xhr.send();
-}
-
-function toggleForm() {
-    var formContainer = document.getElementById("formContainer");
-    if (formContainer.style.display === "none" || formContainer.style.display === "") {
-        formContainer.style.display = "block";
-    } else {
-        formContainer.style.display = "none";
     }
 }
-
-function toggleTopics() {
-    var topicsContainer = document.getElementById("topicsContainer");
-    if (topicsContainer.style.display === "none" || topicsContainer.style.display === "") {
-        topicsContainer.style.display = "block";
-    } else {
-        topicsContainer.style.display = "none";
-    }
+function toggleElement(elementId, displayStyle = "block") {
+    toggleElementDisplay(elementId, displayStyle);
 }

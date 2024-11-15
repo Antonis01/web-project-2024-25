@@ -10,17 +10,16 @@
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
         <div class="buttonContainer">
-            <div class="burgerMenu" onclick="toggleBurgerMenu()">&#9776;</div>
+            <div class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
             <div class="dropdownMenu" id="dropdownMenu">
-                <button class="dropdownButton" onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
-                <button class="dropdownButton" onclick="toggleDiplomaList()">Προβολή λίστας διπλωματικών</button>
-                <button class="dropdownButton" onclick="toggleForm()">Προσθήκη Νέου Θέματος</button>
-                <button class="dropdownButton" onclick="toggleTopics()">Προβολή Θεμάτων</button>
-                <button class="dropdownButton" onclick="toggleInvitationCommision()">Προβολή προσκλήσεων συμμετοχής σε τριμελή</button>
-                <button class="dropdownButton" onclick="toggleStatistics()">Προβολή Στατιστικών</button>
-                <button class="dropdownButton" onclick="toggleDipolamitcsManagement()">Διαχείρηση Διπλωματικών</button>
+                <button class="dropdownButton" onclick="toggleElement('assignmentForm')">Αρχική ανάθεση θέματος σε φοιτητή</button>
+                <button class="dropdownButton" onclick="toggleElement('diplomaList')">Προβολή λίστας διπλωματικών</button>
+                <button class="dropdownButton" onclick="toggleElement('formContainer')">Προσθήκη Νέου Θέματος</button>
+                <button class="dropdownButton" onclick="toggleElement('topicsContainer')">Προβολή Θεμάτων</button>
+                <button class="dropdownButton" onclick="toggleElement('invitationCommision')">Προβολή προσκλήσεων συμμετοχής σε τριμελή</button>
+                <button class="dropdownButton" onclick="toggleElement('formStatistics')">Προβολή Στατιστικών</button>
+                <button class="dropdownButton" onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
                 <button class="dropdownButton" onclick="logout()">Logout</button>
-
             </div>
         </div>
     </div>
@@ -76,21 +75,21 @@
     </div>
 
      <div id="topicsContainer" class="forms" style="display:none;">
-        <h2>Προβολή Θεμάτων</h2>
+        <h2>Θέματα</h2>
         <ul id="topicsList">
             <!-- Dynamically populated list of topics -->
         </ul>
     </div>
 
     <div id="invitationCommision" class="forms" style="display:none;">
-        <h2>Προβολή Θεμάτων</h2>
+        <h2>Προσκλήσεις συμμετοχής σε τριμελή</h2>
         <ul id="invitationList">
             <!-- Dynamically populated list of topics -->
         </ul>
     </div>
 
     <div id="formStatistics" class="forms" style="display:none;">
-        <h2>Προβολή Στατιστικών</h2>
+        <h2>Στατιστικά</h2>
         <ul id="statisticsList">
            <!-- Dynamically populated list of statistics -->
         </ul>

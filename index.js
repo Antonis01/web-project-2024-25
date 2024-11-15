@@ -62,7 +62,7 @@ function isAuthenticated(req, res, next) {
         if (roleUrlMap[role] && url.startsWith(roleUrlMap[role])) {
             return next();
         } else {
-            res.redirect(roleUrlMap[role] ? `${roleUrlMap[role]}/${role}_main_page.html` : '/');
+            res.redirect(roleUrlMap[role] ? `${roleUrlMap[role]}/${role}.html` : '/');
         }
     } else {
         res.redirect('/');
@@ -74,9 +74,9 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     const roles = [
-        { table: 'teacher', role: 'teacher', redirect: '/private/teacher/teacher_main_page.html' },
-        { table: 'student', role: 'student', redirect: '/private/student/student_main_page.html' },
-        { table: 'secretary', role: 'secretary', redirect: '/private/secretary/secretary_main_page.html' }
+        { table: 'teacher', role: 'teacher', redirect: '/private/teacher/teacher.html' },
+        { table: 'student', role: 'student', redirect: '/private/student/student.html' },
+        { table: 'secretary', role: 'secretary', redirect: '/private/secretary/secretary.html' }
     ];
 
     const checkCredentials = (index) => {
@@ -160,7 +160,7 @@ app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
 
 // Route handler for the main page
 app.get('/', (req, res) => {
-    const filePath = path.join(__dirname, 'public/main_page.html');
+    const filePath = path.join(__dirname, 'public/main.html');
     fs.readFile(filePath, (err, data) => {
         if (err) {
             console.error('Error reading main_page.html:', err);
