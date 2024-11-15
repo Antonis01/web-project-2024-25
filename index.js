@@ -10,6 +10,9 @@ const MySQLStore = require('express-mysql-session')(session);
 const app = express();
 app.use(bodyParser.json()); // Use bodyParser to parse JSON data
 
+// Serve static files from the public directory
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 // Create connection to the localhost database 
 const db = mysql.createConnection({
     host: 'localhost',
