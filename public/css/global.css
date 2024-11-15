@@ -23,30 +23,34 @@ body {
 .topBar .title {
     font-size: 18px;
     font-weight: bold;
+    white-space: nowrap; /* Prevents line breaks */
+    text-overflow: ellipsis; /* Adds ellipsis if the text is too long */
 }
 
 .buttonContainer {
     display: flex;
     align-items: center;
-    margin-left: auto;
+    width: 90%;
 }
 
 .burgerMenu {
     font-size: 24px;
     cursor: pointer;
-    margin-left: 20px;
+    margin-left: auto; /* Align the burger menu to the right */
+    margin-right: 20px; /* Add some space from the edge */
 }
 
 .dropdownMenu {
     display: none;
     flex-direction: column;
     position: absolute;
-    top: 50px;
-    right: 20px;
+    top: 50px; /* Position it below the top bar */
+    right: 20px; /* Align it to the right side */
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     z-index: 1001;
+    width: auto; /* Adjust width if needed */
 }
 
 .dropdownButton {
@@ -71,11 +75,6 @@ body {
     cursor: pointer;
     border-radius: 10px;
     font-size: 10px;
-    align-self: center;
-    width: auto;
-    text-align: center;
-    margin-right: 10px;
-    margin-left: 20px;
 }
 
 .rightButton {
@@ -86,8 +85,8 @@ body {
     cursor: pointer;
     border-radius: 10px;
     font-size: 10px;
-    margin-left: auto;
-    align-self: center;
+    position: absolute;
+    right: 3%;
     width: auto;
     text-align: center;
 }
@@ -119,6 +118,8 @@ body {
     width: 100%;
     max-width: 600px;
     box-sizing: border-box;
+    margin-left: left;
+    margin-right: auto; /* Center align the form box */
 }
 
 .announcementBoard h2, .timetable h2 {
@@ -197,6 +198,9 @@ button:hover {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* Set a maximum width */
+    margin-left: auto; /* Center align the form box */
+    margin-right: auto; /* Center align the form box */
 }
 
 .forms h2 {
@@ -228,29 +232,6 @@ button:hover {
 
     .topBar .title {
         font-size: 16px;
-    }
-
-    .buttonContainer {
-        flex-direction: column;
-        align-items: flex-end;
-    }
-
-    .burgerMenu {
-        margin-left: 0;
-    }
-
-    .dropdownMenu {
-        top: 40px;
-        right: 10px;
-    }
-
-    .dropdownButton {
-        padding: 8px 10px;
-    }
-
-    .rightButton {
-        margin-left: 0;
-        margin-top: 10px;
     }
 
     .topBar button {
