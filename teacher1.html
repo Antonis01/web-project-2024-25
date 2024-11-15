@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Δημιουργία και Προβολή Θεμάτων Διπλωματικής</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/main_page.css">
+    
+</head>
+<body>
+   
+    <div class="topBar">
+        <div class="title">Teacher Main Page</div>
+        <button onclick="toggleLoginForm()">Login</button>
+    </div>
+    <h1>Δημιουργία και Προβολή Θεμάτων Διπλωματικής</h1>
+  
+  <!-- Δύο κουμπιά για την εναλλαγή ανάμεσα στις ενότητες -->
+  <button onclick="showForm()">Προσθήκη Νέου Θέματος</button>
+  <button onclick="showTopics()">Προβολή Θεμάτων</button>
+  
+  <!-- Φόρμα για την προσθήκη νέου θέματος -->
+  <div class="form-container" id="formContainer">
+    <h2>Προσθήκη Νέου Θέματος</h2>
+    <form id="topicForm">
+      <label for="title">Τίτλος Θέματος:</label>
+      <input type="text" id="title" name="title" required><br><br>
+      
+      <label for="description">Σύνοψη:</label><br>
+      <textarea id="description" name="description" rows="4" cols="50" required></textarea><br><br>
+      
+      <label for="file">Αρχείο PDF:</label>
+      <input type="file" id="file" name="file" accept=".pdf"><br><br>
+      
+      <button type="button" onclick="addTopic()">Υποβολή</button>
+    </form>
+  </div>
+  
+  <!-- Ενότητα για την προβολή της λίστας των θεμάτων -->
+  <div class="topics-container" id="topicsContainer">
+    <h2>Λίστα Θεμάτων προς Ανάθεση</h2>
+    <div id="topicsList"></div>
+  </div>
+  <script>
+    function showForm() {
+        var form= document.getElementById('formContainer');
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+
+  </script>
+
+<script>
+    function showTopics() {
+        var form = document.getElementById('topicsContainer');
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
