@@ -27,8 +27,40 @@ body {
 
 .buttonContainer {
     display: flex;
-    flex-grow: 1;
-    justify-content: space-between;
+    align-items: center;
+    margin-left: auto;
+}
+
+.burgerMenu {
+    font-size: 24px;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.dropdownMenu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1001;
+}
+
+.dropdownButton {
+    background-color: #fff;
+    color: #4CAF50;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.dropdownButton:hover {
+    background-color: #f2f2f2;
 }
 
 .leftButton {
@@ -55,10 +87,14 @@ body {
     border-radius: 10px;
     font-size: 10px;
     margin-left: auto;
-    margin-right: 40px;
     align-self: center;
     width: auto;
     text-align: center;
+}
+
+.rightButton:hover {
+    background-color: #45a049;
+    color: white;
 }
 
 .topBar button:hover {
@@ -156,13 +192,11 @@ button:hover {
 }
 
 .forms {
-    max-width: 800px;
-    margin: 20px auto;
+    margin-top: 60px; /* Add margin to avoid content being hidden under the fixed top bar */
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-    margin-top: 80px; /* Added margin-top to move the section lower */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .forms h2 {
@@ -194,6 +228,29 @@ button:hover {
 
     .topBar .title {
         font-size: 16px;
+    }
+
+    .buttonContainer {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .burgerMenu {
+        margin-left: 0;
+    }
+
+    .dropdownMenu {
+        top: 40px;
+        right: 10px;
+    }
+
+    .dropdownButton {
+        padding: 8px 10px;
+    }
+
+    .rightButton {
+        margin-left: 0;
+        margin-top: 10px;
     }
 
     .topBar button {

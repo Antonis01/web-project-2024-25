@@ -29,6 +29,15 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     xhr.send(JSON.stringify({ username, password }));
 });
 
+function toggleBurgerMenu() {
+    var menu = document.getElementById("dropdownMenu");
+    if (menu.style.display === "none" || menu.style.display === "") {
+        menu.style.display = "flex";
+    } else {
+        menu.style.display = "none";
+    }
+}
+
 function toggleAssignmentForm() {
     var form = document.getElementById("assignmentForm");
     if (form.style.display === "none" || form.style.display === "") {

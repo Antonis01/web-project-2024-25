@@ -10,16 +10,20 @@
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
         <div class="buttonContainer">
-            <button class="leftButton" onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
-            <button class="leftButton" onclick="toggleDiplomaList()">Προβολή λίστας διπλωματικών</button>
-            <button class="leftButton" onclick="toggleForm()">Προσθήκη Νέου Θέματος</button>
-            <button class="leftButton" onclick="toggleTopics()">Προβολή Θεμάτων</button>
-            <button class="rightButton" onclick="logout()">Logout</button>
+            <div class="burgerMenu" onclick="toggleBurgerMenu()">&#9776;</div>
+            <div class="dropdownMenu" id="dropdownMenu">
+                <button class="dropdownButton" onclick="toggleAssignmentForm()">Αρχική ανάθεση θέματος σε φοιτητή</button>
+                <button class="dropdownButton" onclick="toggleDiplomaList()">Προβολή λίστας διπλωματικών</button>
+                <button class="dropdownButton" onclick="toggleForm()">Προσθήκη Νέου Θέματος</button>
+                <button class="dropdownButton" onclick="toggleTopics()">Προβολή Θεμάτων</button>
+                <button class="dropdownButton" onclick="logout()">Logout</button>
+            </div>
+            
         </div>
     </div>
     
-    <div  id="assignmentForm" class="forms" style="display:none;">
-        <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
+    <div id="assignmentForm" class="forms" style="display:none;">
+        <h2>Αρχική ανάθεση θέματος σε ��οιτητή</h2>
         <form>
             <label for="studentId">ΑΜ Φοιτητή:</label>
             <input type="text" id="studentId" name="studentId" required>
@@ -53,7 +57,7 @@
         </ul>
     </div>
 
-    <div id="formContainer" class="forms"  style="display:none;">
+    <div id="formContainer" class="forms" style="display:none;">
         <h2>Προσθήκη Νέου Θέματος</h2>
         <form id="topicForm">
             <label for="title">Τίτλος Θέματος:</label>
@@ -68,14 +72,12 @@
         </form>
     </div>
 
-     <!-- Λίστα θεμάτων -->
-    <div  id="topics-container" class="forms" style="display:none;">
+    <div id="topicsContainer" class="forms" style="display:none;">
         <h2>Προβολή Θεμάτων</h2>
         <ul id="topicsList">
             <!-- Dynamically populated list of topics -->
         </ul>
     </div>
-    
 
     <script src="/public/javascript/topbar_buttons.js"></script>
 </body>

@@ -160,7 +160,7 @@ app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
 
 // Route handler for the main page
 app.get('/', (req, res) => {
-    const filePath = path.join(__dirname, 'connection/main_page.html');
+    const filePath = path.join(__dirname, 'public/main_page.html');
     fs.readFile(filePath, (err, data) => {
         if (err) {
             console.error('Error reading main_page.html:', err);
