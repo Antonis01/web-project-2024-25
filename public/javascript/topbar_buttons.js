@@ -46,3 +46,25 @@ function logout() {
     };
     xhr.send();
 }
+
+function toggleForm() {
+    var formContainer = document.getElementById("formContainer");
+    var topicsContainer = document.getElementById("topicsContainer");
+    if (formContainer.style.display === "none" || formContainer.style.display === "") {
+        formContainer.style.display = "block";
+        topicsContainer.style.display = "none";
+    } else {
+        formContainer.style.display = "none";
+    }
+}
+
+function toggleTopics() {
+    var formContainer = document.getElementById("formContainer");
+    var topicsContainer = document.getElementById("topicsContainer");
+    if (topicsContainer.style.display === "none" || topicsContainer.style.display === "") {
+        topicsContainer.style.display = "block";
+        formContainer.style.display = "none";
+    } else {
+        topicsContainer.style.display = "none";
+    }
+}
