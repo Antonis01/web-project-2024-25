@@ -74,9 +74,9 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     const roles = [
-        { table: 'teacher', role: 'teacher', redirect: '/private/teacher/teacher.html' },
-        { table: 'student', role: 'student', redirect: '/private/student/student.html' },
-        { table: 'secretary', role: 'secretary', redirect: '/private/secretary/secretary.html' }
+        { table: 'Instructors', role: 'teacher', redirect: '/private/teacher/teacher.html' },
+        { table: 'Students', role: 'student', redirect: '/private/student/student.html' },
+        { table: 'Secretary', role: 'secretary', redirect: '/private/secretary/secretary.html' }
     ];
 
     const checkCredentials = (index) => {
@@ -86,7 +86,7 @@ app.post('/login', (req, res) => {
         }
 
         const { table, role, redirect } = roles[index];
-        db.query(`SELECT * FROM ${table} WHERE ${table}_username = ? AND ${table}_password = ?`, [username, password], (err, results) => {
+        db.query(`SELECT * FROM ${table} WHERE ${role.toLowerCase()}_username = ? AND ${role.toLowerCase()}_password = ?`, [username, password], (err, results) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.status(500).json({ message: 'Internal Server Error' });
