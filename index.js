@@ -14,6 +14,9 @@ app.use(bodyParser.json()); // Use bodyParser to parse JSON data
 // Serve static files from the public directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Create connection to the localhost database 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -189,14 +192,22 @@ app.post('/logout', (req, res) => {
     });
 });
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, 'uploads'));
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `${file.fieldname}-${Date.now()}${ext}`);
+    }
+}) });
 
 app.post('/add-thesis', upload.single('file'), (req, res) => {
     const { title, description, instructor_id, student_id, final_submission_date } = req.body;
     const pdfPath = req.file ? req.file.path : null;
     const status = 'Υπό Ανάθεση'; // Default status
 
-    /* Check if student_id exists in the Students table
+    // Check if student_id exists in the Students table
     const checkStudentQuery = 'SELECT * FROM Students WHERE student_id = ?';
     db.query(checkStudentQuery, [student_id], (err, results) => {
         if (err) {
@@ -209,7 +220,7 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
             res.status(400).json({ success: false, message: 'Student ID does not exist' });
             return;
         }
-*/
+    
         // Insert thesis into Theses table
         const query = `
             INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
@@ -226,6 +237,18 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
             res.json({ success: true, message: 'Thesis added successfully!' });
         });
     });
+});
+app.get('/get-theses', (req, res) => {
+    const query = 'SELECT * FROM Theses';
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching theses:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        res.json({ success: true, data: results });
+    });
+});
 
 const server = http.createServer(app);
 
