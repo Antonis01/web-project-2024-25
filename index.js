@@ -207,19 +207,6 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
     const pdfPath = req.file ? req.file.path : null;
     const status = 'Υπό Ανάθεση'; // Default status
 
-    // Check if student_id exists in the Students table
-    const checkStudentQuery = 'SELECT * FROM Students WHERE student_id = ?';
-    db.query(checkStudentQuery, [student_id], (err, results) => {
-        if (err) {
-            console.error('Error checking student:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
-            return;
-        }
-
-        if (results.length === 0) {
-            res.status(400).json({ success: false, message: 'Student ID does not exist' });
-            return;
-        }
     
         // Insert thesis into Theses table
         const query = `
@@ -237,7 +224,7 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
             res.json({ success: true, message: 'Thesis added successfully!' });
         });
     });
-});
+    
 app.get('/get-theses', (req, res) => {
     const query = 'SELECT * FROM Theses';
     db.query(query, (err, results) => {

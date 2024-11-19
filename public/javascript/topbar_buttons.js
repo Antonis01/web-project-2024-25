@@ -82,7 +82,6 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     .then(data => {
         if (data.success) {
             alert('Thesis added successfully!');
-            // Optionally, you can clear the form or redirect the user
         } else {
             alert('Error adding thesis: ' + data.message);
         }
@@ -93,3 +92,6 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     });
 });
 
+function searchTheses(){
+    alert("searchTheses");
+}
