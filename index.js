@@ -224,7 +224,52 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
             res.json({ success: true, message: 'Thesis added successfully!' });
         });
     });
-    
+
+
+app.post('/update-thesis', upload.single('file'), (req, res) => {
+    const { thesis_id, title, description, instructor_id, student_id, final_submission_date, status } = req.body;
+    const pdfPath = req.file ? req.file.path : null;
+
+    let query = `
+        UPDATE Theses
+        SET title = ?, summary = ?, status = ?, instructor_id = ?, student_id = ?, final_submission_date = ?
+    `;
+    const values = [title, description, status, instructor_id, student_id || null, final_submission_date || null];
+
+    if (pdfPath) {
+        query += `, pdf_path = ?`;
+        values.push(pdfPath);
+    }
+
+    query += ` WHERE thesis_id = ?`;
+    values.push(thesis_id);
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error updating thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        res.json({ success: true, message: 'Thesis updated successfully!' });
+    });
+});
+
+app.get('/get-thesis/:id', (req, res) => {
+    const query = 'SELECT * FROM Theses WHERE thesis_id = ?';
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            console.error('Error fetching thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).json({ success: false, message: 'Thesis not found' });
+            return;
+        }
+        res.json({ success: true, data: results[0] });
+    });
+});
+
 app.get('/get-theses', (req, res) => {
     const query = 'SELECT * FROM Theses';
     db.query(query, (err, results) => {

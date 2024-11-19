@@ -46,7 +46,7 @@
             <option value="under_assignment">Υπό ανάθεση</option>
             <option value="active">Ενεργή</option>
             <option value="completed">Περατωμένη</option>
-            <option value="canceled">Ακυρ��μένη</option>
+            <option value="canceled">Ακυρωμένη</option>
         </select>
         <label for="roleFilter">Ρόλος:</label>
         <select id="roleFilter" onchange="filterDiplomas()">
@@ -107,6 +107,42 @@
         </ul>
     </div>
     
+    <div id="editThesisFormContainer" class="forms" style="display:none;">
+        <h2>Επεξεργασία Θέματος</h2>
+        <form id="editThesisForm">
+            <input type="hidden" id="editThesisId" name="thesis_id">
+            
+            <label for="editTitle">Τίτλος Θέματος:</label>
+            <input type="text" id="editTitle" name="title" required><br><br>
+            
+            <label for="editDescription">Σύνοψη:</label><br>
+            <textarea id="editDescription" name="description" rows="4" cols="50" required></textarea><br><br>
+            
+            <label for="editFile">Αρχείο PDF:</label>
+            <input type="file" id="editFile" name="file" accept=".pdf"><br><br>
+            
+            <label for="editInstructorId">Instructor ID:</label>
+            <input type="number" id="editInstructorId" name="instructor_id" required><br><br>
+            
+            <label for="editStudentId">Student ID:</label>
+            <input type="number" id="editStudentId" name="student_id"><br><br>
+            
+            <label for="editFinalSubmissionDate">Final Submission Date:</label>
+            <input type="date" id="editFinalSubmissionDate" name="final_submission_date"><br><br>
+            
+            <label for="editStatus">Status:</label>
+            <select id="editStatus" name="status" required>
+                <option value="Υπό Ανάθεση">Υπό Ανάθεση</option>
+                <option value="Ενεργή">Ενεργή</option>
+                <option value="Υπό Εξέταση">Υπό Εξέταση</option>
+                <option value="Περατωμένη">Περατωμένη</option>
+                <option value="Ακυρωμένη">Ακυρωμένη</option>
+            </select><br><br>
+            
+            <button type="submit">Αποθήκευση</button>
+            <button type="button" onclick="cancelEdit()">Ακύρωση</button>
+        </form>
+    </div>
     
     <script src="/public/javascript/teacher.js"></script>
    <script src="/public/javascript/topbar_buttons.js"></script>
