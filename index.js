@@ -192,43 +192,43 @@ app.post('/logout', (req, res) => {
     });
 });
 
-const upload = multer({ storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, 'uploads'));
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        cb(null, `${file.fieldname}-${Date.now()}${ext}`);
-    }
-}) });
+const upload = multer({ 
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, path.join(__dirname, 'uploads'));
+        },
+        filename: (req, file, cb) => {
+            const ext = path.extname(file.originalname);
+            cb(null, `file-${Date.now()}${ext}`);
+        }
+    })
+});
 
 app.post('/add-thesis', upload.single('file'), (req, res) => {
     const { title, description, instructor_id, student_id, final_submission_date } = req.body;
-    const pdfPath = req.file ? req.file.path : null;
+    const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
     const status = 'Υπό Ανάθεση'; // Default status
 
-    
-        // Insert thesis into Theses table
-        const query = `
-            INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
-            VALUES (?, ?, ?, ?, ?)
-        `;
-        const values = [title, description, pdfPath, status, instructor_id || null|| null];
+    // Insert thesis into Theses table
+    const query = `
+        INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    const values = [title, description, pdfPath, status, instructor_id || null];
 
-        db.query(query, values, (err, result) => {
-            if (err) {
-                console.error('Error inserting thesis:', err);
-                res.status(500).json({ success: false, message: 'Internal Server Error' });
-                return;
-            }
-            res.json({ success: true, message: 'Thesis added successfully!' });
-        });
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error inserting thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        res.json({ success: true, message: 'Thesis added successfully!' });
     });
-
+});
 
 app.post('/update-thesis', upload.single('file'), (req, res) => {
     const { thesis_id, title, description, instructor_id, student_id, final_submission_date, status } = req.body;
-    const pdfPath = req.file ? req.file.path : null;
+    const pdfPath = req.file ? `uploads/${req.file.filename}` : null;
 
     let query = `
         UPDATE Theses
