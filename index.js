@@ -6,6 +6,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
+const multer = require('multer');
 
 const app = express();
 app.use(bodyParser.json()); // Use bodyParser to parse JSON data
@@ -187,6 +188,44 @@ app.post('/logout', (req, res) => {
         console.log(res);
     });
 });
+
+const upload = multer({ dest: 'uploads/' });
+
+app.post('/add-thesis', upload.single('file'), (req, res) => {
+    const { title, description, instructor_id, student_id, final_submission_date } = req.body;
+    const pdfPath = req.file ? req.file.path : null;
+    const status = 'Υπό Ανάθεση'; // Default status
+
+    /* Check if student_id exists in the Students table
+    const checkStudentQuery = 'SELECT * FROM Students WHERE student_id = ?';
+    db.query(checkStudentQuery, [student_id], (err, results) => {
+        if (err) {
+            console.error('Error checking student:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+
+        if (results.length === 0) {
+            res.status(400).json({ success: false, message: 'Student ID does not exist' });
+            return;
+        }
+*/
+        // Insert thesis into Theses table
+        const query = `
+            INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const values = [title, description, pdfPath, status, instructor_id || null|| null];
+
+        db.query(query, values, (err, result) => {
+            if (err) {
+                console.error('Error inserting thesis:', err);
+                res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return;
+            }
+            res.json({ success: true, message: 'Thesis added successfully!' });
+        });
+    });
 
 const server = http.createServer(app);
 
