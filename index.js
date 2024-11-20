@@ -300,6 +300,86 @@ app.delete('/delete-thesis/:id', (req, res) => {
     });
 });
 
+app.get("/search-student", (req, res) => {
+    const { studentId } = req.query;
+  
+    const query = `
+      SELECT student_name 
+      FROM Students 
+      WHERE am = ?
+    `;
+    db.query(query, [studentId], (err, results) => {
+      if (err) {
+        console.error("Error searching student:", err);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+      }
+  
+      if (results.length > 0) {
+        res.json({ success: true, data: results[0] });
+      } else {
+        res.json({ success: false, message: "Student not found." });
+      }
+    });
+  });
+
+  app.get("/search-thesis", (req, res) => {
+    const { subject } = req.query;
+  
+    const query = `
+      SELECT * 
+      FROM Theses 
+      WHERE title = ? AND status = 'Υπό Ανάθεση'
+    `;
+    db.query(query, [subject], (err, results) => {
+      if (err) {
+        console.error("Error searching thesis:", err);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+      }
+  
+      if (results.length > 0) {
+        res.json({ success: true, data: results[0] });
+      } else {
+        res.json({ success: false, message: "Thesis not found or unavailable." });
+      }
+    });
+  });
+
+  app.post("/assign-topic", (req, res) => {
+    const { studentId, subject } = req.body;
+  
+    // Ελέγχει αν το θέμα υπάρχει και είναι διαθέσιμο
+    const queryCheck = `
+      SELECT thesis_id 
+      FROM Theses 
+      WHERE title = ? AND status = 'Υπό Ανάθεση'
+    `;
+    db.query(queryCheck, [subject], (err, results) => {
+      if (err) {
+        console.error("Error checking thesis:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+  
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Το θέμα δεν είναι διαθέσιμο." });
+      }
+  
+      // Ανάθεση θέματος στον φοιτητή
+      const thesisId = results[0].thesis_id;
+      const queryAssign = `
+        UPDATE Theses 
+        SET status = 'Ενεργή', student_id = ? 
+        WHERE thesis_id = ?
+      `;
+      db.query(queryAssign, [studentId, thesisId], (err) => {
+        if (err) {
+          console.error("Error assigning thesis:", err);
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+  
+        res.json({ message: "Το θέμα ανατέθηκε επιτυχώς στον φοιτητή." });
+      });
+    });
+  });
 const server = http.createServer(app);
 
 server.listen(8080, () => {

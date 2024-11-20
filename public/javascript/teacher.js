@@ -140,3 +140,93 @@ function deleteThesis() {
 function cancelEdit() {
     document.getElementById('editThesisFormContainer').style.display = 'none';
 }
+// Γενική συνάρτηση για αποστολή AJAX αιτημάτων
+function sendRequest(url, method, data = null) {
+    return fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: data ? JSON.stringify(data) : null
+    })
+    .then(response => response.json())
+    .catch(error => {
+        console.error('Error:', error);
+        return { success: false, message: 'Σφάλμα κατά την επεξεργασία του αιτήματος.' };
+    });
+}
+
+// Αναζήτηση φοιτητή βάσει ΑΜ
+function searchStudent() {
+    const studentId = document.getElementById("studentId").value.trim();
+    if (studentId === "") {
+        alert("Συμπληρώστε το πεδίο ΑΜ.");
+        return;
+    }
+
+    sendRequest(`/search-student?studentId=${encodeURIComponent(studentId)}`, 'GET')
+        .then(response => {
+            if (response.success) {
+                alert("Επιτυχής καταχώρηση ΑΜ φοιτητή.");
+                document.getElementById("studentName").value = response.data.studentName; // Αυτόματη συμπλήρωση ονόματος
+            } else {
+                alert("Δεν βρέθηκε φοιτητής με το συγκεκριμένο ΑΜ.");
+            }
+        });
+}
+
+// Αναζήτηση φοιτητή βάσει ονοματεπώνυμου
+function searchStudentName() {
+    const studentName = document.getElementById("studentName").value.trim();
+    if (studentName === "") {
+        alert("Συμπληρώστε το πεδίο ονοματεπώνυμου.");
+        return;
+    }
+
+    sendRequest(`/search-student?studentName=${encodeURIComponent(studentName)}`, 'GET')
+        .then(response => {
+            if (response.success) {
+                alert("Φοιτητής βρέθηκε.");
+                document.getElementById("studentId").value = response.data.studentId; // Αυτόματη συμπλήρωση ΑΜ
+            } else {
+                alert("Δεν βρέθηκε φοιτητής με το συγκεκριμένο ονοματεπώνυμο.");
+            }
+        });
+}
+
+// Αναζήτηση θέματος
+function searchThesis() {
+    const subject = document.getElementById("subject").value.trim();
+    if (subject === "") {
+        alert("Συμπληρώστε το πεδίο θέματος.");
+        return;
+    }
+
+    sendRequest(`/search-thesis?subject=${encodeURIComponent(subject)}`, 'GET')
+        .then(response => {
+            if (response.success) {
+                alert("Θέμα διαθέσιμο για ανάθεση!");
+            } else {
+                alert("Το θέμα δεν είναι διαθέσιμο.");
+            }
+        });
+}
+
+// Ανάθεση θέματος
+function assignTopic() {
+    const studentId = document.getElementById("studentId").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+
+    if (studentId === "" || subject === "") {
+        alert("Συμπληρώστε όλα τα πεδία.");
+        return;
+    }
+
+    const data = { studentId, subject };
+    sendRequest('/assign-topic', 'POST', data)
+        .then(response => {
+            if (response.success) {
+                alert("Η ανάθεση ολοκληρώθηκε με επιτυχία!");
+            } else {
+                alert("Η ανάθεση απέτυχε: " + response.message);
+            }
+        });
+}

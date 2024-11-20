@@ -55,16 +55,17 @@
         <button class="close-button"&times; onclick="toggleElement('assignmentForm')" >x</button>
         <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
         <form>
-            <label for="studentId">ΑΜ Φοιτητή:</label>
-            <input type="text" id="studentId" name="studentId" required>
-            <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
-            <input type="text" id="studentName" name="studentName" required>
-            <label for="subject">Θέμα:</label>
-            <input type="text" id="subject" name="subject" required>
-            <button type="submit">Ανάθεση</button>
-            <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
+          <label for="studentId">ΑΜ Φοιτητή:</label>
+          <input type="text" id="studentId" name="studentId" oninput="searchStudent()" required>
+          <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
+          <input type="text" id="studentName" name="studentName"  oninput="searchStudentname()" required>
+          <label for="subject">Θέμα:</label>
+          <input type="text" id="subject" name="subject" oninput="searchThesis()" required>
+          <button type="button" onclick="assignTopic()">Ανάθεση</button>
+          <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
         </form>
-    </div>
+      </div>
+      
 
     <div id="diplomaList" class="forms" style="display:none; position: relative">
         <button class="close-button"&times; onclick="toggleElement('diplomaList')" >x</button>
