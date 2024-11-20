@@ -48,16 +48,6 @@ function logout() {
     }
 }
 
-document.addEventListener('click', function(event) {
-    var burgerMenu = document.getElementById('burgerMenu');
-    var dropdownMenu = document.getElementById('dropdownMenu');
-
-    // Check if the click is outside the burger menu and dropdown menu
-    if (dropdownMenu.style.display === 'flex' && !burgerMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
-        dropdownMenu.style.display = 'none';
-    }
-});
-
 function toggleElementDisplay(elementId, displayStyle = "block") {
     var element = document.getElementById(elementId);
     if (element.style.display === "none" || element.style.display === "") {
