@@ -102,7 +102,7 @@ document.getElementById('editThesisForm').addEventListener('submit', function(ev
         if (data.success) {
             alert('Thesis updated successfully!');
             document.getElementById('editThesisFormContainer').style.display = 'none';
-            // Optionally, refresh the list of theses
+            fetchTheses(); // Refresh the list of theses
         } else {
             alert('Error updating thesis: ' + data.message);
         }
@@ -112,6 +112,28 @@ document.getElementById('editThesisForm').addEventListener('submit', function(ev
         alert('An error occurred while updating the thesis.');
     });
 });
+
+function deleteThesis() {
+    const thesisId = document.getElementById('editThesisId').value;
+    
+    fetch(`/delete-thesis/${thesisId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Thesis deleted successfully!');
+            document.getElementById('editThesisFormContainer').style.display = 'none';
+            fetchTheses(); // Refresh the list of theses
+        } else {
+            alert('Error deleting thesis: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the thesis.');
+    });
+}
 
 function cancelEdit() {
     document.getElementById('editThesisFormContainer').style.display = 'none';

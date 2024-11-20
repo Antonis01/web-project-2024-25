@@ -282,6 +282,24 @@ app.get('/get-theses', (req, res) => {
     });
 });
 
+app.delete('/delete-thesis/:id', (req, res) => {
+    const thesisId = req.params.id;
+    const query = 'DELETE FROM Theses WHERE thesis_id = ?';
+
+    db.query(query, [thesisId], (err, result) => {
+        if (err) {
+            console.error('Error deleting thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.status(404).json({ success: false, message: 'Thesis not found' });
+            return;
+        }
+        res.json({ success: true, message: 'Thesis deleted successfully!' });
+    });
+});
+
 const server = http.createServer(app);
 
 server.listen(8080, () => {
