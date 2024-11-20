@@ -11,7 +11,8 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     .then(data => {
         if (data.success) {
             alert('Thesis added successfully!');
-            // Optionally, you can clear the form or redirect the user
+            // Fetch and display the updated list of theses
+            fetchTheses();
         } else {
             alert('Error adding thesis: ' + data.message);
         }
@@ -22,7 +23,7 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+function fetchTheses() {
     fetch('/get-theses')
         .then(response => response.json())
         .then(data => {
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
                         <strong>Student ID:</strong> ${thesis.student_id}<br>
                         <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                        <strong>PDF Path:</strong> <a href="/${thesis.pdf_path}" target="_blank">View PDF</a><br>
+                        <strong>PDF Path:</strong> <a href="/uploads/${thesis.pdf_path}" target="_blank">View PDF</a><br>
                         <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
                     `;
                     thesesList.appendChild(listItem);
@@ -52,7 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             alert('An error occurred while fetching the theses.');
         });
-});
+}
+
+document.addEventListener('DOMContentLoaded', fetchTheses);
 
 function editThesis(thesisId) {
     fetch(`/get-thesis/${thesisId}`)
