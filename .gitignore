@@ -1,3 +1,4 @@
 /uploads/*
 \uploads\*
 /uploads
+mysql/table2.sql
