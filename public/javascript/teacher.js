@@ -116,23 +116,25 @@ document.getElementById('editThesisForm').addEventListener('submit', function(ev
 function deleteThesis() {
     const thesisId = document.getElementById('editThesisId').value;
     
-    fetch(`/delete-thesis/${thesisId}`, {
-        method: 'DELETE'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Thesis deleted successfully!');
-            document.getElementById('editThesisFormContainer').style.display = 'none';
-            fetchTheses(); // Refresh the list of theses
-        } else {
-            alert('Error deleting thesis: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the thesis.');
-    });
+    if (confirm('Are you sure you want to delete this thesis?')) {
+        fetch(`/delete-thesis/${thesisId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Thesis deleted successfully!');
+                document.getElementById('editThesisFormContainer').style.display = 'none';
+                fetchTheses(); // Refresh the list of theses
+            } else {
+                alert('Error deleting thesis: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the thesis.');
+        });
+    }
 }
 
 function cancelEdit() {
