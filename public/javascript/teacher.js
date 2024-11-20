@@ -40,7 +40,7 @@ function fetchTheses() {
                         <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
                         <strong>Student ID:</strong> ${thesis.student_id}<br>
                         <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                        <strong>PDF Path:</strong> <a href="/uploads/${thesis.pdf_path}" target="_blank">View PDF</a><br>
+                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
                         <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
                     `;
                     thesesList.appendChild(listItem);
@@ -56,6 +56,13 @@ function fetchTheses() {
 }
 
 document.addEventListener('DOMContentLoaded', fetchTheses);
+
+function viewPDF(pdfPath) {
+    const pdfViewerContainer = document.getElementById('pdfViewerContainer');
+    const pdfViewer = document.getElementById('pdfViewer');
+    pdfViewer.src = pdfPath;
+    pdfViewerContainer.style.display = 'block';
+}
 
 function editThesis(thesisId) {
     fetch(`/get-thesis/${thesisId}`)

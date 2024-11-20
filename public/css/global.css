@@ -2,11 +2,18 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f2f2f2;
+    background-image: url('/public/images/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
 }
 
 .topBar {
-    background: linear-gradient(90deg, #4CAF50, #45a049);
+    background: linear-gradient(90deg, #657086, #1e232e);
     color: white;
     padding: 5px 20px;
     display: flex;
@@ -55,7 +62,7 @@ body {
 
 .dropdownButton {
     background-color: #fff;
-    color: #4CAF50;
+    color: #343a46;
     border: none;
     padding: 10px 20px;
     cursor: pointer;
@@ -69,7 +76,7 @@ body {
 
 .leftButton {
     background-color: #fff;
-    color: #4CAF50;
+    color: #343a46;
     border: none;
     padding: 5px 20px;
     cursor: pointer;
@@ -79,7 +86,7 @@ body {
 
 .rightButton {
     background-color: #fff;
-    color: #4CAF50;
+    color: #343a46;
     border: none;
     padding: 5px 20px;
     cursor: pointer;
@@ -92,12 +99,12 @@ body {
 }
 
 .rightButton:hover {
-    background-color: #45a049;
+    background-color: #343a46;
     color: white;
 }
 
 .topBar button:hover {
-    background-color: #45a049;
+    background-color: #343a46;
     color: white;
 }
 
@@ -138,7 +145,7 @@ body {
 }
 
 .timetable th {
-    background-color: #4CAF50;
+    background-color: #343a46;
     color: white;
 }
 
@@ -180,7 +187,7 @@ button {
     margin: 10px 0;
     border: none;
     border-radius: 10px;
-    background-color: #4CAF50;
+    background-color: #343a46;
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -189,7 +196,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #343a46;
 }
 
 .forms {
