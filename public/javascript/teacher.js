@@ -230,3 +230,33 @@ function assignTopic() {
             }
         });
 }
+
+function searchThesesList() {
+    const statusFilter = document.getElementById('statusFilter').value;
+
+    fetch(`/search-theses?status=${statusFilter}`)
+        .then(response => response.json())
+        .then(data => {
+            const diplomaListItems = document.getElementById('diplomaListItems');
+            diplomaListItems.innerHTML = ''; 
+
+            data.data.forEach(thesis => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <strong>Title:</strong> ${thesis.title}<br>
+                    <strong>Summary:</strong> ${thesis.summary}<br>
+                    <strong>Status:</strong> ${thesis.status}<br>
+                    <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
+                    <strong>Student ID:</strong> ${thesis.student_id}<br>
+                    <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
+                    <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
+                    <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
+                `;
+                diplomaListItems.appendChild(listItem);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while searching for theses.');
+        });
+}

@@ -61,7 +61,7 @@ function toggleElementDisplay(elementId, displayStyle = "block") {
         menu.style.display = "none";
     }
 
-    if (elementId == "formContainer") {
+    if (elementId == "thesesAddView") {
         element = document.getElementById("topicsContainer");
         if (element.style.display === "none" || element.style.display === "") {
             element.style.display = displayStyle;

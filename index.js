@@ -322,27 +322,25 @@ app.get("/search-student", (req, res) => {
     });
   });
 
-  app.get("/search-thesis", (req, res) => {
-    const { subject } = req.query;
-  
-    const query = `
-      SELECT * 
-      FROM Theses 
-      WHERE title = ? AND status = 'Υπό Ανάθεση'
-    `;
-    db.query(query, [subject], (err, results) => {
-      if (err) {
-        console.error("Error searching thesis:", err);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
-      }
-  
-      if (results.length > 0) {
-        res.json({ success: true, data: results[0] });
-      } else {
-        res.json({ success: false, message: "Thesis not found or unavailable." });
-      }
+  app.get('/search-theses', (req, res) => {
+    const statusFilter = req.query.status;
+    let query = 'SELECT * FROM Theses WHERE 1=1';
+    const queryParams = [];
+
+    if (statusFilter && statusFilter !== 'Όλες') {
+        query += ' AND status = ?';
+        queryParams.push(statusFilter);
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('Error searching theses:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        res.json({ success: true, data: results });
     });
-  });
+});
 
   app.post("/assign-topic", (req, res) => {
     const { studentId, subject } = req.body;

@@ -51,8 +51,8 @@ body {
     display: none;
     flex-direction: column;
     position: absolute;
-    top: 50px; /* Position it below the top bar */
-    right: 20px; /* Align it to the right side */
+    top: 40px; /* Position it below the top bar */
+    right: 40px; /* Align it to the right side */
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -272,6 +272,10 @@ button.close-button:hover {
 
     .topBar .rightButton {
         margin-right: 20px;
+    }
+
+    .dropdownMenu {
+        right: 20px;
     }
 
     .content {

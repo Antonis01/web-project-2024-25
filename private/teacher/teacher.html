@@ -12,19 +12,19 @@
         <div class="buttonContainer">
             <div id="burgerMenu" class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
             <div class="dropdownMenu" id="dropdownMenu">
-                <button class="dropdownButton" onclick="toggleElement('formContainer')">Προσθήκη/Προβολή Θέματος</button>
-                <button class="dropdownButton" onclick="toggleElement('assignmentForm')">Αρχική ανάθεση θέματος σε φοιτητή</button>
-                <button class="dropdownButton" onclick="toggleElement('diplomaList')">Προβολή λίστας διπλωματικών</button>
-                <button class="dropdownButton" onclick="toggleElement('invitationCommision')">Προβολή προσκλήσεων συμμετοχής σε τριμελή</button>
-                <button class="dropdownButton" onclick="toggleElement('formStatistics')">Προβολή Στατιστικών</button>
+                <button class="dropdownButton" onclick="toggleElement('thesesAddView')">Προσθήκη/Προβολή θέματος</button>
+                <button class="dropdownButton" onclick="toggleElement('assignTheses')">Aνάθεση θέματος</button>
+                <button class="dropdownButton" onclick="toggleElement('thesesList')">Λίστα διπλωματικών</button>
+                <button class="dropdownButton" onclick="toggleElement('invitationCommision')">Προσκλήσεις σε τριμελή</button>
+                <button class="dropdownButton" onclick="toggleElement('formStatistics')">Στατιστικά</button>
                 <button class="dropdownButton" onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
                 <button class="dropdownButton" onclick="logout()">Logout</button>
             </div>
         </div>
     </div>
 
-    <div id="formContainer" class="forms" style="display:none; position: relative";>
-        <button class="close-button"&times; onclick="toggleElement('formContainer')" >x</button>
+    <div id="thesesAddView" class="forms" style="display:none; position: relative";>
+        <button class="close-button"&times; onclick="toggleElement('thesesAddView')" >x</button>
         <h2>Προσθήκη θέματος</h2>
         <form id="topicForm">
             <label for="title">Τίτλος Θέματος:</label>
@@ -51,11 +51,11 @@
         </ul>
     </div>
 
-    <div id="assignmentForm" class="forms" style="display:none; position: relative">
-        <button class="close-button"&times; onclick="toggleElement('assignmentForm')" >x</button>
+    <div id="assignTheses" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('assignTheses')" >x</button>
         <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
         <form>
-          <label for="studentId">ΑΜ Φοιτητή:</label>
+            <label for="studentId">ΑΜ Φοιτητή:</label>
           <input type="text" id="studentId" name="studentId" oninput="searchStudent()" required>
           <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
           <input type="text" id="studentName" name="studentName"  oninput="searchStudentname()" required>
@@ -64,27 +64,26 @@
           <button type="button" onclick="assignTopic()">Ανάθεση</button>
           <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
         </form>
-      </div>
-      
+    </div>
 
-    <div id="diplomaList" class="forms" style="display:none; position: relative">
-        <button class="close-button"&times; onclick="toggleElement('diplomaList')" >x</button>
+    <div id="thesesList" class="forms" style="display:none; position: relative">
+        <button class="close-button" onclick="toggleElement('thesesList')">&times;</button>
         <h2>Λίστα Διπλωματικών</h2>
         <label for="statusFilter">Κατάσταση:</label>
-        <select id="statusFilter" onchange="filterDiplomas()">
-            <option value="all">Όλες</option>
-            <option value="under_assignment">Υπό ανάθεση</option>
-            <option value="active">Ενεργή</option>
-            <option value="completed">Περατωμένη</option>
-            <option value="canceled">Ακυρωμένη</option>
+        <select id="statusFilter">
+            <option value="Όλες">Όλες</option>
+            <option value="Υπό ανάθεση">Υπό ανάθεση</option>
+            <option value="Ενεργή">Ενεργή</option>
+            <option value="Περατωμένη">Περατωμένη</option>
+            <option value="Ακυρωμένη">Ακυρωμένη</option>
         </select>
         <label for="roleFilter">Ρόλος:</label>
-        <select id="roleFilter" onchange="filterDiplomas()">
+        <select id="roleFilter">
             <option value="all">Όλοι</option>
             <option value="supervisor">Επιβλέπων</option>
             <option value="committee_member">Μέλος Τριμελούς</option>
         </select>
-        <button type="submit" onClick="searchTheses()">Αναζήτηση</button>
+        <button id="searchThesesList" type="button" onclick="searchThesesList()">Αναζήτηση</button>
         <ul id="diplomaListItems">
             <!-- Dynamically populated list of diplomas -->
         </ul>
