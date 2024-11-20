@@ -10,12 +10,11 @@
     <div class="topBar">
         <div class="title">Teacher Main Page</div>
         <div class="buttonContainer">
-            <div class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
+            <div id="burgerMenu" class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
             <div class="dropdownMenu" id="dropdownMenu">
+                <button class="dropdownButton" onclick="toggleElement('formContainer')">Προσθήκη/Προβολή Θέματος</button>
                 <button class="dropdownButton" onclick="toggleElement('assignmentForm')">Αρχική ανάθεση θέματος σε φοιτητή</button>
                 <button class="dropdownButton" onclick="toggleElement('diplomaList')">Προβολή λίστας διπλωματικών</button>
-                <button class="dropdownButton" onclick="toggleElement('formContainer')">Προσθήκη Νέου Θέματος</button>
-                <button class="dropdownButton" onclick="toggleElement('topicsContainer')">Προβολή Θεμάτων</button>
                 <button class="dropdownButton" onclick="toggleElement('invitationCommision')">Προβολή προσκλήσεων συμμετοχής σε τριμελή</button>
                 <button class="dropdownButton" onclick="toggleElement('formStatistics')">Προβολή Στατιστικών</button>
                 <button class="dropdownButton" onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
@@ -23,8 +22,37 @@
             </div>
         </div>
     </div>
-    
-    <div id="assignmentForm" class="forms" style="display:none;">
+
+    <div id="formContainer" class="forms" style="display:none; position: relative";>
+        <button class="close-button"&times; onclick="toggleElement('formContainer')" >x</button>
+        <h2>Προσθήκη θέματος</h2>
+        <form id="topicForm">
+            <label for="title">Τίτλος Θέματος:</label>
+            <input type="text" id="title" name="title" required><br><br>
+            
+            <label for="description">Σύνοψη:</label><br>
+            <textarea id="description" name="description" rows="4" cols="50" required></textarea><br><br>
+            
+            <label for="file">Αρχείο PDF:</label>
+            <input type="file" id="file" name="file" accept=".pdf"><br><br>
+            
+            <label for="instructor_id">Instructor ID:</label>
+            <input type="number" id="instructor_id" name="instructor_id" required><br><br>
+            
+            <button type="submit">Προσθήκη</button>
+        </form>
+    </div>
+
+    <div id="topicsContainer" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('topicsContainer')" >x</button>
+        <h2>Λίστα θεμάτων</h2>
+        <ul id="topicsList">
+            <!-- Dynamic list of topics -->
+        </ul>
+    </div>
+
+    <div id="assignmentForm" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('assignmentForm')" >x</button>
         <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
         <form>
             <label for="studentId">ΑΜ Φοιτητή:</label>
@@ -38,7 +66,8 @@
         </form>
     </div>
 
-    <div id="diplomaList" class="forms" style="display:none;">
+    <div id="diplomaList" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('diplomaList')" >x</button>
         <h2>Λίστα Διπλωματικών</h2>
         <label for="statusFilter">Κατάσταση:</label>
         <select id="statusFilter" onchange="filterDiplomas()">
@@ -60,54 +89,32 @@
         </ul>
     </div>
 
-    <div id="formContainer" class="forms" style="display:none;">
-        <h2>Προσθήκη Νέου Θέματος</h2>
-        <form id="topicForm">
-            <label for="title">Τίτλος Θέματος:</label>
-            <input type="text" id="title" name="title" required><br><br>
-            
-            <label for="description">Σύνοψη:</label><br>
-            <textarea id="description" name="description" rows="4" cols="50" required></textarea><br><br>
-            
-            <label for="file">Αρχείο PDF:</label>
-            <input type="file" id="file" name="file" accept=".pdf"><br><br>
-            
-            <label for="instructor_id">Instructor ID:</label>
-            <input type="number" id="instructor_id" name="instructor_id" required><br><br>
-            
-            <button type="submit">Προσθήκη</button>
-        </form>
-    </div>
-
-    <div id="topicsContainer" class="forms" style="display:none;">
-        <h2>Θέματα</h2>
-        <ul id="topicsList">
-            <!-- Dynamically populated list of topics -->
-        </ul>
-    </div>
-
-    <div id="invitationCommision" class="forms" style="display:none;">
+    <div id="invitationCommision" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('invitationCommision')" >x</button>
         <h2>Προσκλήσεις συμμετοχής σε τριμελή</h2>
         <ul id="invitationList">
             <!-- Dynamically populated list of topics -->
         </ul>
     </div>
 
-    <div id="formStatistics" class="forms" style="display:none;">
+    <div id="formStatistics" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('formStatistics')" >x</button>
         <h2>Στατιστικά</h2>
         <ul id="statisticsList">
            <!-- Dynamically populated list of statistics -->
         </ul>
     </div>
 
-    <div id="dipolamaticsManagement" class="forms" style="display:none;">
+    <div id="dipolamaticsManagement" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('dipolamaticsManagement')" >x</button>
         <h2>Διαχείρηση Διπλωματικών</h2>
         <ul id="diploManagement">
            
         </ul>
     </div>
     
-    <div id="editThesisFormContainer" class="forms" style="display:none;">
+    <div id="editThesisFormContainer" class="forms" style="display:none; position: relative">
+        <button class="close-button"&times; onclick="toggleElement('editThesisFormContainer')" >x</button>
         <h2>Επεξεργασία Θέματος</h2>
         <form id="editThesisForm">
             <input type="hidden" id="editThesisId" name="thesis_id">
@@ -145,8 +152,8 @@
         </form>
     </div>
     
-    <div id="pdfViewerContainer" class="forms" style="display:none;">
-        <h2>PDF Viewer</h2>
+    <div id="pdfViewerContainer" class="forms" style="display:none; position: relative;">
+        <button class="close-button"&times; onclick="toggleElement('pdfViewerContainer')" >x</button>
         <iframe id="pdfViewer" width="100%" height="800px"></iframe>
     </div>
     

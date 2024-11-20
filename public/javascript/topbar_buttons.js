@@ -48,6 +48,16 @@ function logout() {
     }
 }
 
+document.addEventListener('click', function(event) {
+    var burgerMenu = document.getElementById('burgerMenu');
+    var dropdownMenu = document.getElementById('dropdownMenu');
+
+    // Check if the click is outside the burger menu and dropdown menu
+    if (dropdownMenu.style.display === 'flex' && !burgerMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.style.display = 'none';
+    }
+});
+
 function toggleElementDisplay(elementId, displayStyle = "block") {
     var element = document.getElementById(elementId);
     if (element.style.display === "none" || element.style.display === "") {
@@ -58,13 +68,17 @@ function toggleElementDisplay(elementId, displayStyle = "block") {
 
     if (elementId !== "dropdownMenu") {
         var menu = document.getElementById("dropdownMenu");
-        if (menu.style.display === "none" || menu.style.display === "") {
-            menu.style.display = "flex";
-        } else {
-            menu.style.display = "none";
-        }
+        menu.style.display = "none";
+    }
+
+    if (elementId == "formContainer") {
+        element = document.getElementById("topicsContainer");
+        if (element.style.display === "none" || element.style.display === "") {
+            element.style.display = displayStyle;
+        } 
     }
 }
+
 function toggleElement(elementId, displayStyle = "block") {
     toggleElementDisplay(elementId, displayStyle);
 }
