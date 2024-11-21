@@ -52,17 +52,29 @@
     </div>
 
     <div id="assignTheses" class="forms" style="display:none; position: relative">
-        <button class="close-button"&times; onclick="toggleElement('assignTheses')" >x</button>
+        <button class="close-button" onclick="toggleElement('assignTheses')">&times;</button>
         <h2>Αρχική ανάθεση θέματος σε φοιτητή</h2>
         <form>
-            <label for="studentId">ΑΜ Φοιτητή:</label>
-          <input type="text" id="studentId" name="studentId" oninput="searchStudent()" required>
-          <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
-          <input type="text" id="studentName" name="studentName"  oninput="searchStudentname()" required>
-          <label for="subject">Θέμα:</label>
-          <input type="text" id="subject" name="subject" oninput="searchThesis()" required>
-          <button type="button" onclick="assignTopic()">Ανάθεση</button>
-          <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
+            <label for="searchType">Αναζήτηση με:</label>
+            <select id="searchType" name="searchType" onchange="toggleSearchFields()">
+                <option value="studentId">ΑΜ Φοιτητή</option>
+                <option value="studentName">Ονοματεπώνυμο Φοιτητή</option>
+            </select>
+            <div id="searchById" style="display: block; position: relative;">
+                <label for="studentId">ΑΜ Φοιτητή:</label>
+                <input type="text" id="studentId" name="studentId" oninput="debounceSearchStudentById()">
+                <div id="studentIdSuggestions" class="suggestions"></div>
+            </div>
+            <div id="searchByName" style="display: none; position: relative;">
+                <label for="studentName">Ονοματεπώνυμο Φοιτητή:</label>
+                <input type="text" id="studentName" name="studentName" oninput="debounceSearchStudentByName()">
+                <div id="studentNameSuggestions" class="suggestions"></div>
+            </div>
+            <label for="subject">Θέμα:</label>
+            <input type="text" id="subject" name="subject" oninput="debounceSearchThesis()" required>
+            <div id="thesisSearchResults" class="suggestions"></div>
+            <button type="button" onclick="assignTopic()">Ανάθεση</button>
+            <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
         </form>
     </div>
 

@@ -301,26 +301,30 @@ app.delete('/delete-thesis/:id', (req, res) => {
 });
 
 app.get("/search-student", (req, res) => {
-    const { studentId } = req.query;
-  
-    const query = `
-      SELECT student_name 
-      FROM Students 
-      WHERE am = ?
-    `;
-    db.query(query, [studentId], (err, results) => {
-      if (err) {
-        console.error("Error searching student:", err);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
-      }
-  
-      if (results.length > 0) {
-        res.json({ success: true, data: results[0] });
-      } else {
-        res.json({ success: false, message: "Student not found." });
-      }
+    const { studentId, studentName } = req.query;
+    let query = '';
+    let queryParams = [];
+
+    if (studentId) {
+        query = 'SELECT am AS student_id FROM Students WHERE am LIKE ?';
+        queryParams = [`%${studentId}%`];
+    } else if (studentName) {
+        query = 'SELECT student_name FROM Students WHERE student_name LIKE ?';
+        queryParams = [`%${studentName}%`];
+    } else {
+        res.status(400).json({ success: false, message: 'Missing search parameter' });
+        return;
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error("Error searching student:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+
+        res.json({ success: true, data: results });
     });
-  });
+});
 
 app.get('/search-theses', (req, res) => {
     const statusFilter = req.query.status;
@@ -349,6 +353,26 @@ app.get('/search-theses', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
+        res.json({ success: true, data: results });
+    });
+});
+
+app.get("/search-thesis", (req, res) => {
+    const { subject } = req.query;
+    if (!subject) {
+        res.status(400).json({ success: false, message: 'Missing search parameter' });
+        return;
+    }
+
+    const query = 'SELECT title FROM Theses WHERE title LIKE ?';
+    const queryParams = [`%${subject}%`];
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error("Error searching thesis:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+
         res.json({ success: true, data: results });
     });
 });

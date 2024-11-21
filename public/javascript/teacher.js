@@ -156,7 +156,8 @@ function deleteThesis() {
 function cancelEdit() {
     document.getElementById('editThesisFormContainer').style.display = 'none';
 }
-// Γενική συνάρτηση για αποστολή AJAX αιτημάτων
+
+// General function to send AJAX requests
 function sendRequest(url, method, data = null) {
     return fetch(url, {
         method: method,
@@ -170,63 +171,120 @@ function sendRequest(url, method, data = null) {
     });
 }
 
-// Αναζήτηση φοιτητή βάσει ΑΜ
-function searchStudent() {
-    const studentId = document.getElementById("studentId").value.trim();
-    if (studentId === "") {
-        alert("Συμπληρώστε το πεδίο ΑΜ.");
-        return;
-    }
-
-    sendRequest(`/search-student?studentId=${encodeURIComponent(studentId)}`, 'GET')
-        .then(response => {
-            if (response.success) {
-                alert("Επιτυχής καταχώρηση ΑΜ φοιτητή.");
-                document.getElementById("studentName").value = response.data.studentName; // Αυτόματη συμπλήρωση ονόματος
-            } else {
-                alert("Δεν βρέθηκε φοιτητής με το συγκεκριμένο ΑΜ.");
-            }
-        });
+// Debounce function to delay the search request
+function debounce(func, delay) {
+    let debounceTimer;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => func.apply(context, args), delay);
+    };
 }
 
-// Αναζήτηση φοιτητή βάσει ονοματεπώνυμου
-function searchStudentName() {
-    const studentName = document.getElementById("studentName").value.trim();
-    if (studentName === "") {
-        alert("Συμπληρώστε το πεδίο ονοματεπώνυμου.");
-        return;
+// Toggle search fields based on selected search type
+function toggleSearchFields() {
+    const searchType = document.getElementById("searchType").value;
+    if (searchType === "studentId") {
+        document.getElementById("searchById").style.display = "block";
+        document.getElementById("searchByName").style.display = "none";
+    } else {
+        document.getElementById("searchById").style.display = "none";
+        document.getElementById("searchByName").style.display = "block";
     }
-
-    sendRequest(`/search-student?studentName=${encodeURIComponent(studentName)}`, 'GET')
-        .then(response => {
-            if (response.success) {
-                alert("Φοιτητής βρέθηκε.");
-                document.getElementById("studentId").value = response.data.studentId; // Αυτόματη συμπλήρωση ΑΜ
-            } else {
-                alert("Δεν βρέθηκε φοιτητής με το συγκεκριμένο ονοματεπώνυμο.");
-            }
-        });
 }
 
-// Αναζήτηση θέματος
-function searchThesis() {
+// Search thesis with debounce
+const debounceSearchThesis = debounce(function() {
     const subject = document.getElementById("subject").value.trim();
     if (subject === "") {
-        alert("Συμπληρώστε το πεδίο θέματος.");
+        document.getElementById("thesisSearchResults").innerHTML = "";
         return;
     }
 
     sendRequest(`/search-thesis?subject=${encodeURIComponent(subject)}`, 'GET')
         .then(response => {
+            const resultsContainer = document.getElementById("thesisSearchResults");
+            resultsContainer.innerHTML = ""; // Clear previous results
+
             if (response.success) {
-                alert("Θέμα διαθέσιμο για ανάθεση!");
+                response.data.forEach(thesis => {
+                    const resultItem = document.createElement("div");
+                    resultItem.className = "suggestion-item";
+                    resultItem.textContent = thesis.title;
+                    resultItem.onclick = () => {
+                        document.getElementById("subject").value = thesis.title;
+                        resultsContainer.innerHTML = "";
+                    };
+                    resultsContainer.appendChild(resultItem);
+                });
             } else {
-                alert("Το θέμα δεν είναι διαθέσιμο.");
+                resultsContainer.innerHTML = "No results found.";
             }
         });
-}
+}, 300);
 
-// Ανάθεση θέματος
+// Search student by ID with debounce
+const debounceSearchStudentById = debounce(function() {
+    const studentId = document.getElementById("studentId").value.trim();
+    if (studentId === "") {
+        document.getElementById("studentIdSuggestions").innerHTML = "";
+        return;
+    }
+
+    sendRequest(`/search-student?studentId=${encodeURIComponent(studentId)}`, 'GET')
+        .then(response => {
+            const suggestionsContainer = document.getElementById("studentIdSuggestions");
+            suggestionsContainer.innerHTML = ""; // Clear previous suggestions
+
+            if (response.success) {
+                response.data.forEach(student => {
+                    const suggestionItem = document.createElement("div");
+                    suggestionItem.className = "suggestion-item";
+                    suggestionItem.textContent = student.student_id;
+                    suggestionItem.onclick = () => {
+                        document.getElementById("studentId").value = student.student_id;
+                        suggestionsContainer.innerHTML = "";
+                    };
+                    suggestionsContainer.appendChild(suggestionItem);
+                });
+            } else {
+                suggestionsContainer.innerHTML = "No results found.";
+            }
+        });
+}, 300);
+
+// Search student by name with debounce
+const debounceSearchStudentByName = debounce(function() {
+    const studentName = document.getElementById("studentName").value.trim();
+    if (studentName === "") {
+        document.getElementById("studentNameSuggestions").innerHTML = "";
+        return;
+    }
+
+    sendRequest(`/search-student?studentName=${encodeURIComponent(studentName)}`, 'GET')
+        .then(response => {
+            const suggestionsContainer = document.getElementById("studentNameSuggestions");
+            suggestionsContainer.innerHTML = ""; // Clear previous suggestions
+
+            if (response.success) {
+                response.data.forEach(student => {
+                    const suggestionItem = document.createElement("div");
+                    suggestionItem.className = "suggestion-item";
+                    suggestionItem.textContent = student.student_name;
+                    suggestionItem.onclick = () => {
+                        document.getElementById("studentName").value = student.student_name;
+                        suggestionsContainer.innerHTML = "";
+                    };
+                    suggestionsContainer.appendChild(suggestionItem);
+                });
+            } else {
+                suggestionsContainer.innerHTML = "No results found.";
+            }
+        });
+}, 300);
+
+// Assign topic
 function assignTopic() {
     const studentId = document.getElementById("studentId").value.trim();
     const subject = document.getElementById("subject").value.trim();
@@ -282,3 +340,29 @@ function searchThesesList() {
             alert('An error occurred while searching for theses.');
         });
 }
+
+app.get("/search-student", (req, res) => {
+    const { studentId, studentName } = req.query;
+    let query = '';
+    let queryParams = [];
+
+    if (studentId) {
+        query = 'SELECT am AS student_id FROM Students WHERE am LIKE ?';
+        queryParams = [`%${studentId}%`];
+    } else if (studentName) {
+        query = 'SELECT student_name FROM Students WHERE student_name LIKE ?';
+        queryParams = [`%${studentName}%`];
+    } else {
+        res.status(400).json({ success: false, message: 'Missing search parameter' });
+        return;
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error("Error searching student:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+
+        res.json({ success: true, data: results });
+    });
+});
