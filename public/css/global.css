@@ -149,6 +149,12 @@ body {
     color: white;
 }
 
+.ceid-logo {
+    display: block;
+    margin: 0 auto; /* Center the logo */
+    max-width: 1000px; /* Adjust the size of the logo as needed */
+}
+
 .loginPage {
     background-color: #fff;
     padding: 20px;
@@ -305,6 +311,10 @@ button.close-button:hover {
 
     .timetable th, .timetable td {
         padding: 6px;
+    }
+    
+    .ceid-logo {
+        max-width: 350px;
     }
 
     .loginPage {
