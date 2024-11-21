@@ -1,3 +1,11 @@
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------Node.js Server----------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -9,13 +17,23 @@ const MySQLStore = require('express-mysql-session')(session);
 const multer = require('multer');
 
 const app = express();
-app.use(bodyParser.json()); // Use bodyParser to parse JSON data
+
+// Use bodyParser to parse JSON data
+app.use(bodyParser.json()); 
 
 // Serve static files from the public directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+---------------------------------Database Connection --------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
 
 // Create connection to the localhost database 
 const db = mysql.createConnection({
@@ -51,6 +69,14 @@ app.use(session({
     store: sessionStore
 }));
 
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+------------------------------Login and Authentication-------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
 // Check if user is authenticated and authorized
 function isAuthenticated(req, res, next) {
     const roleUrlMap = {
@@ -73,7 +99,6 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-// Updated login route
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -90,7 +115,8 @@ app.post('/login', (req, res) => {
         }
 
         const { table, role, redirect } = roles[index];
-        db.query(`SELECT * FROM ${table} WHERE ${role.toLowerCase()}_username = ? AND ${role.toLowerCase()}_password = ?`, [username, password], (err, results) => {
+        db.query(`SELECT * FROM ${table} WHERE ${role.toLowerCase()}_username = ? AND 
+        ${role.toLowerCase()}_password = ?`, [username, password], (err, results) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.status(500).json({ message: 'Internal Server Error' });
@@ -100,7 +126,6 @@ app.post('/login', (req, res) => {
                 req.session.user = { username: username, role: role };
                 console.log(`User ${username} logged in with role ${role} and session ID: ${req.sessionID}`);
                 res.json({ redirect });
-                // print the ajax response
                 console.log(res);
             } else {
                 checkCredentials(index + 1);
@@ -111,56 +136,27 @@ app.post('/login', (req, res) => {
     checkCredentials(0);
 });
 
-// Dynamic route handler for any HTML file inside private/teacher directory
-app.get('/private/teacher/:filename', isAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, 'private/teacher', req.params.filename);
-    fs.readFile(filePath, (err, data) => {
+app.post('/logout', (req, res) => {
+    console.log(`User ${req.session.user.username} logged out with session ID: ${req.sessionID}`);
+    req.session.destroy((err) => {
         if (err) {
-            console.error(`Error reading ${req.params.filename}:`, err);
-            res.writeHead(500, {'Content-Type': 'text/plain'});
-            res.end('Internal Server Error');
+            console.error('Error destroying session:', err);
+            res.status(500).json({ message: 'Internal Server Error' });
             return;
         }
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        console.log(req.params.filename);
-        console.log(filePath);
-        res.end(data);
+        console.log('Session destroyed');
+        res.json({ message: 'Logout successful', redirect: '/' });
+        console.log(res);
     });
 });
 
-// Dynamic route handler for any HTML file inside private/student directory
-app.get('/private/student/:filename', isAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, 'private/student', req.params.filename);
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error(`Error reading ${req.params.filename}:`, err);
-            res.writeHead(500, {'Content-Type': 'text/plain'});
-            res.end('Internal Server Error');
-            return;
-        }
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        console.log(req.params.filename);
-        console.log(filePath);
-        res.end(data);
-    });
-});
-
-// Dynamic route handler for any HTML file inside private/secretary directory
-app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
-    const filePath = path.join(__dirname, 'private/secretary', req.params.filename);
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error(`Error reading ${req.params.filename}:`, err);
-            res.writeHead(500, {'Content-Type': 'text/plain'});
-            res.end('Internal Server Error');
-            return;
-        }
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        console.log(req.params.filename);
-        console.log(filePath);
-        res.end(data);
-    });
-});
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------Get Requests------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
 
 // Route handler for the main page
 app.get('/', (req, res) => {
@@ -178,82 +174,58 @@ app.get('/', (req, res) => {
     });
 });
 
-app.post('/logout', (req, res) => {
-    console.log(`User ${req.session.user.username} logged out with session ID: ${req.sessionID}`);
-    req.session.destroy((err) => {
+// Dynamic route handler for the private/teacher directory
+app.get('/private/teacher/:filename', isAuthenticated, (req, res) => {
+    const filePath = path.join(__dirname, 'private/teacher', req.params.filename);
+    fs.readFile(filePath, (err, data) => {
         if (err) {
-            console.error('Error destroying session:', err);
-            res.status(500).json({ message: 'Internal Server Error' });
+            console.error(`Error reading ${req.params.filename}:`, err);
+            res.writeHead(500, {'Content-Type': 'text/plain'});
+            res.end('Internal Server Error');
             return;
         }
-        console.log('Session destroyed');
-        res.json({ message: 'Logout successful', redirect: '/' });
-        console.log(res);
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(req.params.filename);
+        console.log(filePath);
+        res.end(data);
     });
 });
 
-const upload = multer({ 
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, path.join(__dirname, 'uploads'));
-        },
-        filename: (req, file, cb) => {
-            const ext = path.extname(file.originalname);
-            cb(null, `file-${Date.now()}${ext}`);
-        }
-    })
-});
-
-app.post('/add-thesis', upload.single('file'), (req, res) => {
-    const { title, description, instructor_id, student_id, final_submission_date } = req.body;
-    const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
-    const status = 'Υπό Ανάθεση'; // Default status
-
-    // Insert thesis into Theses table
-    const query = `
-        INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-    const values = [title, description, pdfPath, status, instructor_id || null];
-
-    db.query(query, values, (err, result) => {
+// Dynamic route handler for the private/student directory
+app.get('/private/student/:filename', isAuthenticated, (req, res) => {
+    const filePath = path.join(__dirname, 'private/student', req.params.filename);
+    fs.readFile(filePath, (err, data) => {
         if (err) {
-            console.error('Error inserting thesis:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            console.error(`Error reading ${req.params.filename}:`, err);
+            res.writeHead(500, {'Content-Type': 'text/plain'});
+            res.end('Internal Server Error');
             return;
         }
-        res.json({ success: true, message: 'Thesis added successfully!' });
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(req.params.filename);
+        console.log(filePath);
+        res.end(data);
     });
 });
 
-app.post('/update-thesis', upload.single('file'), (req, res) => {
-    const { thesis_id, title, description, instructor_id, student_id, final_submission_date, status } = req.body;
-    const pdfPath = req.file ? `uploads/${req.file.filename}` : null;
-
-    let query = `
-        UPDATE Theses
-        SET title = ?, summary = ?, status = ?, instructor_id = ?, student_id = ?, final_submission_date = ?
-    `;
-    const values = [title, description, status, instructor_id, student_id || null, final_submission_date || null];
-
-    if (pdfPath) {
-        query += `, pdf_path = ?`;
-        values.push(pdfPath);
-    }
-
-    query += ` WHERE thesis_id = ?`;
-    values.push(thesis_id);
-
-    db.query(query, values, (err, result) => {
+// Dynamic route handler for the private/secretary directory
+app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
+    const filePath = path.join(__dirname, 'private/secretary', req.params.filename);
+    fs.readFile(filePath, (err, data) => {
         if (err) {
-            console.error('Error updating thesis:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            console.error(`Error reading ${req.params.filename}:`, err);
+            res.writeHead(500, {'Content-Type': 'text/plain'});
+            res.end('Internal Server Error');
             return;
         }
-        res.json({ success: true, message: 'Thesis updated successfully!' });
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        console.log(req.params.filename);
+        console.log(filePath);
+        res.end(data);
     });
 });
 
+// Route handler for assigning a thesis to a student
 app.get('/get-thesis/:id', (req, res) => {
     const query = 'SELECT * FROM Theses WHERE thesis_id = ?';
     db.query(query, [req.params.id], (err, results) => {
@@ -270,6 +242,7 @@ app.get('/get-thesis/:id', (req, res) => {
     });
 });
 
+// Route handler for getting all theses
 app.get('/get-theses', (req, res) => {
     const query = 'SELECT * FROM Theses';
     db.query(query, (err, results) => {
@@ -282,24 +255,7 @@ app.get('/get-theses', (req, res) => {
     });
 });
 
-app.delete('/delete-thesis/:id', (req, res) => {
-    const thesisId = req.params.id;
-    const query = 'DELETE FROM Theses WHERE thesis_id = ?';
-
-    db.query(query, [thesisId], (err, result) => {
-        if (err) {
-            console.error('Error deleting thesis:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
-            return;
-        }
-        if (result.affectedRows === 0) {
-            res.status(404).json({ success: false, message: 'Thesis not found' });
-            return;
-        }
-        res.json({ success: true, message: 'Thesis deleted successfully!' });
-    });
-});
-
+// Route handler for searching students
 app.get("/search-student", (req, res) => {
     const { studentId, studentName } = req.query;
     let query = '';
@@ -326,6 +282,7 @@ app.get("/search-student", (req, res) => {
     });
 });
 
+// Route handler for searching instructors
 app.get('/search-theses', (req, res) => {
     const statusFilter = req.query.status;
     const roleFilter = req.query.role;
@@ -357,6 +314,7 @@ app.get('/search-theses', (req, res) => {
     });
 });
 
+// Route handler for exporting theses
 app.get("/search-thesis", (req, res) => {
     const { subject } = req.query;
     if (!subject) {
@@ -377,6 +335,7 @@ app.get("/search-thesis", (req, res) => {
     });
 });
 
+// Route handler for exporting theses
 app.get('/export-theses', (req, res) => {
     const statusFilter = req.query.status;
     const roleFilter = req.query.role;
@@ -422,10 +381,83 @@ app.get('/export-theses', (req, res) => {
     });
 });
 
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------Post Requests-----------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
+// Route handler for the add-thesis form
+const upload = multer({ 
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, path.join(__dirname, 'uploads'));
+        },
+        filename: (req, file, cb) => {
+            const ext = path.extname(file.originalname);
+            cb(null, `file-${Date.now()}${ext}`);
+        }
+    })
+});
+
+// Route handler for the add-thesis form
+app.post('/add-thesis', upload.single('file'), (req, res) => {
+    const { title, description, instructor_id, student_id, final_submission_date } = req.body;
+    const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
+    const status = 'Υπό Ανάθεση'; // Default status
+
+    const query = `
+        INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    const values = [title, description, pdfPath, status, instructor_id || null];
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error inserting thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        res.json({ success: true, message: 'Thesis added successfully!' });
+    });
+});
+
+// Route handler for updating a thesis
+app.post('/update-thesis', upload.single('file'), (req, res) => {
+    const { thesis_id, title, description, instructor_id, student_id, final_submission_date, status } = req.body;
+    const pdfPath = req.file ? `uploads/${req.file.filename}` : null;
+
+    let query = `
+        UPDATE Theses
+        SET title = ?, summary = ?, status = ?, instructor_id = ?, 
+        student_id = ?, final_submission_date = ?
+    `;
+    const values = [title, description, status, instructor_id, student_id || null, final_submission_date || null];
+
+    if (pdfPath) {
+        query += `, pdf_path = ?`;
+        values.push(pdfPath);
+    }
+
+    query += ` WHERE thesis_id = ?`;
+    values.push(thesis_id);
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error updating thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        res.json({ success: true, message: 'Thesis updated successfully!' });
+    });
+});
+
+// Route handler for assigning a thesis to a student
 app.post("/assign-topic", (req, res) => {
     const { studentId, subject } = req.body;
   
-    // Ελέγχει αν το θέμα υπάρχει και είναι διαθέσιμο
     const queryCheck = `
       SELECT thesis_id 
       FROM Theses 
@@ -441,7 +473,6 @@ app.post("/assign-topic", (req, res) => {
         return res.status(404).json({ message: "Το θέμα δεν είναι διαθέσιμο." });
       }
   
-      // Ανάθεση θέματος στον φοιτητή
       const thesisId = results[0].thesis_id;
       const queryAssign = `
         UPDATE Theses 
@@ -457,7 +488,43 @@ app.post("/assign-topic", (req, res) => {
         res.json({ message: "Το θέμα ανατέθηκε επιτυχώς στον φοιτητή." });
       });
     });
-  });
+});
+
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------Delete Requests---------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
+// Route handler for deleting a thesis
+app.delete('/delete-thesis/:id', (req, res) => {
+    const thesisId = req.params.id;
+    const query = 'DELETE FROM Theses WHERE thesis_id = ?';
+
+    db.query(query, [thesisId], (err, result) => {
+        if (err) {
+            console.error('Error deleting thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        if (result.affectedRows === 0) {
+            res.status(404).json({ success: false, message: 'Thesis not found' });
+            return;
+        }
+        res.json({ success: true, message: 'Thesis deleted successfully!' });
+    });
+});
+
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------Server Listening--------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
 const server = http.createServer(app);
 
 server.listen(8080, () => {
