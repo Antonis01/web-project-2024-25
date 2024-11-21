@@ -34,14 +34,19 @@ function fetchTheses() {
                 data.data.forEach(thesis => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        <strong>Title:</strong> ${thesis.title}<br>
-                        <strong>Summary:</strong> ${thesis.summary}<br>
-                        <strong>Status:</strong> ${thesis.status}<br>
-                        <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
-                        <strong>Student ID:</strong> ${thesis.student_id}<br>
-                        <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
-                        <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
+                        <div class="thesis-title">
+                            <strong>Title:</strong> ${thesis.title}
+                            <button onclick="toggleDetails(this)">Show details</button>
+                        </div>
+                        <div class="thesis-details" style="display: none;">
+                            <strong>Summary:</strong> ${thesis.summary}<br>
+                            <strong>Status:</strong> ${thesis.status}<br>
+                            <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
+                            <strong>Student ID:</strong> ${thesis.student_id}<br>
+                            <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
+                            <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
+                            <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
+                        </div>
                     `;
                     thesesList.appendChild(listItem);
                 });
@@ -53,6 +58,17 @@ function fetchTheses() {
             console.error('Error:', error);
             alert('An error occurred while fetching the theses.');
         });
+}
+
+function toggleDetails(button) {
+    const details = button.parentElement.nextElementSibling;
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        button.textContent = 'Hide details';
+    } else {
+        details.style.display = 'none';
+        button.textContent = 'Show details';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', fetchTheses);
@@ -233,24 +249,30 @@ function assignTopic() {
 
 function searchThesesList() {
     const statusFilter = document.getElementById('statusFilter').value;
+    const roleFilter = document.getElementById('roleFilter').value;
 
-    fetch(`/search-theses?status=${statusFilter}`)
+    fetch(`/search-theses?status=${statusFilter}&role=${roleFilter}`)
         .then(response => response.json())
         .then(data => {
             const diplomaListItems = document.getElementById('diplomaListItems');
-            diplomaListItems.innerHTML = ''; 
+            diplomaListItems.innerHTML = ''; // Clear the current list
 
             data.data.forEach(thesis => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
-                    <strong>Title:</strong> ${thesis.title}<br>
-                    <strong>Summary:</strong> ${thesis.summary}<br>
-                    <strong>Status:</strong> ${thesis.status}<br>
-                    <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
-                    <strong>Student ID:</strong> ${thesis.student_id}<br>
-                    <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                    <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
-                    <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
+                    <div class="thesis-title">
+                        <strong>Title:</strong> ${thesis.title}
+                        <button onclick="toggleDetails(this)">Show details</button>
+                    </div>
+                    <div class="thesis-details" style="display: none;">
+                        <strong>Summary:</strong> ${thesis.summary}<br>
+                        <strong>Status:</strong> ${thesis.status}<br>
+                        <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
+                        <strong>Student ID:</strong> ${thesis.student_id}<br>
+                        <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
+                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
+                        <strong>Role:</strong> ${thesis.role}<br>
+                    </div>
                 `;
                 diplomaListItems.appendChild(listItem);
             });

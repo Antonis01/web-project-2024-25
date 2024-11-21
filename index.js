@@ -322,14 +322,25 @@ app.get("/search-student", (req, res) => {
     });
   });
 
-  app.get('/search-theses', (req, res) => {
+app.get('/search-theses', (req, res) => {
     const statusFilter = req.query.status;
-    let query = 'SELECT * FROM Theses WHERE 1=1';
+    const roleFilter = req.query.role;
+    let query = `
+        SELECT Theses.*, Committees.role 
+        FROM Theses 
+        LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
+        WHERE 1=1
+    `;
     const queryParams = [];
 
     if (statusFilter && statusFilter !== 'Όλες') {
-        query += ' AND status = ?';
+        query += ' AND Theses.status = ?';
         queryParams.push(statusFilter);
+    }
+
+    if (roleFilter && roleFilter !== 'all') {
+        query += ' AND Committees.role = ?';
+        queryParams.push(roleFilter);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -342,7 +353,7 @@ app.get("/search-student", (req, res) => {
     });
 });
 
-  app.post("/assign-topic", (req, res) => {
+app.post("/assign-topic", (req, res) => {
     const { studentId, subject } = req.body;
   
     // Ελέγχει αν το θέμα υπάρχει και είναι διαθέσιμο

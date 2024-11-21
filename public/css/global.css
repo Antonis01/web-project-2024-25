@@ -254,6 +254,22 @@ button.close-button:hover {
     background: red;
 }
 
+.thesis-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.thesis-details {
+    margin-left: 20px;
+}
+
+.center-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
 /* Responsive styles */
 @media (max-width: 600px) {
     .topBar {

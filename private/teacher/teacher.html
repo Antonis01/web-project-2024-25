@@ -80,10 +80,12 @@
         <label for="roleFilter">Ρόλος:</label>
         <select id="roleFilter">
             <option value="all">Όλοι</option>
-            <option value="supervisor">Επιβλέπων</option>
-            <option value="committee_member">Μέλος Τριμελούς</option>
+            <option value="Επιβλέπων">Επιβλέπων</option>
+            <option value="Μέλος Τριμελούς">Μέλος Τριμελούς</option>
         </select>
-        <button id="searchThesesList" type="button" onclick="searchThesesList()">Αναζήτηση</button>
+        <div class="center-button">
+            <button type="button" onclick="searchThesesList()">Αναζήτηση</button>
+        </div>
         <ul id="diplomaListItems">
             <!-- Dynamically populated list of diplomas -->
         </ul>
