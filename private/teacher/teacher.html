@@ -49,6 +49,9 @@
         <ul id="topicsList">
             <!-- Dynamic list of topics -->
         </ul>
+        <div id="pdfViewerContainer" class="forms" style="display:none; position: relative;">
+            <iframe id="pdfViewer" width="100%" height="800px"></iframe>
+        </div>
     </div>
 
     <div id="assignTheses" class="forms" style="display:none; position: relative">
@@ -97,6 +100,8 @@
         </select>
         <div class="center-button">
             <button type="button" onclick="searchThesesList()">Αναζήτηση</button>
+            <button type="button" onclick="exportTheses('csv')">Export CSV</button>
+            <button type="button" onclick="exportTheses('json')">Export JSON</button>
         </div>
         <ul id="diplomaListItems">
             <!-- Dynamically populated list of diplomas -->
@@ -166,10 +171,7 @@
         </form>
     </div>
     
-    <div id="pdfViewerContainer" class="forms" style="display:none; position: relative;">
-        <button class="close-button"&times; onclick="toggleElement('pdfViewerContainer')" >x</button>
-        <iframe id="pdfViewer" width="100%" height="800px"></iframe>
-    </div>
+    
     
     <script src="/public/javascript/teacher.js"></script>
     <script src="/public/javascript/topbar_buttons.js"></script>

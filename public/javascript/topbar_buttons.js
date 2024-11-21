@@ -59,7 +59,7 @@ function toggleElementDisplay(elementId, displayStyle = "block") {
     if (elementId !== "dropdownMenu") {
         var menu = document.getElementById("dropdownMenu");
         menu.style.display = "none";
-    }
+    }        
 
     if (elementId == "thesesAddView") {
         element = document.getElementById("topicsContainer");
@@ -95,7 +95,3 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
         alert('An error occurred while adding the thesis.');
     });
 });
-
-function searchTheses(){
-    alert("searchTheses");
-}

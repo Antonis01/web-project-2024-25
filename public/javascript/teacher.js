@@ -44,7 +44,7 @@ function fetchTheses() {
                             <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
                             <strong>Student ID:</strong> ${thesis.student_id}<br>
                             <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                            <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
+                            <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
                             <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
                         </div>
                     `;
@@ -73,11 +73,25 @@ function toggleDetails(button) {
 
 document.addEventListener('DOMContentLoaded', fetchTheses);
 
-function viewPDF(pdfPath) {
-    const pdfViewerContainer = document.getElementById('pdfViewerContainer');
-    const pdfViewer = document.getElementById('pdfViewer');
-    pdfViewer.src = pdfPath;
-    pdfViewerContainer.style.display = 'block';
+function viewPDF(pdfPath, container) {
+    // Check if the PDF viewer already exists
+    const existingViewer = container.querySelector('.pdf-viewer');
+    if (existingViewer) {
+        // If it exists, remove it
+        existingViewer.remove();
+    } else {
+        // If it doesn't exist, create a new PDF viewer
+        const pdfViewer = document.createElement('iframe');
+        pdfViewer.src = pdfPath;
+        pdfViewer.width = '100%';
+        pdfViewer.height = '800px';
+        pdfViewer.className = 'pdf-viewer';
+        pdfViewer.style.border = 'none';
+        pdfViewer.style.marginTop = '10px';
+
+        // Append the PDF viewer to the container
+        container.appendChild(pdfViewer);
+    }
 }
 
 function editThesis(thesisId) {
@@ -366,3 +380,24 @@ app.get("/search-student", (req, res) => {
         res.json({ success: true, data: results });
     });
 });
+
+function exportTheses(format) {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const roleFilter = document.getElementById('roleFilter').value;
+
+    fetch(`/export-theses?status=${statusFilter}&role=${roleFilter}&format=${format}`)
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `theses.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        })
+        .catch(error => {
+            console.error('Error exporting theses:', error);
+            alert('An error occurred while exporting the theses.');
+        });
+}

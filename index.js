@@ -377,6 +377,51 @@ app.get("/search-thesis", (req, res) => {
     });
 });
 
+app.get('/export-theses', (req, res) => {
+    const statusFilter = req.query.status;
+    const roleFilter = req.query.role;
+    const format = req.query.format;
+
+    let query = `
+        SELECT Theses.*, Committees.role 
+        FROM Theses 
+        LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
+        WHERE 1=1
+    `;
+    const queryParams = [];
+
+    if (statusFilter && statusFilter !== 'Όλες') {
+        query += ' AND Theses.status = ?';
+        queryParams.push(statusFilter);
+    }
+
+    if (roleFilter && roleFilter !== 'all') {
+        query += ' AND Committees.role = ?';
+        queryParams.push(roleFilter);
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('Error exporting theses:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+
+        if (format === 'csv') {
+            const csv = results.map(row => Object.values(row).join(',')).join('\n');
+            res.header('Content-Type', 'text/csv');
+            res.attachment('theses.csv');
+            res.send(csv);
+        } else if (format === 'json') {
+            res.header('Content-Type', 'application/json');
+            res.attachment('theses.json');
+            res.send(JSON.stringify(results));
+        } else {
+            res.status(400).json({ success: false, message: 'Invalid format' });
+        }
+    });
+});
+
 app.post("/assign-topic", (req, res) => {
     const { studentId, subject } = req.body;
   
