@@ -262,7 +262,7 @@ app.get("/search-student", (req, res) => {
     let queryParams = [];
 
     if (studentId) {
-        query = 'SELECT am AS student_id FROM Students WHERE am LIKE ?';
+        query = 'SELECT am FROM Students WHERE am LIKE ?';
         queryParams = [`%${studentId}%`];
     } else if (studentName) {
         query = 'SELECT student_name FROM Students WHERE student_name LIKE ?';
@@ -456,37 +456,58 @@ app.post('/update-thesis', upload.single('file'), (req, res) => {
 
 // Route handler for assigning a thesis to a student
 app.post("/assign-topic", (req, res) => {
-    const { studentId, subject } = req.body;
-  
-    const queryCheck = `
-      SELECT thesis_id 
-      FROM Theses 
-      WHERE title = ? AND status = 'Υπό Ανάθεση'
-    `;
-    db.query(queryCheck, [subject], (err, results) => {
-      if (err) {
-        console.error("Error checking thesis:", err);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-  
-      if (results.length === 0) {
-        return res.status(404).json({ message: "Το θέμα δεν είναι διαθέσιμο." });
-      }
-  
-      const thesisId = results[0].thesis_id;
-      const queryAssign = `
-        UPDATE Theses 
-        SET status = 'Ενεργή', student_id = ? 
-        WHERE thesis_id = ?
-      `;
-      db.query(queryAssign, [studentId, thesisId], (err) => {
+    const { am, subject } = req.body;
+
+    if (!am || !subject) {
+        res.status(400).json({ success: false, message: 'Missing student AM or subject' });
+        return;
+    }
+
+    // Check if the student AM exists in the students table and get the student_id
+    const checkStudentQuery = 'SELECT student_id FROM Students WHERE am = ?';
+    db.query(checkStudentQuery, [am], (err, studentResults) => {
         if (err) {
-          console.error("Error assigning thesis:", err);
-          return res.status(500).json({ message: "Internal Server Error" });
+            console.error("Error checking student:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
-  
-        res.json({ message: "Το θέμα ανατέθηκε επιτυχώς στον φοιτητή." });
-      });
+
+        if (studentResults.length === 0) {
+            return res.status(400).json({ success: false, message: 'Student AM does not exist' });
+        }
+
+        const studentId = studentResults[0].student_id;
+
+        // Check if the thesis is available
+        const queryCheck = `
+            SELECT thesis_id 
+            FROM Theses 
+            WHERE title = ? AND status = 'Υπό Ανάθεση'
+        `;
+        db.query(queryCheck, [subject], (err, thesisResults) => {
+            if (err) {
+                console.error("Error checking thesis:", err);
+                return res.status(500).json({ success: false, message: "Internal Server Error" });
+            }
+
+            if (thesisResults.length === 0) {
+                return res.status(404).json({ success: false, message: "Το θέμα δεν είναι διαθέσιμο." });
+            }
+
+            const thesisId = thesisResults[0].thesis_id;
+            const queryAssign = `
+                UPDATE Theses 
+                SET status = 'Ενεργή', student_id = ? 
+                WHERE thesis_id = ?
+            `;
+            db.query(queryAssign, [studentId, thesisId], (err) => {
+                if (err) {
+                    console.error("Error assigning thesis:", err);
+                    return res.status(500).json({ success: false, message: "Internal Server Error" });
+                }
+
+                res.json({ success: true, message: "Το θέμα ανατέθηκε επιτυχώς στον φοιτητή." });
+            });
+        });
     });
 });
 

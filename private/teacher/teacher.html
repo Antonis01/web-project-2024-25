@@ -65,7 +65,7 @@
             </select>
             <div id="searchById" style="display: block; position: relative;">
                 <label for="studentId">ΑΜ Φοιτητή:</label>
-                <input type="text" id="studentId" name="studentId" oninput="debounceSearchStudentById()">
+                <input type="text" id="studentId" name="studentId" oninput="debounceSearchStudentByAm()">
                 <div id="studentIdSuggestions" class="suggestions"></div>
             </div>
             <div id="searchByName" style="display: none; position: relative;">
@@ -75,6 +75,8 @@
             </div>
             <label for="subject">Θέμα:</label>
             <input type="text" id="subject" name="subject" oninput="debounceSearchThesis()" required>
+            <input type="hidden" id="thesisId" name="thesisId">
+            <input type="hidden" id="hiddenStudentId" name="hiddenStudentId">
             <div id="thesisSearchResults" class="suggestions"></div>
             <button type="button" onclick="assignTopic()">Ανάθεση</button>
             <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>

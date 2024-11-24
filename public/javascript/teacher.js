@@ -228,6 +228,7 @@ const debounceSearchThesis = debounce(function() {
                     resultItem.textContent = thesis.title;
                     resultItem.onclick = () => {
                         document.getElementById("subject").value = thesis.title;
+                        document.getElementById("thesisId").value = thesis.thesis_id; // Store thesis ID
                         resultsContainer.innerHTML = "";
                     };
                     resultsContainer.appendChild(resultItem);
@@ -238,15 +239,15 @@ const debounceSearchThesis = debounce(function() {
         });
 }, 300);
 
-// Search student by ID with debounce
-const debounceSearchStudentById = debounce(function() {
-    const studentId = document.getElementById("studentId").value.trim();
-    if (studentId === "") {
+// Search student by AM with debounce
+const debounceSearchStudentByAm = debounce(function() {
+    const am = document.getElementById("studentId").value.trim();
+    if (am === "") {
         document.getElementById("studentIdSuggestions").innerHTML = "";
         return;
     }
 
-    sendRequest(`/search-student?studentId=${encodeURIComponent(studentId)}`, 'GET')
+    sendRequest(`/search-student?am=${encodeURIComponent(am)}`, 'GET')
         .then(response => {
             const suggestionsContainer = document.getElementById("studentIdSuggestions");
             suggestionsContainer.innerHTML = ""; // Clear previous suggestions
@@ -255,9 +256,10 @@ const debounceSearchStudentById = debounce(function() {
                 response.data.forEach(student => {
                     const suggestionItem = document.createElement("div");
                     suggestionItem.className = "suggestion-item";
-                    suggestionItem.textContent = student.student_id;
+                    suggestionItem.textContent = student.am;
                     suggestionItem.onclick = () => {
-                        document.getElementById("studentId").value = student.student_id;
+                        document.getElementById("studentId").value = student.am;
+                        document.getElementById("hiddenStudentId").value = student.student_id; // Store student ID in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
                     suggestionsContainer.appendChild(suggestionItem);
@@ -288,6 +290,7 @@ const debounceSearchStudentByName = debounce(function() {
                     suggestionItem.textContent = student.student_name;
                     suggestionItem.onclick = () => {
                         document.getElementById("studentName").value = student.student_name;
+                        document.getElementById("hiddenStudentId").value = student.student_id; // Store student ID in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
                     suggestionsContainer.appendChild(suggestionItem);
@@ -300,15 +303,15 @@ const debounceSearchStudentByName = debounce(function() {
 
 // Assign topic
 function assignTopic() {
-    const studentId = document.getElementById("studentId").value.trim();
+    const am = document.getElementById("studentId").value.trim();
     const subject = document.getElementById("subject").value.trim();
 
-    if (studentId === "" || subject === "") {
+    if (am === "" || subject === "") {
         alert("Συμπληρώστε όλα τα πεδία.");
         return;
     }
 
-    const data = { studentId, subject };
+    const data = { am, subject };
     sendRequest('/assign-topic', 'POST', data)
         .then(response => {
             if (response.success) {
