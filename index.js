@@ -257,6 +257,7 @@ app.get('/get-theses', (req, res) => {
 
 // Route handler for searching students
 app.get("/search-student", (req, res) => {
+    const { am, studentName } = req.query;
     let query = '';
     let queryParams = [];
 
