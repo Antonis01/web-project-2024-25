@@ -314,8 +314,8 @@ app.get('/search-theses', (req, res) => {
     });
 });
 
-// Route handler for exporting theses
-app.get("/search-thesis", (req, res) => {
+// Route handler for getting the theses title
+app.get("/get-theses-title", (req, res) => {
     const { subject } = req.query;
     if (!subject) {
         res.status(400).json({ success: false, message: 'Missing search parameter' });

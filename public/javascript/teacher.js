@@ -216,7 +216,7 @@ const debounceSearchThesis = debounce(function() {
         return;
     }
 
-    sendRequest(`/search-thesis?subject=${encodeURIComponent(subject)}`, 'GET')
+    sendRequest(`/get-theses-title?subject=${encodeURIComponent(subject)}`, 'GET')
         .then(response => {
             const resultsContainer = document.getElementById("thesisSearchResults");
             resultsContainer.innerHTML = ""; // Clear previous results
