@@ -3,16 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Main Page</title>
+    <title>Student Main Page</title>
     <link rel="stylesheet" type="text/css" href="/public/css/global.css">
 </head>
 <body>
     <div class="topBar">
         <div class="title">Student Main Page</div>
             <div class="buttonContainer">
-                <button class="rightButton" onclick="logout()">Logout</button>
+                <div id="burgerMenu" class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
+                <div class="dropdownMenu" id="dropdownMenu">
+                    <button class="dropdownButton" onclick="toggleElement('topicDiplomatic')">Θέμα Διπλωματικής</button>
+                    <button class="dropdownButton" onclick="toggleElement('editProfile')">Επεξεργασία Προφίλ</button>
+                    <button class="dropdownButton" onclick="toggleElement('diploManagement')">Διαχείρηση Διπλωματικής</button>
+                    <button class="dropdownButton" onclick="logout()">Logout</button>
             </div>
+        </div>  
     </div>
+
+    <div id="topicDiplomatic" class="forms" style="display:none; position: relative";>
+        <button class="close-button"&times; onclick="toggleElement('topicDiplomatic')" >x</button>
+        <h2>Λεπτομέριες διπλωματικής</h2>
+          <form id="topicDiplo">
+          
+                <label for="topicTitle">Θέμα:</label>
+                <input type="text" id="topicTitle" disabled>
+                
+                <label for="topicDescription">Περιγραφή:</label>
+                <textarea id="topicDescription" rows="5" disabled></textarea>
+
+                <label for="attachment">Συνημμένο Αρχείο:</label>
+                <a id="attachment" href="#" target="_blank">Κατεβάστε το αρχείο</a>
+
+                <label for="committee">Μέλη Τριμελούς Επιτροπής:</label>
+                <ul id="committee">
+                    <li>Μέλος 1</li>
+                    <li>Μέλος 2</li>
+                    <li>Μέλος 3</li>
+                </ul>
+
+                <p><strong>Ημερομηνία ανάθεσης:</strong> <span id="assignmentDate">-</span></p>
+                <p><strong>Χρόνος από την ανάθεση:</strong> <span id="timeSinceAssignment">-</span></p>
+           </form>
+        </div>
+    
+
+        <div id="editProfile" class="forms" style="display:none; position: relative";>
+            <button class="close-button"&times; onclick="toggleElement('editProfile')" >x</button>
+            <h2>Επεξεργασία Προφίλ</h2>
+            <form id="profileForm">
+                <label for="address">Ταχυδρομική Διεύθυνση:</label>
+                <input type="text" id="address" name="address" required>
+
+                <label for="email">Email Επικοινωνίας:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="mobilePhone">Κινητό Τηλέφωνο:</label>
+                <input type="text" id="mobilePhone" name="mobilePhone" required>
+
+                <input type="text" id="landlinePhone" name="landlinePhone">
+
+                <button type="submit">Αποθήκευση Αλλαγών</button>
+            </form>
+        </div>
+       
+        <div id="diploManagement" class="forms" style="display:none; position: relative";>
+            <button class="close-button"&times; onclick="toggleElement('diploManagement')" >x</button>
+            <h2>Διαχείριση Διπλωματικής Εργασίας</h2>
+                            <p>Ανάλογα με την κατάσταση της διπλωματικής εργασίας σας, μπορείτε να εκτελέσετε τις εξής ενέργειες:</p>
+                <ul>
+                    <li><button onclick="submitProgress()">Υποβολή Προόδου</button></li>
+                    <li><button onclick="requestExtension()">Αίτημα Παράτασης</button></li>
+                    <li><button onclick="cancelThesis()">Ακύρωση Θέματος</button></li>
+                </ul>
+     </div>       
+
     <script src="/public/javascript/topbar_buttons.js"></script>
 </body>
 </html>
