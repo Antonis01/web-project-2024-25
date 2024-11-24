@@ -200,10 +200,10 @@ function debounce(func, delay) {
 function toggleSearchFields() {
     const searchType = document.getElementById("searchType").value;
     if (searchType === "studentId") {
-        document.getElementById("searchById").style.display = "block";
+        document.getElementById("searchByAM").style.display = "block";
         document.getElementById("searchByName").style.display = "none";
     } else {
-        document.getElementById("searchById").style.display = "none";
+        document.getElementById("searchByAM").style.display = "none";
         document.getElementById("searchByName").style.display = "block";
     }
 }
@@ -241,15 +241,15 @@ const debounceSearchThesis = debounce(function() {
 
 // Search student by AM with debounce
 const debounceSearchStudentByAm = debounce(function() {
-    const am = document.getElementById("studentId").value.trim();
+    const am = document.getElementById("studentAM").value.trim();
     if (am === "") {
-        document.getElementById("studentIdSuggestions").innerHTML = "";
+        document.getElementById("studentAMSuggestions").innerHTML = "";
         return;
     }
 
     sendRequest(`/search-student?am=${encodeURIComponent(am)}`, 'GET')
         .then(response => {
-            const suggestionsContainer = document.getElementById("studentIdSuggestions");
+            const suggestionsContainer = document.getElementById("studentAMSuggestions");
             suggestionsContainer.innerHTML = ""; // Clear previous suggestions
 
             if (response.success) {
@@ -258,7 +258,7 @@ const debounceSearchStudentByAm = debounce(function() {
                     suggestionItem.className = "suggestion-item";
                     suggestionItem.textContent = student.am;
                     suggestionItem.onclick = () => {
-                        document.getElementById("studentId").value = student.am;
+                        document.getElementById("studentAM").value = student.am;
                         document.getElementById("hiddenStudentId").value = student.student_id; // Store student ID in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
@@ -303,7 +303,7 @@ const debounceSearchStudentByName = debounce(function() {
 
 // Assign topic
 function assignTopic() {
-    const am = document.getElementById("studentId").value.trim();
+    const am = document.getElementById("studentAM").value.trim();
     const subject = document.getElementById("subject").value.trim();
 
     if (am === "" || subject === "") {

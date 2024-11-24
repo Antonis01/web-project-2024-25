@@ -257,15 +257,14 @@ app.get('/get-theses', (req, res) => {
 
 // Route handler for searching students
 app.get("/search-student", (req, res) => {
-    const { studentId, studentName } = req.query;
     let query = '';
     let queryParams = [];
 
-    if (studentId) {
-        query = 'SELECT am FROM Students WHERE am LIKE ?';
-        queryParams = [`%${studentId}%`];
+    if (am) {
+        query = 'SELECT am, student_id FROM Students WHERE am LIKE ?';
+        queryParams = [`%${am}%`];
     } else if (studentName) {
-        query = 'SELECT student_name FROM Students WHERE student_name LIKE ?';
+        query = 'SELECT student_name, student_id FROM Students WHERE student_name LIKE ?';
         queryParams = [`%${studentName}%`];
     } else {
         res.status(400).json({ success: false, message: 'Missing search parameter' });
