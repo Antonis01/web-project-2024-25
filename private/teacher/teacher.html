@@ -18,6 +18,8 @@
                 <button class="dropdownButton" onclick="toggleElement('invitationCommision')">Προσκλήσεις σε τριμελή</button>
                 <button class="dropdownButton" onclick="toggleElement('formStatistics')">Στατιστικά</button>
                 <button class="dropdownButton" onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
+                <button class="dropdownButton" onclick="toggleElement('activeTheses')">Ενεργές Αναθέσεις</button>
+                <button class="dropdownButton" onclick="toggleElement('invitationList')">Προσκλήσεις</button>
                 <button class="dropdownButton" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -173,7 +175,21 @@
         </form>
     </div>
     
-    
+    <div id="activeTheses" class="forms" style="display:none; position: relative">
+        <button class="close-button" onclick="toggleElement('activeTheses')">&times;</button>
+        <h2>Ενεργές Αναθέσεις</h2>
+        <ul id="activeThesesList">
+            <!-- Dynamic list of active theses -->
+        </ul>
+    </div>
+
+    <div id="invitationList" class="forms" style="display:none; position: relative">
+        <button class="close-button" onclick="toggleElement('invitationList')">&times;</button>
+        <h2>Προσκλήσεις συμμετοχής σε τριμελή</h2>
+        <ul id="invitationListItems">
+            <!-- Dynamic list of invitations -->
+        </ul>
+    </div>
     
     <script src="/public/javascript/teacher.js"></script>
     <script src="/public/javascript/topbar_buttons.js"></script>

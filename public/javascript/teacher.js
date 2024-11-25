@@ -185,6 +185,139 @@ function sendRequest(url, method, data = null) {
     });
 }
 
+// Fetch and display active theses
+function fetchActiveTheses() {
+    console.log('Fetching active theses...');
+    sendRequest('/active-theses', 'GET')
+        .then(response => {
+            console.log('Active theses response:', response);
+            const activeThesesList = document.getElementById('activeThesesList');
+            activeThesesList.innerHTML = ''; // Clear the current list
+
+            if (response.success) {
+                response.data.forEach(thesis => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="thesis-title">
+                            <strong>Title:</strong> ${thesis.title}
+                            <button onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση Ανάθεσης</button>
+                        </div>
+                    `;
+                    activeThesesList.appendChild(listItem);
+                });
+            } else {
+                activeThesesList.innerHTML = 'No active theses found.';
+            }
+        });
+}
+
+// Fetch and display active theses in the new section
+function fetchActiveThesesSection() {
+    console.log('Fetching active theses for the new section...');
+    sendRequest('/active-theses', 'GET')
+        .then(response => {
+            console.log('Active theses response:', response);
+            const activeThesesListSection = document.getElementById('activeThesesListSection');
+            activeThesesListSection.innerHTML = ''; // Clear the current list
+
+            if (response.success) {
+                response.data.forEach(thesis => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="thesis-title">
+                            <strong>Title:</strong> ${thesis.title}
+                            <button onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση Ανάθεσης</button>
+                        </div>
+                    `;
+                    activeThesesListSection.appendChild(listItem);
+                });
+            } else {
+                activeThesesListSection.innerHTML = 'No active theses found.';
+            }
+        });
+}
+
+// Cancel assignment
+function cancelAssignment(thesisId) {
+    if (confirm('Are you sure you want to cancel this assignment?')) {
+        sendRequest(`/cancel-assignment/${thesisId}`, 'POST')
+            .then(response => {
+                if (response.success) {
+                    alert('Assignment cancelled successfully!');
+                    fetchActiveTheses(); // Refresh the list of active theses
+                    fetchActiveThesesSection(); // Refresh the list of active theses in the new section
+                } else {
+                    alert('Error cancelling assignment: ' + response.message);
+                }
+            });
+    }
+}
+
+// Fetch active theses when the page loads
+document.addEventListener('DOMContentLoaded', fetchActiveTheses);
+document.addEventListener('DOMContentLoaded', fetchActiveThesesSection);
+
+// Fetch and display active invitations
+function fetchActiveInvitations() {
+    console.log('Fetching active invitations...');
+    sendRequest('/active-invitations', 'GET')
+        .then(response => {
+            console.log('Active invitations response:', response);
+            const invitationListItems = document.getElementById('invitationListItems');
+            invitationListItems.innerHTML = ''; // Clear the current list
+
+            if (response.success) {
+                response.data.forEach(invitation => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="invitation-title">
+                            <strong>Thesis ID:</strong> ${invitation.thesis_id} <br>
+                            <strong>Role:</strong> ${invitation.role} <br>
+                            <button onclick="acceptInvitation(${invitation.committee_id})">Αποδοχή</button>
+                            <button onclick="rejectInvitation(${invitation.committee_id})">Απόρριψη</button>
+                        </div>
+                    `;
+                    invitationListItems.appendChild(listItem);
+                });
+            } else {
+                invitationListItems.innerHTML = 'No active invitations found.';
+            }
+        });
+}
+
+// Accept invitation
+function acceptInvitation(committeeId) {
+    if (confirm('Are you sure you want to accept this invitation?')) {
+        sendRequest(`/accept-invitation/${committeeId}`, 'POST')
+            .then(response => {
+                if (response.success) {
+                    alert('Invitation accepted successfully!');
+                    fetchActiveInvitations(); // Refresh the list of active invitations
+                } else {
+                    alert('Error accepting invitation: ' + response.message);
+                }
+            });
+    }
+}
+
+// Reject invitation
+function rejectInvitation(committeeId) {
+    if (confirm('Are you sure you want to reject this invitation?')) {
+        sendRequest(`/reject-invitation/${committeeId}`, 'POST')
+            .then(response => {
+                if (response.success) {
+                    alert('Invitation rejected successfully!');
+                    fetchActiveInvitations(); // Refresh the list of active invitations
+                } else {
+                    alert('Error rejecting invitation: ' + response.message);
+                }
+            });
+    }
+}
+
+// Fetch active invitations when the page loads
+document.addEventListener('DOMContentLoaded', fetchActiveInvitations);
+
 // Debounce function to delay the search request
 function debounce(func, delay) {
     let debounceTimer;
@@ -337,16 +470,7 @@ function searchThesesList() {
                 listItem.innerHTML = `
                     <div class="thesis-title">
                         <strong>Title:</strong> ${thesis.title}
-                        <button onclick="toggleDetails(this)">Show details</button>
-                    </div>
-                    <div class="thesis-details" style="display: none;">
-                        <strong>Summary:</strong> ${thesis.summary}<br>
-                        <strong>Status:</strong> ${thesis.status}<br>
-                        <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
-                        <strong>Student ID:</strong> ${thesis.student_id}<br>
-                        <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}')">View PDF</a><br>
-                        <strong>Role:</strong> ${thesis.role}<br>
+                        <button onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση Ανάθεσης</button>
                     </div>
                 `;
                 diplomaListItems.appendChild(listItem);
