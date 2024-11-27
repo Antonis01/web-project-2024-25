@@ -153,6 +153,30 @@ app.post('/logout', (req, res) => {
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+------------------------------------Middleware Functions-----------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
+// Middleware function to get the instructor id from the session
+// It's used in the /search-theses get request
+function getInstructorId(req, res, next) {
+    const username = req.session.user.username;
+    const query = 'SELECT instructor_id FROM Instructors WHERE teacher_username = ?';
+    db.query(query, [username], (err, results) => {
+        if (err) {
+            console.error('Error fetching instructor id:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        req.instructorId = results[0].instructor_id;
+        next();
+    });
+}
+
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 -------------------------------------Get Requests------------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -282,12 +306,13 @@ app.get("/search-student", (req, res) => {
     });
 });
 
-// Route handler for searching instructors
-app.get('/search-theses', (req, res) => {
+// Searching theses by the logged in instructor
+app.get('/search-theses', getInstructorId, (req, res) => {
     const statusFilter = req.query.status;
     const roleFilter = req.query.role;
+    const instructorId = req.instructorId;
     let query = `
-        SELECT Theses.*, Committees.role 
+        SELECT Theses.*, Committees.role, Committees.instructor_id
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
         WHERE 1=1
@@ -302,6 +327,11 @@ app.get('/search-theses', (req, res) => {
     if (roleFilter && roleFilter !== 'all') {
         query += ' AND Committees.role = ?';
         queryParams.push(roleFilter);
+    }
+
+    if (instructorId) {
+        query += ' AND Committees.instructor_id = ?';
+        queryParams.push(instructorId);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -552,7 +582,7 @@ app.post('/cancel-assignment/:id', (req, res) => {
     const thesisId = req.params.id;
     const query = `
         UPDATE Theses 
-        SET status = 'Υπό Ανάθεση', student_id = NULL 
+        SET status = 'Ακυρωμένη', student_id = NULL 
         WHERE thesis_id = ?
     `;
     db.query(query, [thesisId], (err) => {

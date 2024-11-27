@@ -470,7 +470,16 @@ function searchThesesList() {
                 listItem.innerHTML = `
                     <div class="thesis-title">
                         <strong>Title:</strong> ${thesis.title}
-                        <button onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση Ανάθεσης</button>
+                        <button onclick="toggleDetails(this)">Show details</button>
+                    </div>
+                    <div class="thesis-details" style="display: none;">
+                        <strong>Summary:</strong> ${thesis.summary}<br>
+                        <strong>Status:</strong> ${thesis.status}<br>
+                        <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
+                        <strong>Student ID:</strong> ${thesis.student_id}<br>
+                        <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
+                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
+                        <strong>Role:</strong> ${thesis.role}<br>
                     </div>
                 `;
                 diplomaListItems.appendChild(listItem);
