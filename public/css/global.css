@@ -30,8 +30,8 @@ body {
 .topBar .title {
     font-size: 18px;
     font-weight: bold;
-    white-space: nowrap; /* Prevents line breaks */
-    text-overflow: ellipsis; /* Adds ellipsis if the text is too long */
+    white-space: nowrap; 
+    text-overflow: ellipsis; 
 }
 
 .buttonContainer {
@@ -43,21 +43,50 @@ body {
 .burgerMenu {
     font-size: 24px;
     cursor: pointer;
-    margin-left: auto; /* Align the burger menu to the right */
-    margin-right: 20px; /* Add some space from the edge */
+    margin-left: auto; 
+    margin-right: 20px; 
+}
+
+.sideMenu {
+    width: 200px; 
+    position: fixed;
+    top: 50%;
+    right: 83%;
+    transform: translate(-50%, -50%);
+    background-color: #f8f9fa; 
+    overflow-y: auto; 
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.sideMenu button {
+    color: #343a46;
+    display: block; 
+    width: 100%; 
+    padding: 8px 10px; 
+    margin: 2px 0; 
+    background-color: #ffffff; 
+    border: none; 
+    text-align: left; 
+    cursor: pointer; 
+}
+
+.sideMenu button:hover {
+    color: white;
+    background-color: #343a46; 
 }
 
 .dropdownMenu {
     display: none;
     flex-direction: column;
     position: absolute;
-    top: 40px; /* Position it below the top bar */
-    right: 40px; /* Align it to the right side */
+    top: 40px; 
+    right: 40px;
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     z-index: 1001;
-    width: auto; /* Adjust width if needed */
+    width: auto; 
 }
 
 .dropdownButton {
@@ -126,7 +155,7 @@ body {
     max-width: 600px;
     box-sizing: border-box;
     margin-left: left;
-    margin-right: auto; /* Center align the form box */
+    margin-right: auto; 
 }
 
 .announcementBoard h2, .timetable h2 {
@@ -151,8 +180,8 @@ body {
 
 .ceid-logo {
     display: block;
-    margin: 0 auto; /* Center the logo */
-    max-width: 1000px; /* Adjust the size of the logo as needed */
+    margin: 0 auto; 
+    max-width: 1000px;
 }
 
 .loginPage {
@@ -206,14 +235,14 @@ button:hover {
 }
 
 .forms {
-    margin-top: 60px; /* Add margin to avoid content being hidden under the fixed top bar */
+    margin-top: 60px;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 600px; /* Set a maximum width */
-    margin-left: auto; /* Center align the form box */
-    margin-right: auto; /* Center align the form box */
+    max-width: 600px; 
+    margin-left: auto; 
+    margin-right: auto; 
 }
 
 .forms h2 {
@@ -253,7 +282,7 @@ button.close-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 30px; /* Ensure the text is centered vertically */
+    line-height: 30px; 
 }
 
 button.close-button:hover {
@@ -312,6 +341,10 @@ button.close-button:hover {
         right: 20px;
     }
 
+    .sideMenu {
+        display: none;
+    }
+
     .content {
         padding: 70px 10px 10px;
         flex-direction: column;
@@ -338,6 +371,10 @@ button.close-button:hover {
 
 /* Desktop styles */
 @media (min-width: 601px) {
+    .burgerMenu {
+        display: none; 
+    }
+
     .content {
         flex-direction: column;
         align-items: flex-start;

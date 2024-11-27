@@ -25,6 +25,18 @@
         </div>
     </div>
 
+    <div class="sideMenu">
+        <button onclick="toggleElement('thesesAddView')">Προσθήκη/Προβολή θέματος</button>
+        <button onclick="toggleElement('assignTheses')">Aνάθεση θέματος</button>
+        <button onclick="toggleElement('thesesList')">Λίστα διπλωματικών</button>
+        <button onclick="toggleElement('invitationCommision')">Προσκλήσεις σε τριμελή</button>
+        <button onclick="toggleElement('formStatistics')">Στατιστικά</button>
+        <button onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
+        <button onclick="toggleElement('activeTheses')">Ενεργές Αναθέσεις</button>
+        <button onclick="toggleElement('invitationList')">Προσκλήσεις</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
     <div id="thesesAddView" class="forms" style="display:none; position: relative";>
         <button class="close-button"&times; onclick="toggleElement('thesesAddView')" >x</button>
         <h2>Προσθήκη θέματος</h2>
