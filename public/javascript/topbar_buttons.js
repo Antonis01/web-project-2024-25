@@ -59,13 +59,20 @@ function toggleElementDisplay(elementId, displayStyle = "block") {
     if (elementId !== "dropdownMenu") {
         var menu = document.getElementById("dropdownMenu");
         menu.style.display = "none";
-    }        
+    }
 
-    if (elementId == "thesesAddView") {
-        element = document.getElementById("topicsContainer");
-        if (element.style.display === "none" || element.style.display === "") {
-            element.style.display = displayStyle;
-        } 
+    if (elementId === "topicsContainer" && element.style.display !== "none") {
+        var thesesAddView = document.getElementById("thesesAddView");
+        if (thesesAddView.style.display === "none" || thesesAddView.style.display === "") {
+            thesesAddView.style.display = displayStyle;
+        }
+    }
+
+    if (elementId === "thesesAddView" && element.style.display !== "none") {
+        var topicsContainer = document.getElementById("topicsContainer");
+        if (topicsContainer.style.display === "none" || topicsContainer.style.display === "") {
+            topicsContainer.style.display = displayStyle;
+        }
     }
 }
 
