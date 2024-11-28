@@ -74,6 +74,13 @@ function toggleElementDisplay(elementId, displayStyle = "block") {
             topicsContainer.style.display = displayStyle;
         }
     }
+
+    if (elementId === "thesesAddView" && element.style.display === "none") {
+        var topicsContainer = document.getElementById("topicsContainer");
+        if (topicsContainer.style.display !== "none") {
+            topicsContainer.style.display = "none";
+        }
+    }
 }
 
 function toggleElement(elementId, displayStyle = "block") {
