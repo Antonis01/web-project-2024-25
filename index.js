@@ -312,9 +312,17 @@ app.get('/search-theses', getInstructorId, (req, res) => {
     const roleFilter = req.query.role;
     const instructorId = req.instructorId;
     let query = `
-        SELECT Theses.*, Committees.role, Committees.instructor_id
+        SELECT Theses.*, 
+               t1.teacher_name AS teacher_name, Committees.role,
+               t2.teacher_name AS teacher2_name, Committees.role2,
+               t3.teacher_name AS teacher3_name, Committees.role3,
+               Students.am AS student_am
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
+        LEFT JOIN Instructors t1 ON Committees.instructor_id = t1.instructor_id
+        LEFT JOIN Instructors t2 ON Committees.instructor_id2 = t2.instructor_id
+        LEFT JOIN Instructors t3 ON Committees.instructor_id3 = t3.instructor_id
+        LEFT JOIN Students ON Theses.student_id = Students.student_id
         WHERE 1=1
     `;
     const queryParams = [];

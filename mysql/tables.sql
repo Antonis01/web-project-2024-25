@@ -62,14 +62,26 @@ CREATE TABLE Assignments (
 CREATE TABLE Committees (
     committee_id INT PRIMARY KEY AUTO_INCREMENT,
     thesis_id INT,
-    instructor_id INT,
     assignment_id INT,
+    instructor_id INT,
     role ENUM('Επιβλέπων', 'Μέλος') NOT NULL,
     response ENUM('Αποδοχή', 'Απόρριψη') DEFAULT NULL,
     invitation_date DATE DEFAULT NULL,
     response_date DATE DEFAULT NULL,
+    instructor_id2 INT,
+    role2 ENUM('Επιβλέπων', 'Μέλος') NOT NULL,
+    response2 ENUM('Αποδοχή', 'Απόρριψη') DEFAULT NULL,
+    invitation_date2 DATE DEFAULT NULL,
+    response_date2 DATE DEFAULT NULL,
+    instructor_id3 INT,
+    role3 ENUM('Επιβλέπων', 'Μέλος') NOT NULL,
+    response3 ENUM('Αποδοχή', 'Απόρριψη') DEFAULT NULL,
+    invitation_date3 DATE DEFAULT NULL,
+    response_date3 DATE DEFAULT NULL,
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id),
     FOREIGN KEY (instructor_id) REFERENCES Instructors(instructor_id),
+    FOREIGN KEY (instructor_id2) REFERENCES Instructors(instructor_id),
+    FOREIGN KEY (instructor_id3) REFERENCES Instructors(instructor_id),
     FOREIGN KEY (assignment_id) REFERENCES Assignments(assignment_id)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
 

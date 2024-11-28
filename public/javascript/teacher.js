@@ -465,21 +465,25 @@ function searchThesesList() {
             const diplomaListItems = document.getElementById('diplomaListItems');
             diplomaListItems.innerHTML = ''; // Clear the current list
 
-            data.data.forEach(thesis => {
+            data.data.forEach(theses => {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
                     <div class="thesis-title">
-                        <strong>Title:</strong> ${thesis.title}
+                        <strong>Title:</strong> ${theses.title}
                         <button onclick="toggleDetails(this)">Show details</button>
                     </div>
                     <div class="thesis-details" style="display: none;">
-                        <strong>Summary:</strong> ${thesis.summary}<br>
-                        <strong>Status:</strong> ${thesis.status}<br>
-                        <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
-                        <strong>Student ID:</strong> ${thesis.student_id}<br>
-                        <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
-                        <strong>Role:</strong> ${thesis.role}<br>
+                        <strong>Summary:</strong> ${theses.summary}<br>
+                        <strong>Status:</strong> ${theses.status}<br>
+                        <strong>Student AM:</strong> ${theses.student_am}<br>
+                        <strong>Final Submission Date:</strong> ${theses.final_submission_date}<br>
+                        <strong>Instructor Name:</strong> ${theses.teacher_name}<br>
+                        <strong>Role:</strong> ${theses.role}<br>
+                        <strong>Instructor2 Name:</strong> ${theses.teacher2_name}<br>
+                        <strong>Role2:</strong> ${theses.role2}<br>
+                        <strong>Instructor3 Name:</strong> ${theses.teacher3_name}<br>
+                        <strong>Role3:</strong> ${theses.role3}<br>
+                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${theses.pdf_path}', this.parentElement)">View PDF</a><br>
                     </div>
                 `;
                 diplomaListItems.appendChild(listItem);
