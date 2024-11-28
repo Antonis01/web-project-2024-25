@@ -51,21 +51,21 @@ body {
     width: 200px; 
     position: fixed;
     top: 50%;
-    right: 83%;
+    right: 84%;
     transform: translate(-50%, -50%);
-    background-color: #f8f9fa; 
+    background-color: #657086; 
     overflow-y: auto; 
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
     border-radius: 8px;
 }
 
 .sideMenu button {
-    color: #343a46;
+    color: #000000;
     display: block; 
     width: 100%; 
     padding: 8px 10px; 
     margin: 2px 0; 
-    background-color: #ffffff; 
+    background-color: #657086; 
     border: none; 
     text-align: left; 
     cursor: pointer; 
@@ -74,6 +74,12 @@ body {
 .sideMenu button:hover {
     color: white;
     background-color: #343a46; 
+}
+
+.upatras-logo {
+    display: block;
+    margin: 0 auto; 
+    max-width: 200px; 
 }
 
 .dropdownMenu {
