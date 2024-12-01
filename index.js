@@ -584,6 +584,7 @@ app.post("/assign-topic", (req, res) => {
             }
 
             const thesisId = thesisResults[0].thesis_id;
+            
             const queryAssign = `
                 UPDATE Theses 
                 SET status = 'Ενεργή', student_id = ? 
