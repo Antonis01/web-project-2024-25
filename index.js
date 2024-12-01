@@ -486,6 +486,7 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
         INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
         VALUES (?, ?, ?, ?, ?)
     `;
+    
     const values = [title, description, pdfPath, status, instructor_id || null];
 
     db.query(query, values, (err, result) => {
@@ -494,6 +495,21 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
+
+        const thesisId = result.insertId;
+
+        const query2 = `
+            INSERT INTO Committees (thesis_id, instructor_id, role)
+            VALUES (LAST_INSERT_ID(), ?, 'Επιβλέπων')
+        `;
+
+        db.query(query2, [instructor_id], (err) => {
+            if (err) {
+                console.error('Error inserting committee:', err);
+                res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return;
+            }
+        });
         res.json({ success: true, message: 'Thesis added successfully!' });
     });
 });
