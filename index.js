@@ -103,7 +103,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     const roles = [
-        { table: 'Instructors', role: 'teacher', redirect: '/private/teacher/teacher.html' },
+        { table: 'Teachers', role: 'teacher', redirect: '/private/teacher/teacher.html' },
         { table: 'Students', role: 'student', redirect: '/private/student/student.html' },
         { table: 'Secretary', role: 'secretary', redirect: '/private/secretary/secretary.html' }
     ];
@@ -158,18 +158,18 @@ app.post('/logout', (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
-// Middleware function to get the instructor id from the session
+// Middleware function to get the teacher id from the session
 // It's used in the /search-theses get request
-function getInstructorId(req, res, next) {
+function getTeacherId(req, res, next) {
     const username = req.session.user.username;
-    const query = 'SELECT instructor_id FROM Instructors WHERE teacher_username = ?';
+    const query = 'SELECT teacher_am FROM Teachers WHERE teacher_username = ?';
     db.query(query, [username], (err, results) => {
         if (err) {
-            console.error('Error fetching instructor id:', err);
+            console.error('Error fetching teacher id:', err);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
-        req.instructorId = results[0].instructor_id;
+        req.teacherId = results[0].teacher_am;
         next();
     });
 }
@@ -286,10 +286,10 @@ app.get("/search-student", (req, res) => {
     let queryParams = [];
 
     if (am) {
-        query = 'SELECT am, student_id FROM Students WHERE am LIKE ?';
+        query = 'SELECT student_am FROM Students WHERE student_am LIKE ?';
         queryParams = [`%${am}%`];
     } else if (studentName) {
-        query = 'SELECT student_name, student_id FROM Students WHERE student_name LIKE ?';
+        query = 'SELECT student_name, student_am FROM Students WHERE student_name LIKE ?';
         queryParams = [`%${studentName}%`];
     } else {
         res.status(400).json({ success: false, message: 'Missing search parameter' });
@@ -306,23 +306,23 @@ app.get("/search-student", (req, res) => {
     });
 });
 
-// Searching theses by the logged in instructor
-app.get('/search-theses', getInstructorId, (req, res) => {
+// Searching theses by the logged in teacher
+app.get('/search-theses', getTeacherId, (req, res) => {
     const statusFilter = req.query.status;
     const roleFilter = req.query.role;
-    const instructorId = req.instructorId;
+    const teacherId = req.teacherId;
     let query = `
         SELECT Theses.*, 
                t1.teacher_name AS teacher_name, Committees.role,
                t2.teacher_name AS teacher2_name, Committees.role2,
                t3.teacher_name AS teacher3_name, Committees.role3,
-               Students.am AS student_am
+               Students.student_am AS student_am
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
-        LEFT JOIN Instructors t1 ON Committees.instructor_id = t1.instructor_id
-        LEFT JOIN Instructors t2 ON Committees.instructor_id2 = t2.instructor_id
-        LEFT JOIN Instructors t3 ON Committees.instructor_id3 = t3.instructor_id
-        LEFT JOIN Students ON Theses.student_id = Students.student_id
+        LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
+        LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
+        LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
+        LEFT JOIN Students ON Theses.student_am = Students.student_am
         WHERE 1=1
     `;
     const queryParams = [];
@@ -337,9 +337,9 @@ app.get('/search-theses', getInstructorId, (req, res) => {
         queryParams.push(roleFilter);
     }
 
-    if (instructorId) {
-        query += ' AND Committees.instructor_id = ?';
-        queryParams.push(instructorId);
+    if (teacherId) {
+        query += ' AND Committees.teacher_am = ?';
+        queryParams.push(teacherId);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -432,10 +432,11 @@ app.get('/active-theses', (req, res) => {
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
 
-        console.log('Active theses results:', results);
+        //console.log('Active theses results:', results);
         res.json({ success: true, data: results });
     });
 });
+
 
 // Route handler for fetching active invitations
 app.get('/active-invitations', (req, res) => {
@@ -450,7 +451,7 @@ app.get('/active-invitations', (req, res) => {
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
 
-        console.log('Active invitations results:', results);
+        //console.log('Active invitations results:', results);
         res.json({ success: true, data: results });
     });
 });
@@ -478,16 +479,16 @@ const upload = multer({
 
 // Route handler for the add-thesis form
 app.post('/add-thesis', upload.single('file'), (req, res) => {
-    const { title, description, instructor_id, student_id, final_submission_date } = req.body;
+    const { title, description, teacher_am, student_id, final_submission_date } = req.body;
     const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
     const status = 'Υπό Ανάθεση'; // Default status
 
     const query = `
-        INSERT INTO Theses (title, summary, pdf_path, status, instructor_id)
+        INSERT INTO Theses (title, summary, pdf_path, status, teacher_am)
         VALUES (?, ?, ?, ?, ?)
     `;
     
-    const values = [title, description, pdfPath, status, instructor_id || null];
+    const values = [title, description, pdfPath, status, teacher_am || null];
 
     db.query(query, values, (err, result) => {
         if (err) {
@@ -499,11 +500,11 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
         const thesisId = result.insertId;
 
         const query2 = `
-            INSERT INTO Committees (thesis_id, instructor_id, role)
+            INSERT INTO Committees (thesis_id, teacher_am, role)
             VALUES (LAST_INSERT_ID(), ?, 'Επιβλέπων')
         `;
 
-        db.query(query2, [instructor_id], (err) => {
+        db.query(query2, [teacher_am], (err) => {
             if (err) {
                 console.error('Error inserting committee:', err);
                 res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -516,15 +517,15 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
 
 // Route handler for updating a thesis
 app.post('/update-thesis', upload.single('file'), (req, res) => {
-    const { thesis_id, title, description, instructor_id, student_id, final_submission_date, status } = req.body;
+    const { thesis_id, title, description, teacher_am, student_id, final_submission_date, status } = req.body;
     const pdfPath = req.file ? `uploads/${req.file.filename}` : null;
 
     let query = `
         UPDATE Theses
-        SET title = ?, summary = ?, status = ?, instructor_id = ?, 
+        SET title = ?, summary = ?, status = ?, teacher_am = ?, 
         student_id = ?, final_submission_date = ?
     `;
-    const values = [title, description, status, instructor_id, student_id || null, final_submission_date || null];
+    const values = [title, description, status, teacher_am, student_id || null, final_submission_date || null];
 
     if (pdfPath) {
         query += `, pdf_path = ?`;
@@ -554,7 +555,7 @@ app.post("/assign-topic", (req, res) => {
     }
 
     // Check if the student AM exists in the students table and get the student_id
-    const checkStudentQuery = 'SELECT student_id FROM Students WHERE am = ?';
+    const checkStudentQuery = 'SELECT student_am FROM Students WHERE student_am = ?';
     db.query(checkStudentQuery, [am], (err, studentResults) => {
         if (err) {
             console.error("Error checking student:", err);
@@ -565,7 +566,7 @@ app.post("/assign-topic", (req, res) => {
             return res.status(400).json({ success: false, message: 'Student AM does not exist' });
         }
 
-        const studentId = studentResults[0].student_id;
+        const studentAM = studentResults[0].student_am;
 
         // Check if the thesis is available
         const queryCheck = `
@@ -587,14 +588,26 @@ app.post("/assign-topic", (req, res) => {
             
             const queryAssign = `
                 UPDATE Theses 
-                SET status = 'Ενεργή', student_id = ? 
+                SET status = 'Ενεργή', student_am = ? 
                 WHERE thesis_id = ?
             `;
-            db.query(queryAssign, [studentId, thesisId], (err) => {
+            db.query(queryAssign, [studentAM, thesisId], (err) => {
                 if (err) {
                     console.error("Error assigning thesis:", err);
                     return res.status(500).json({ success: false, message: "Internal Server Error" });
                 }
+
+                const queryAssignments = `
+                    INSERT INTO Assignments (student_am, thesis_id) 
+                    VALUES (?, ?)
+                `;
+
+                db.query(queryAssignments, [studentAM, thesisId], (err) => {
+                    if (err) {
+                        console.error("Error inserting assignment:", err);
+                        return res.status(500).json({ success: false, message: "Internal Server Error" });
+                    }
+                });
 
                 res.json({ success: true, message: "Το θέμα ανατέθηκε επιτυχώς στον φοιτητή." });
             });
@@ -617,23 +630,6 @@ app.post('/cancel-assignment/:id', (req, res) => {
         }
 
         res.json({ success: true, message: "Assignment cancelled successfully!" });
-    });
-});
-
-app.get('/active-theses', (req, res) => {
-    const query = `
-        SELECT thesis_id, title 
-        FROM Theses 
-        WHERE status = 'Ενεργή'
-    `;
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("Error fetching active theses:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
-        }
-
-        console.log('Active theses results:', results);
-        res.json({ success: true, data: results });
     });
 });
 

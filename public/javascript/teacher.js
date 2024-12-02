@@ -41,7 +41,7 @@ function fetchTheses() {
                         <div class="thesis-details" style="display: none;">
                             <strong>Summary:</strong> ${thesis.summary}<br>
                             <strong>Status:</strong> ${thesis.status}<br>
-                            <strong>Instructor ID:</strong> ${thesis.instructor_id}<br>
+                            <strong>Teacher AM:</strong> ${thesis.teacher_am}<br>
                             <strong>Student ID:</strong> ${thesis.student_id}<br>
                             <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
                             <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
@@ -389,10 +389,10 @@ const debounceSearchStudentByAm = debounce(function() {
                 response.data.forEach(student => {
                     const suggestionItem = document.createElement("div");
                     suggestionItem.className = "suggestion-item";
-                    suggestionItem.textContent = student.am;
+                    suggestionItem.textContent = student.student_am;
                     suggestionItem.onclick = () => {
-                        document.getElementById("studentAM").value = student.am;
-                        document.getElementById("hiddenStudentId").value = student.student_id; // Store student ID in hidden field
+                        document.getElementById("studentAM").value = student.student_am;
+                        document.getElementById("hiddenStudentId").value = student.student_am; // Store student ID in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
                     suggestionsContainer.appendChild(suggestionItem);
@@ -423,7 +423,7 @@ const debounceSearchStudentByName = debounce(function() {
                     suggestionItem.textContent = student.student_name;
                     suggestionItem.onclick = () => {
                         document.getElementById("studentName").value = student.student_name;
-                        document.getElementById("hiddenStudentId").value = student.student_id; // Store student ID in hidden field
+                        document.getElementById("hiddenStudentId").value = student.student_am; // Store student am in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
                     suggestionsContainer.appendChild(suggestionItem);
