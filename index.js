@@ -123,7 +123,7 @@ app.post('/login', (req, res) => {
                 return;
             }
             if (results.length > 0) {
-                req.session.user = { username: username, role: role };
+                req.session.user = { username: username, role: role, teacher_am: results[0].teacher_am };
                 console.log(`User ${username} logged in with role ${role} and session ID: ${req.sessionID}`);
                 res.json({ redirect });
                 console.log(res);
@@ -177,7 +177,7 @@ function getTeacherId(req, res, next) {
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--------------------------------------Get Requests------------------------------------
+-------------------------------------Route Handlers----------------------------------
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 */
@@ -249,6 +249,14 @@ app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
     });
 });
 
+/*
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------Get Requests------------------------------------
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+*/
+
 // Route handler for assigning a thesis to a student
 app.get('/get-thesis/:id', (req, res) => {
     const query = 'SELECT * FROM Theses WHERE thesis_id = ?';
@@ -262,6 +270,7 @@ app.get('/get-thesis/:id', (req, res) => {
             res.status(404).json({ success: false, message: 'Thesis not found' });
             return;
         }
+
         res.json({ success: true, data: results[0] });
     });
 });
@@ -479,10 +488,14 @@ const upload = multer({
 
 // Route handler for the add-thesis form
 app.post('/add-thesis', upload.single('file'), (req, res) => {
-    const { title, description, teacher_am, student_id, final_submission_date } = req.body;
+    const { title, description } = req.body;
     const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
     const status = 'Υπό Ανάθεση'; // Default status
-
+    const teacher_am = req.session.user.teacher_am;
+    console.log("teeeeeestttt");
+    console.log(teacher_am);
+    console.log(req.session.user.teacher_am);
+    console.log("tesssssssssssssst");
     const query = `
         INSERT INTO Theses (title, summary, pdf_path, status, teacher_am)
         VALUES (?, ?, ?, ?, ?)
@@ -496,8 +509,6 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
-
-        const thesisId = result.insertId;
 
         const query2 = `
             INSERT INTO Committees (thesis_id, teacher_am, role)
@@ -516,16 +527,18 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
 });
 
 // Route handler for updating a thesis
+// We use let instead of const because we will be appending to the query string
+// Route handler for updating a thesis
 app.post('/update-thesis', upload.single('file'), (req, res) => {
-    const { thesis_id, title, description, teacher_am, student_id, final_submission_date, status } = req.body;
+    const { thesis_id, title, description, teacher_am, student_am, final_submission_date, status } = req.body;
     const pdfPath = req.file ? `uploads/${req.file.filename}` : null;
 
     let query = `
         UPDATE Theses
         SET title = ?, summary = ?, status = ?, teacher_am = ?, 
-        student_id = ?, final_submission_date = ?
+        student_am = ?, final_submission_date = ?
     `;
-    const values = [title, description, status, teacher_am, student_id || null, final_submission_date || null];
+    const values = [title, description, status, teacher_am, student_am || null, final_submission_date || null];
 
     if (pdfPath) {
         query += `, pdf_path = ?`;
@@ -541,7 +554,20 @@ app.post('/update-thesis', upload.single('file'), (req, res) => {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
-        res.json({ success: true, message: 'Thesis updated successfully!' });
+
+        const query2 = `
+            UPDATE Committees
+            SET teacher_am = ?
+            WHERE thesis_id = ? AND role = 'Επιβλέπων'
+        `;
+        db.query(query2, [teacher_am, thesis_id], (err) => {
+            if (err) {
+                console.error('Error updating committee:', err);
+                res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return;
+            }
+            res.json({ success: true, message: 'Theses and Committee updated successfully!' });
+        });
     });
 });
 
@@ -677,22 +703,44 @@ app.post('/reject-invitation/:id', (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
-// Route handler for deleting a thesis
+// Delete the theses 
 app.delete('/delete-thesis/:id', (req, res) => {
     const thesisId = req.params.id;
-    const query = 'DELETE FROM Theses WHERE thesis_id = ?';
 
-    db.query(query, [thesisId], (err, result) => {
+    // Delete from Assignments table
+    const query1 = 'DELETE FROM Assignments WHERE thesis_id = ?';
+    db.query(query1, [thesisId], (err, result) => {
         if (err) {
-            console.error('Error deleting thesis:', err);
+            console.error('Error deleting assignments:', err);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
-        if (result.affectedRows === 0) {
-            res.status(404).json({ success: false, message: 'Thesis not found' });
-            return;
-        }
-        res.json({ success: true, message: 'Thesis deleted successfully!' });
+
+        // Delete from Committees table
+        const query2 = 'DELETE FROM Committees WHERE thesis_id = ?';
+        db.query(query2, [thesisId], (err, result) => {
+            if (err) {
+                console.error('Error deleting committees:', err);
+                res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return;
+            }
+
+            // Delete from Theses table
+            const query3 = 'DELETE FROM Theses WHERE thesis_id = ?';
+            db.query(query3, [thesisId], (err, result) => {
+                if (err) {
+                    console.error('Error deleting thesis:', err);
+                    res.status(500).json({ success: false, message: 'Internal Server Error' });
+                    return;
+                }
+                if (result.affectedRows === 0) {
+                    res.status(404).json({ success: false, message: 'Thesis not found' });
+                    return;
+                }
+
+                res.json({ success: true, message: 'Thesis deleted successfully!' });
+            });
+        });
     });
 });
 

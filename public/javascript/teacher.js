@@ -42,7 +42,7 @@ function fetchTheses() {
                             <strong>Summary:</strong> ${thesis.summary}<br>
                             <strong>Status:</strong> ${thesis.status}<br>
                             <strong>Teacher AM:</strong> ${thesis.teacher_am}<br>
-                            <strong>Student ID:</strong> ${thesis.student_id}<br>
+                            <strong>Student AM:</strong> ${thesis.student_am}<br>
                             <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
                             <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
                             <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
@@ -103,8 +103,8 @@ function editThesis(thesisId) {
                 document.getElementById('editThesisId').value = thesis.thesis_id;
                 document.getElementById('editTitle').value = thesis.title;
                 document.getElementById('editDescription').value = thesis.summary;
-                document.getElementById('editInstructorId').value = thesis.instructor_id;
-                document.getElementById('editStudentId').value = thesis.student_id;
+                document.getElementById('editTeacherAM').value = thesis.teacher_am;
+                document.getElementById('editStudentAM').value = thesis.student_am;
                 document.getElementById('editFinalSubmissionDate').value = thesis.final_submission_date;
                 document.getElementById('editStatus').value = thesis.status;
                 document.getElementById('editThesisFormContainer').style.display = 'block';
@@ -130,16 +130,16 @@ document.getElementById('editThesisForm').addEventListener('submit', function(ev
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Thesis updated successfully!');
+            alert('Theses and Committee updated successfully!');
             document.getElementById('editThesisFormContainer').style.display = 'none';
             fetchTheses(); // Refresh the list of theses
         } else {
-            alert('Error updating thesis: ' + data.message);
+            alert('Error updating theses or the commitee: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating the thesis.');
+        alert('An error occurred while updating the theses or the commitee.');
     });
 });
 
@@ -153,7 +153,7 @@ function deleteThesis() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Thesis deleted successfully!');
+                alert('Theses deleted successfully!');
                 document.getElementById('editThesisFormContainer').style.display = 'none';
                 fetchTheses(); // Refresh the list of theses
             } else {
