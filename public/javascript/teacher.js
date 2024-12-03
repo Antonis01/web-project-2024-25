@@ -332,7 +332,7 @@ function debounce(func, delay) {
 // Toggle search fields based on selected search type
 function toggleSearchFields() {
     const searchType = document.getElementById("searchType").value;
-    if (searchType === "studentId") {
+    if (searchType === "studentAM") {
         document.getElementById("searchByAM").style.display = "block";
         document.getElementById("searchByName").style.display = "none";
     } else {
@@ -423,7 +423,7 @@ const debounceSearchStudentByName = debounce(function() {
                     suggestionItem.textContent = student.student_name;
                     suggestionItem.onclick = () => {
                         document.getElementById("studentName").value = student.student_name;
-                        document.getElementById("hiddenStudentId").value = student.student_am; // Store student am in hidden field
+                        document.getElementById("hiddenStudentAM").value = student.student_am; // Store student am in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
                     suggestionsContainer.appendChild(suggestionItem);
@@ -439,7 +439,7 @@ function assignTopic() {
     const am = document.getElementById("studentAM").value.trim();
     const subject = document.getElementById("subject").value.trim();
 
-    if (am === "" || subject === "") {
+    if ( !am || !subject ) {
         alert("Συμπληρώστε όλα τα πεδία.");
         return;
     }

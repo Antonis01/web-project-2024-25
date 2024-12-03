@@ -43,7 +43,7 @@ CREATE TABLE Theses (
     title VARCHAR(255) NOT NULL,
     summary TEXT,
     pdf_path VARCHAR(255),
-    status ENUM('Υπό Ανάθεση', 'Ενεργή', 'Υπό Εξέταση', 'Περατωμένη', 'Ακυρωμένη') NOT NULL,
+    status ENUM('Υπό Ανάθεση', 'Ενεργή', 'Υπό Εξέταση', 'Περατωμένη', 'Ακυρωμένη') NULL,
     teacher_am INT,
     student_am INT,
     final_submission_date DATE DEFAULT NULL,
