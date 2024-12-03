@@ -450,20 +450,23 @@ app.get('/active-theses', (req, res) => {
 
 
 // Route handler for fetching active invitations
-app.get('/active-invitations', (req, res) => {
-    const query = `
-        SELECT committee_id, thesis_id, role, response 
-        FROM Committees 
-        WHERE response IS NULL
-    `;
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("Error fetching active invitations:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
-        }
+app.get('/get-invitations/:teacher_am', (req, res) => {
+    const teacherAM = req.params.teacher_am;
 
-        //console.log('Active invitations results:', results);
-        res.json({ success: true, data: results });
+    const query = `
+        SELECT c.committee_id, c.role, c.response, c.invitation_date, t.title
+        FROM Committees AS c
+        JOIN Theses AS t ON c.thesis_id = t.thesis_id
+        WHERE c.teacher_am = ? AND c.response IS NULL
+    `;
+
+    db.query(query, [teacherAM], (err, results) => {
+        if (err) {
+            console.error('Error fetching invitations:', err);
+            res.status(500).send('Error fetching invitations');
+            return;
+        }
+        res.json({ invitations: results });
     });
 });
 
@@ -655,39 +658,43 @@ app.post('/cancel-assignment/:id', (req, res) => {
     });
 });
 
-// Route handler for accepting an invitation
+// Endpoint για αποδοχή πρόσκλησης
 app.post('/accept-invitation/:id', (req, res) => {
     const committeeId = req.params.id;
+
     const query = `
-        UPDATE Committees 
-        SET response = 'Αποδοχή', response_date = NOW() 
+        UPDATE Committees
+        SET response = 'Αποδοχή', response_date = NOW()
         WHERE committee_id = ?
     `;
+
     db.query(query, [committeeId], (err) => {
         if (err) {
-            console.error("Error accepting invitation:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            console.error('Error accepting invitation:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
         }
-
-        res.json({ success: true, message: "Invitation accepted successfully!" });
+        res.json({ success: true, message: 'Invitation accepted successfully!' });
     });
 });
 
-// Route handler for rejecting an invitation
+// Endpoint για απόρριψη πρόσκλησης
 app.post('/reject-invitation/:id', (req, res) => {
     const committeeId = req.params.id;
+
     const query = `
-        UPDATE Committees 
-        SET response = 'Απόρριψη', response_date = NOW() 
+        UPDATE Committees
+        SET response = 'Απόρριψη', response_date = NOW()
         WHERE committee_id = ?
     `;
+
     db.query(query, [committeeId], (err) => {
         if (err) {
-            console.error("Error rejecting invitation:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            console.error('Error rejecting invitation:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
         }
-
-        res.json({ success: true, message: "Invitation rejected successfully!" });
+        res.json({ success: true, message: 'Invitation rejected successfully!' });
     });
 });
 
@@ -739,6 +746,8 @@ app.delete('/delete-thesis/:id', (req, res) => {
         });
     });
 });
+
+
 
 /*
 -------------------------------------------------------------------------------------

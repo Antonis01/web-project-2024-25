@@ -541,3 +541,65 @@ function exportTheses(format) {
             alert('An error occurred while exporting the theses.');
         });
 }
+// Κλήση της loadInvitations() μόλις φορτώσει η σελίδα
+window.onload = () => {
+    loadInvitations();
+}; 
+
+function loadInvitations() {
+    alert('δεν υπάρχουν ενεργές προσκλήσεις')
+    fetch('/get-invitations') // Κλήση του endpoint για τις προσκλήσεις
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('invitationsTableBody');
+            tableBody.innerHTML = ''; // Καθαρισμός του πίνακα
+
+            // Έλεγχος για επιτυχία και δεδομένα
+            if (data.success && data.data.length > 0) {
+                data.data.forEach(invitation => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${invitation.thesisTitle || "Χωρίς Θέμα"}</td>
+                        <td>${invitation.invitation_date || "Χωρίς Ημερομηνία"}</td>
+                        <td>${invitation.response || "Εκκρεμεί"}</td>
+                        <td>
+                            <button class="accept-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'accept')">Αποδοχή</button>
+                            <button class="reject-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'reject')">Απόρριψη</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                // Μήνυμα σε περίπτωση που δεν υπάρχουν προσκλήσεις
+                tableBody.innerHTML = '<tr><td colspan="4">Δεν υπάρχουν ενεργές προσκλήσεις.</td></tr>';
+            }
+        })
+        .catch(err => console.error('Error loading invitations:', err));
+}
+
+// Λειτουργία για αποδοχή ή απόρριψη πρόσκλησης
+function handleInvitationResponse(committeeId, action) {
+    console.log(`Processing ${action} for committee ID: ${committeeId}`);
+
+    // Επιλογή κατάλληλου endpoint
+    const url = action === 'accept'
+        ? `/accept-invitation/${committeeId}`
+        : `/reject-invitation/${committeeId}`;
+
+    // Αποστολή αιτήματος στον server
+    fetch(url, {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(`${action === 'accept' ? 'Accepted' : 'Rejected'} invitation ID: ${committeeId}`);
+            // Ανανέωση της λίστας προσκλήσεων
+            loadInvitations();
+        } else {
+            console.error(`Failed to ${action} invitation ID: ${committeeId}`, data.message);
+        }
+    })
+    .catch(err => console.error('Error processing invitation:', err));
+}
+
