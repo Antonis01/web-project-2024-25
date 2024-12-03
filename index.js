@@ -646,7 +646,7 @@ app.post('/cancel-assignment/:id', (req, res) => {
     const thesisId = req.params.id;
     const query = `
         UPDATE Theses 
-        SET status = 'Ακυρωμένη', student_id = NULL 
+        SET status = 'Ακυρωμένη', student_am = NULL 
         WHERE thesis_id = ?
     `;
     db.query(query, [thesisId], (err) => {
