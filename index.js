@@ -15,6 +15,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const multer = require('multer');
+const { Parser } = require('json2csv');
 
 const app = express();
 
@@ -327,13 +328,13 @@ app.get('/search-theses', getTeacherId, (req, res) => {
                t1.teacher_name AS teacher_name, Committees.role,
                t2.teacher_name AS teacher2_name, Committees.role2,
                t3.teacher_name AS teacher3_name, Committees.role3,
-               Students.student_am AS student_am
+               s.student_am AS student_am
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
         LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
         LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
         LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-        LEFT JOIN Students ON Theses.student_am = Students.student_am
+        LEFT JOIN Students s ON Theses.student_am = s.student_am
         WHERE 1=1
     `;
     const queryParams = [];
@@ -363,37 +364,24 @@ app.get('/search-theses', getTeacherId, (req, res) => {
     });
 });
 
-// Route handler for getting the theses title
-app.get("/get-theses-title", (req, res) => {
-    const { subject } = req.query;
-    if (!subject) {
-        res.status(400).json({ success: false, message: 'Missing search parameter' });
-        return;
-    }
-
-    const query = 'SELECT title FROM Theses WHERE title LIKE ?';
-    const queryParams = [`%${subject}%`];
-
-    db.query(query, queryParams, (err, results) => {
-        if (err) {
-            console.error("Error searching thesis:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
-        }
-
-        res.json({ success: true, data: results });
-    });
-});
-
-// Route handler for exporting theses
-app.get('/export-theses', (req, res) => {
+// Export theses to CSV or JSON
+app.get('/export-theses', getTeacherId, (req, res) => {
     const statusFilter = req.query.status;
     const roleFilter = req.query.role;
     const format = req.query.format;
-
+    const teacherId = req.teacherId;
     let query = `
-        SELECT Theses.*, Committees.role 
+        SELECT Theses.*, 
+               t1.teacher_name AS teacher_name, Committees.role,
+               t2.teacher_name AS teacher2_name, Committees.role2,
+               t3.teacher_name AS teacher3_name, Committees.role3,
+               s.student_am AS student_am
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
+        LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
+        LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
+        LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
+        LEFT JOIN Students s ON Theses.student_am = s.student_am
         WHERE 1=1
     `;
     const queryParams = [];
@@ -408,6 +396,11 @@ app.get('/export-theses', (req, res) => {
         queryParams.push(roleFilter);
     }
 
+    if (teacherId) {
+        query += ' AND Committees.teacher_am = ?';
+        queryParams.push(teacherId);
+    }
+
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error exporting theses:', err);
@@ -416,19 +409,26 @@ app.get('/export-theses', (req, res) => {
         }
 
         if (format === 'csv') {
-            const csv = results.map(row => Object.values(row).join(',')).join('\n');
+            // Convert results to CSV using json2csv
+            const fields = ['thesis_id', 'title', 'summary', 'status', 'teacher_name', 'role', 'teacher2_name', 'role2', 'teacher3_name', 'role3', 'student_am'];
+            const json2csvParser = new Parser({ fields });
+            const csv = json2csvParser.parse(results);
+
+            // Set headers for CSV file download
             res.header('Content-Type', 'text/csv');
             res.attachment('theses.csv');
             res.send(csv);
         } else if (format === 'json') {
+            // Send JSON response
             res.header('Content-Type', 'application/json');
             res.attachment('theses.json');
-            res.send(JSON.stringify(results));
+            res.send(JSON.stringify(results, null, 2));
         } else {
             res.status(400).json({ success: false, message: 'Invalid format' });
         }
     });
 });
+     
 
 // Route handler for fetching active theses
 app.get('/active-theses', (req, res) => {
