@@ -51,8 +51,8 @@ body {
     width: 200px; 
     position: fixed;
     top: 50%;
-    right: 84%;
-    transform: translate(-50%, -50%);
+    left: 1%;
+    transform: translateY(-50%);
     background-color: #657086; 
     overflow-y: auto; 
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
