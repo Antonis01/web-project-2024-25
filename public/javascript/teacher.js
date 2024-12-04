@@ -541,27 +541,20 @@ function exportTheses(format) {
             alert('An error occurred while exporting the theses.');
         });
 }
-// Κλήση της loadInvitations() μόλις φορτώσει η σελίδα
-window.onload = () => {
-    loadInvitations();
-}; 
-
 function loadInvitations() {
-    alert('δεν υπάρχουν ενεργές προσκλήσεις')
-    fetch('/get-invitations') // Κλήση του endpoint για τις προσκλήσεις
+    fetch('/get-invitations')
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('invitationsTableBody');
-            tableBody.innerHTML = ''; // Καθαρισμός του πίνακα
+            tableBody.innerHTML = '';
 
-            // Έλεγχος για επιτυχία και δεδομένα
             if (data.success && data.data.length > 0) {
                 data.data.forEach(invitation => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${invitation.thesisTitle || "Χωρίς Θέμα"}</td>
-                        <td>${invitation.invitation_date || "Χωρίς Ημερομηνία"}</td>
-                        <td>${invitation.response || "Εκκρεμεί"}</td>
+                        <td>${invitation.invitation_date2 || "Χωρίς Ημερομηνία"}</td>
+                        <td>${invitation.response2 || "Εκκρεμεί"}</td>
                         <td>
                             <button class="accept-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'accept')">Αποδοχή</button>
                             <button class="reject-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'reject')">Απόρριψη</button>
@@ -570,7 +563,6 @@ function loadInvitations() {
                     tableBody.appendChild(row);
                 });
             } else {
-                // Μήνυμα σε περίπτωση που δεν υπάρχουν προσκλήσεις
                 tableBody.innerHTML = '<tr><td colspan="4">Δεν υπάρχουν ενεργές προσκλήσεις.</td></tr>';
             }
         })

@@ -121,25 +121,24 @@
         </ul>
     </div>
 
-    <div id="invitationCommision" class="forms" style="display:none; position: relative">
-        <button class="close-button" onclick="toggleElement('invitationCommision')">x</button>
-        <div class="container">
-            <h2>Προσκλήσεις Συμμετοχής σε Τριμελείς</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Θέμα</th>
-                        <th>Ημερομηνία Αποστολής</th>
-                        <th>Κατάσταση</th>
-                        <th>Ενέργειες</th>
-                    </tr>
-                </thead>
-                <tbody id="invitationsTableBody">
-                    <!-- Δυναμικά δεδομένα από τη βάση -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div id="invitationCommision" class="forms" style="display:none; position: relative">
+    <button class="close-button" onclick="toggleElement('invitationCommision')">x</button>
+    <h2>Προσκλήσεις</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Τίτλος Διπλωματικής</th>
+                <th>Ημερομηνία Πρόσκλησης</th>
+                <th>Απάντηση</th>
+                <th>Ενέργειες</th>
+            </tr>
+        </thead>
+        <tbody id="invitationsTableBody">
+            <!-- Dynamically populated list of invitations -->
+        </tbody>
+    </table>
+    <button type="button" onclick="loadInvitations()">load</button>
+</div>
     
     <div id="formStatistics" class="forms" style="display:none; position: relative">
         <button class="close-button"&times; onclick="toggleElement('formStatistics')" >x</button>

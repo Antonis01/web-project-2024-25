@@ -449,24 +449,29 @@ app.get('/active-theses', (req, res) => {
 });
 
 
-// Route handler for fetching active invitations
-app.get('/get-invitations/:teacher_am', (req, res) => {
-    const teacherAM = req.params.teacher_am;
+
+app.get('/get-invitations', (req, res) => {
+    const teacherAM = req.session.user.teacher_am;
+
+    if (!teacherAM) {
+        console.error('Teacher AM not found in session');
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
 
     const query = `
-        SELECT c.committee_id, c.role, c.response, c.invitation_date, t.title
+        SELECT c.committee_id, c.role2, c.response2, c.invitation_date2, t.title AS thesisTitle
         FROM Committees AS c
         JOIN Theses AS t ON c.thesis_id = t.thesis_id
-        WHERE c.teacher_am = ? AND c.response IS NULL
+        WHERE c.teacher_am2 = ? AND c.response2 IS NULL
     `;
 
     db.query(query, [teacherAM], (err, results) => {
         if (err) {
             console.error('Error fetching invitations:', err);
-            res.status(500).send('Error fetching invitations');
-            return;
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-        res.json({ invitations: results });
+
+        res.json({ success: true, data: results });
     });
 });
 
