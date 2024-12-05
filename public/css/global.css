@@ -2,7 +2,8 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('/public/images/background2.jpg');
+    /*background-image: url('/public/images/background3.jpg');*/
+    background-color: #f2f2f2;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -13,7 +14,7 @@ body {
 }
 
 .topBar {
-    background: linear-gradient(90deg, #657086, #1e232e);
+    background: linear-gradient(90deg, #cacccf, #3f3e3e);
     color: white;
     padding: 5px 20px;
     display: flex;
@@ -25,6 +26,7 @@ body {
     left: 0;
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 20px;
 }
 
 .topBar .title {
@@ -48,15 +50,15 @@ body {
 }
 
 .sideMenu {
-    width: 200px; 
     position: fixed;
-    top: 50%;
-    left: 1%;
-    transform: translateY(-50%);
+    top: 30px;
+    left: 0;
+    height: calc(100% - 20px); 
+    width: 250px; 
     background-color: #fff; 
-    overflow-y: auto; 
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    border-radius: 8px;
+    overflow-x: hidden; 
+    padding-top: 20px; 
+    z-index: 1000; 
 }
 
 .sideMenu button {
