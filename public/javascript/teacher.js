@@ -595,3 +595,58 @@ function handleInvitationResponse(committeeId, action) {
     .catch(err => console.error('Error processing invitation:', err));
 }
 
+// Fetch and display theses for management
+function fetchThesesForManagement() {
+    const statusFilter = document.getElementById('statusFilterManagement').value;
+
+    fetch(`/get-theses?status=${statusFilter}`)
+        .then(response => response.json())
+        .then(data => {
+            const diploManagement = document.getElementById('diploManagement');
+            diploManagement.innerHTML = ''; // Clear the current list
+
+            if (data.success) {
+                data.data.forEach(thesis => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="thesis-title">
+                            <strong>Title:</strong> ${thesis.title}
+                            <button onclick="toggleDetails(this)">Show details</button>
+                        </div>
+                        <div class="thesis-details" style="display: none;">
+                            <strong>Summary:</strong> ${thesis.summary}<br>
+                            <strong>Status:</strong> ${thesis.status}<br>
+                            <strong>Student AM:</strong> ${thesis.student_am}<br>
+                            <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
+                            <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
+                            ${statusFilter === 'Υπό Ανάθεση' ? `
+                            <div class="committee-details">
+                                <strong>Committee Members:</strong>
+                                <ul>
+                                    ${thesis.committee.map(member => `
+                                        <li>
+                                            <strong>Teacher:</strong> ${member.teacher_name}<br>
+                                            <strong>Role:</strong> ${member.role}<br>
+                                            <strong>Invitation Date:</strong> ${member.invitation_date}<br>
+                                            <strong>Response:</strong> ${member.response}<br>
+                                            <strong>Response Date:</strong> ${member.response_date}<br>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    diploManagement.appendChild(listItem);
+                });
+            } else {
+                alert('Failed to fetch theses for management.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while fetching the theses.');
+        });
+}
+
+// Fetch theses for management when the page loads
+document.addEventListener('DOMContentLoaded', fetchThesesForManagement);

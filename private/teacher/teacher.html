@@ -149,10 +149,19 @@
     </div>
 
     <div id="dipolamaticsManagement" class="forms" style="display:none; position: relative">
-        <button class="close-button"&times; onclick="toggleElement('dipolamaticsManagement')" >x</button>
+        <button class="close-button" &times; onclick="toggleElement('dipolamaticsManagement')">x</button>
         <h2>Διαχείρηση Διπλωματικών</h2>
+        
+        <label for="statusFilterManagement">Κατάσταση:</label>
+        <select id="statusFilterManagement" onchange="fetchThesesForManagement()">
+            <option value="Όλες">Όλες</option>
+            <option value="Υπό Ανάθεση">Υπό Ανάθεση</option>
+            <option value="Ενεργή">Ενεργή</option>
+            <option value="Υπό Εξέταση">Υπό Εξέταση</option>
+        </select>
+        
         <ul id="diploManagement">
-           
+            <!-- Dynamically populated list of theses -->
         </ul>
     </div>
     

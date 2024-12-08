@@ -279,15 +279,61 @@ app.get('/get-thesis/:id', (req, res) => {
 
 // Route handler for getting all theses
 app.get('/get-theses', (req, res) => {
-    const query = 'SELECT * FROM Theses';
-    console.log("get-theses tessssssssssssssssssssssttttttttttt");
-    db.query(query, (err, results) => {
+    const statusFilter = req.query.status;
+    let query = `
+        SELECT Theses.*, 
+               t1.teacher_name AS teacher_name, Committees.role,
+               t2.teacher_name AS teacher2_name, Committees.role2,
+               t3.teacher_name AS teacher3_name, Committees.role3,
+               Committees.invitation_date, Committees.response, Committees.response_date,
+               Committees.invitation_date2, Committees.response2, Committees.response_date2,
+               Committees.invitation_date3, Committees.response3, Committees.response_date3
+        FROM Theses 
+        LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
+        LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
+        LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
+        LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
+        WHERE Theses.status = ?
+    `;
+    const queryParams = [statusFilter];
+
+    db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error fetching theses:', err);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
-        res.json({ success: true, data: results });
+
+        const theses = results.map(thesis => {
+            return {
+                ...thesis,
+                committee: [
+                    {
+                        teacher_name: thesis.teacher_name,
+                        role: thesis.role,
+                        invitation_date: thesis.invitation_date,
+                        response: thesis.response,
+                        response_date: thesis.response_date
+                    },
+                    {
+                        teacher_name: thesis.teacher2_name,
+                        role: thesis.role2,
+                        invitation_date: thesis.invitation_date2,
+                        response: thesis.response2,
+                        response_date: thesis.response_date2
+                    },
+                    {
+                        teacher_name: thesis.teacher3_name,
+                        role: thesis.role3,
+                        invitation_date: thesis.invitation_date3,
+                        response: thesis.response3,
+                        response_date: thesis.response_date3
+                    }
+                ]
+            };
+        });
+
+        res.json({ success: true, data: theses });
     });
 });
 
