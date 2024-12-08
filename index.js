@@ -277,9 +277,15 @@ app.get('/get-thesis/:id', (req, res) => {
     });
 });
 
-// Route handler for getting all theses
+// Route handler for retrieving theses for management
 app.get('/get-theses', (req, res) => {
     const statusFilter = req.query.status;
+    const teacherAM = req.session.user.teacher_am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
     let query = `
         SELECT Theses.*, 
                t1.teacher_name AS teacher_name, Committees.role,
@@ -293,15 +299,19 @@ app.get('/get-theses', (req, res) => {
         LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
         LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
         LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-        WHERE Theses.status = ?
+        WHERE Committees.role = 'Επιβλέπων' AND Committees.teacher_am = ?
     `;
-    const queryParams = [statusFilter];
+    const queryParams = [teacherAM];
+
+    if (statusFilter && statusFilter !== 'Όλες') {
+        query += ' AND Theses.status = ?';
+        queryParams.push(statusFilter);
+    }
 
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error fetching theses:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
-            return;
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
 
         const theses = results.map(thesis => {
@@ -747,6 +757,51 @@ app.post('/reject-invitation/:id', (req, res) => {
             return;
         }
         res.json({ success: true, message: 'Invitation rejected successfully!' });
+    });
+});
+
+// Route handler for adding a note
+app.post('/add-note', (req, res) => {
+    const { thesis_id, content } = req.body;
+    const teacher_am = req.session.user.teacher_am;
+
+    if (!teacher_am) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        INSERT INTO Notes (thesis_id, teacher_am, content)
+        VALUES (?, ?, ?)
+    `;
+    db.query(query, [thesis_id, teacher_am, content], (err, result) => {
+        if (err) {
+            console.error('Error adding note:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Note added successfully!' });
+    });
+});
+
+// Route handler for retrieving notes for a specific thesis
+app.get('/get-notes/:thesis_id', (req, res) => {
+    const thesis_id = req.params.thesis_id;
+    const teacher_am = req.session.user.teacher_am;
+
+    if (!teacher_am) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT * FROM Notes
+        WHERE thesis_id = ? AND teacher_am = ?
+        ORDER BY created_at DESC
+    `;
+    db.query(query, [thesis_id, teacher_am], (err, results) => {
+        if (err) {
+            console.error('Error fetching notes:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, data: results });
     });
 });
 

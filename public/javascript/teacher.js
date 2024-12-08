@@ -612,6 +612,7 @@ function fetchThesesForManagement() {
                         <div class="thesis-title">
                             <strong>Title:</strong> ${thesis.title}
                             <button onclick="toggleDetails(this)">Show details</button>
+                            ${thesis.role === 'Επιβλέπων' ? `<button onclick="cancelAssignment(${thesis.thesis_id})">Cancel Assignment</button>` : ''}
                         </div>
                         <div class="thesis-details" style="display: none;">
                             <strong>Summary:</strong> ${thesis.summary}<br>
@@ -619,7 +620,7 @@ function fetchThesesForManagement() {
                             <strong>Student AM:</strong> ${thesis.student_am}<br>
                             <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
                             <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
-                            ${statusFilter === 'Υπό Ανάθεση' ? `
+                            ${thesis.status === 'Υπό Ανάθεση' ? `
                             <div class="committee-details">
                                 <strong>Committee Members:</strong>
                                 <ul>
@@ -634,9 +635,25 @@ function fetchThesesForManagement() {
                                     `).join('')}
                                 </ul>
                             </div>` : ''}
+                            ${thesis.status === 'Ενεργή' ? `
+                            <div class="notes-section">
+                                <h3>Σημειώσεις</h3>
+                                <form id="addNoteForm-${thesis.thesis_id}" onsubmit="addNoteHandler(event, ${thesis.thesis_id})">
+                                    <textarea id="noteText-${thesis.thesis_id}" maxlength="300" placeholder="Add your note here..."></textarea>
+                                    <button type="submit">Add Note</button>
+                                </form>
+                                <ul id="notesList-${thesis.thesis_id}">
+                                    <!-- Dynamically populated list of notes -->
+                                </ul>
+                            </div>` : ''}
                         </div>
                     `;
                     diploManagement.appendChild(listItem);
+
+                    // Fetch notes if the thesis is active
+                    if (thesis.status === 'Ενεργή') {
+                        fetchNotes(thesis.thesis_id);
+                    }
                 });
             } else {
                 alert('Failed to fetch theses for management.');
@@ -645,6 +662,68 @@ function fetchThesesForManagement() {
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while fetching the theses.');
+        });
+}
+
+// Function to add a note
+function addNoteHandler(event, thesisId) {
+    event.preventDefault();
+    const noteText = document.getElementById(`noteText-${thesisId}`).value.trim();
+
+    if (noteText.length > 300) {
+        alert('Note text cannot exceed 300 characters.');
+        return;
+    }
+
+    fetch('/add-note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thesis_id: thesisId, content: noteText })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Note added successfully!');
+            document.getElementById(`noteText-${thesisId}`).value = ''; // Clear the input field
+            fetchNotes(thesisId); // Refresh the list of notes
+        } else {
+            alert('Error adding note: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding the note.');
+    });
+}
+
+// Function to fetch and display notes for a specific thesis
+function fetchNotes(thesisId) {
+    fetch(`/get-notes/${thesisId}`)
+        .then(response => response.json())
+        .then(data => {
+            const notesList = document.getElementById(`notesList-${thesisId}`);
+            notesList.innerHTML = ''; // Clear the current list
+
+            if (data.success) {
+                data.data.forEach(note => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="note-text">
+                            ${note.content}
+                        </div>
+                        <div class="note-date">
+                            ${new Date(note.created_at).toLocaleString()}
+                        </div>
+                    `;
+                    notesList.appendChild(listItem);
+                });
+            } else {
+                alert('Error fetching notes: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while fetching the notes.');
         });
 }
 
