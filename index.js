@@ -116,18 +116,16 @@ app.post('/login', (req, res) => {
         }
 
         const { table, role, redirect } = roles[index];
-        db.query(`SELECT * FROM ${table} WHERE ${role.toLowerCase()}_username = ? AND 
-        ${role.toLowerCase()}_password = ?`, [username, password], (err, results) => {
+        db.query(`SELECT *, ${role}_am FROM ${table} WHERE ${role.toLowerCase()}_username = ? AND ${role.toLowerCase()}_password = ?`, [username, password], (err, results) => {
             if (err) {
                 console.error('Error executing query:', err);
                 res.status(500).json({ message: 'Internal Server Error' });
                 return;
             }
             if (results.length > 0) {
-                req.session.user = { username: username, role: role, teacher_am: results[0].teacher_am };
-                console.log(`User ${username} logged in with role ${role} and session ID: ${req.sessionID}`);
+                req.session.user = { username: username, role: role, am: results[0][`${role.toLowerCase()}_am`] };
+                console.log(`User ${username} logged in with role ${role} and session ID: ${req.sessionID} and session am: ${req.session.user.am}`);
                 res.json({ redirect });
-                console.log(res);
             } else {
                 checkCredentials(index + 1);
             }
@@ -280,7 +278,7 @@ app.get('/get-thesis/:id', (req, res) => {
 // Route handler for retrieving theses for management
 app.get('/get-theses', (req, res) => {
     const statusFilter = req.query.status;
-    const teacherAM = req.session.user.teacher_am;
+    const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
@@ -507,7 +505,7 @@ app.get('/active-theses', (req, res) => {
 
 
 app.get('/get-invitations', (req, res) => {
-    const teacherAM = req.session.user.teacher_am;
+    const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
         console.error('Teacher AM not found in session');
@@ -557,7 +555,7 @@ const upload = multer({
 app.post('/add-thesis', upload.single('file'), (req, res) => {
     const { title, description } = req.body;
     const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
-    const teacher_am = req.session.user.teacher_am;
+    const teacher_am = req.session.user.am;
 
     const query = `
         INSERT INTO Theses (title, summary, pdf_path, teacher_am)
@@ -763,7 +761,7 @@ app.post('/reject-invitation/:id', (req, res) => {
 // Route handler for adding a note
 app.post('/add-note', (req, res) => {
     const { thesis_id, content } = req.body;
-    const teacher_am = req.session.user.teacher_am;
+    const teacher_am = req.session.user.am;
 
     if (!teacher_am) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
@@ -785,7 +783,7 @@ app.post('/add-note', (req, res) => {
 // Route handler for retrieving notes for a specific thesis
 app.get('/get-notes/:thesis_id', (req, res) => {
     const thesis_id = req.params.thesis_id;
-    const teacher_am = req.session.user.teacher_am;
+    const teacher_am = req.session.user.am;
 
     if (!teacher_am) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
