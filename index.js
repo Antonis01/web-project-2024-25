@@ -517,8 +517,8 @@ app.get('/get-invitations', (req, res) => {
                c.role3, c.response3, c.invitation_date3
         FROM Committees AS c
         JOIN Theses AS t ON c.thesis_id = t.thesis_id
-        WHERE (c.teacher_am2 = ? OR c.teacher_am3 = ?) AND (c.response2 IS NULL OR c.response3 IS NULL)
-    `;
+        WHERE (c.teacher_am2 = ? OR c.teacher_am3 = ?)
+        `;
 
     db.query(query, [teacherAM, teacherAM], (err, results) => {
         if (err) {
@@ -527,6 +527,7 @@ app.get('/get-invitations', (req, res) => {
         }
 
         res.json({ success: true, data: results });
+        console.log(results);
     });
 });
 
@@ -718,17 +719,21 @@ app.post('/cancel-assignment/:id', (req, res) => {
     });
 });
 
-// Endpoint για αποδοχή πρόσκλησης
 app.post('/accept-invitation/:id', (req, res) => {
     const committeeId = req.params.id;
+    const teacherAM = req.session.user.am;
 
     const query = `
         UPDATE Committees
-        SET response = 'Αποδοχή', response_date = NOW()
+        SET 
+            response2 = CASE WHEN teacher_am2 = ? THEN 'Αποδοχή' ELSE response2 END,
+            response_date2 = CASE WHEN teacher_am2 = ? THEN NOW() ELSE response_date2 END,
+            response3 = CASE WHEN teacher_am3 = ? THEN 'Αποδοχή' ELSE response3 END,
+            response_date3 = CASE WHEN teacher_am3 = ? THEN NOW() ELSE response_date3 END
         WHERE committee_id = ?
     `;
 
-    db.query(query, [committeeId], (err) => {
+    db.query(query, [teacherAM, teacherAM, teacherAM, teacherAM, committeeId], (err) => {
         if (err) {
             console.error('Error accepting invitation:', err);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -738,17 +743,20 @@ app.post('/accept-invitation/:id', (req, res) => {
     });
 });
 
-// Endpoint για απόρριψη πρόσκλησης
 app.post('/reject-invitation/:id', (req, res) => {
     const committeeId = req.params.id;
-
+    const teacherAM = req.session.user.am;
     const query = `
         UPDATE Committees
-        SET response = 'Απόρριψη', response_date = NOW()
+        SET 
+            response2 = CASE WHEN teacher_am2 = ? THEN 'Απόρριψη' ELSE response2 END,
+            response_date2 = CASE WHEN teacher_am2 = ? THEN NOW() ELSE response_date2 END,
+            response3 = CASE WHEN teacher_am3 = ? THEN 'Απόρριψη' ELSE response3 END,
+            response_date3 = CASE WHEN teacher_am3 = ? THEN NOW() ELSE response_date3 END
         WHERE committee_id = ?
     `;
 
-    db.query(query, [committeeId], (err) => {
+    db.query(query, [teacherAM, teacherAM, teacherAM, teacherAM, committeeId], (err) => {
         if (err) {
             console.error('Error rejecting invitation:', err);
             res.status(500).json({ success: false, message: 'Internal Server Error' });

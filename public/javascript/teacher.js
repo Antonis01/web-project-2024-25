@@ -257,67 +257,6 @@ function cancelAssignment(thesisId) {
 document.addEventListener('DOMContentLoaded', fetchActiveTheses);
 document.addEventListener('DOMContentLoaded', fetchActiveThesesSection);
 
-// Fetch and display active invitations
-function fetchActiveInvitations() {
-    console.log('Fetching active invitations...');
-    sendRequest('/active-invitations', 'GET')
-        .then(response => {
-            console.log('Active invitations response:', response);
-            const invitationListItems = document.getElementById('invitationListItems');
-            invitationListItems.innerHTML = ''; // Clear the current list
-
-            if (response.success) {
-                response.data.forEach(invitation => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        <div class="invitation-title">
-                            <strong>Thesis ID:</strong> ${invitation.thesis_id} <br>
-                            <strong>Role:</strong> ${invitation.role} <br>
-                            <button onclick="acceptInvitation(${invitation.committee_id})">Αποδοχή</button>
-                            <button onclick="rejectInvitation(${invitation.committee_id})">Απόρριψη</button>
-                        </div>
-                    `;
-                    invitationListItems.appendChild(listItem);
-                });
-            } else {
-                invitationListItems.innerHTML = 'No active invitations found.';
-            }
-        });
-}
-
-// Accept invitation
-function acceptInvitation(committeeId) {
-    if (confirm('Are you sure you want to accept this invitation?')) {
-        sendRequest(`/accept-invitation/${committeeId}`, 'POST')
-            .then(response => {
-                if (response.success) {
-                    alert('Invitation accepted successfully!');
-                    fetchActiveInvitations(); // Refresh the list of active invitations
-                } else {
-                    alert('Error accepting invitation: ' + response.message);
-                }
-            });
-    }
-}
-
-// Reject invitation
-function rejectInvitation(committeeId) {
-    if (confirm('Are you sure you want to reject this invitation?')) {
-        sendRequest(`/reject-invitation/${committeeId}`, 'POST')
-            .then(response => {
-                if (response.success) {
-                    alert('Invitation rejected successfully!');
-                    fetchActiveInvitations(); // Refresh the list of active invitations
-                } else {
-                    alert('Error rejecting invitation: ' + response.message);
-                }
-            });
-    }
-}
-
-// Fetch active invitations when the page loads
-document.addEventListener('DOMContentLoaded', fetchActiveInvitations);
-
 // Debounce function to delay the search request
 function debounce(func, delay) {
     let debounceTimer;
@@ -553,8 +492,14 @@ function loadInvitations() {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${invitation.thesisTitle || "Χωρίς Θέμα"}</td>
-                        <td>${invitation.invitation_date2 || "Χωρίς Ημερομηνία"}</td>
-                        <td>${invitation.response2 || "Εκκρεμεί"}</td>
+                        <td>
+                            ${invitation.invitation_date2 || "Χωρίς Ημερομηνία"}<br>
+                            ${invitation.invitation_date3 || "Χωρίς Ημερομηνία"}<br>
+                        </td>
+                        <td>
+                            ${invitation.response2 || "Εκκρεμεί"}
+                            ${invitation.response3 || "Εκκρεμεί"}
+                        </td>
                         <td>
                             <button class="accept-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'accept')">Αποδοχή</button>
                             <button class="reject-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'reject')">Απόρριψη</button>
@@ -569,30 +514,26 @@ function loadInvitations() {
         .catch(err => console.error('Error loading invitations:', err));
 }
 
-// Λειτουργία για αποδοχή ή απόρριψη πρόσκλησης
 function handleInvitationResponse(committeeId, action) {
     console.log(`Processing ${action} for committee ID: ${committeeId}`);
-
-    // Επιλογή κατάλληλου endpoint
+    
     const url = action === 'accept'
         ? `/accept-invitation/${committeeId}`
         : `/reject-invitation/${committeeId}`;
-
-    // Αποστολή αιτήματος στον server
+    
     fetch(url, {
         method: 'POST',
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            console.log(`${action === 'accept' ? 'Accepted' : 'Rejected'} invitation ID: ${committeeId}`);
-            // Ανανέωση της λίστας προσκλήσεων
+            alert(`${action === 'accept' ? 'Accepted' : 'Rejected'} invitation ID: ${committeeId}`);
             loadInvitations();
         } else {
-            console.error(`Failed to ${action} invitation ID: ${committeeId}`, data.message);
+            alert(`Error: ${data.message}`);
         }
     })
-    .catch(err => console.error('Error processing invitation:', err));
+    .catch(err => console.error(`Error processing ${action} invitation:`, err));
 }
 
 // Fetch and display theses for management
