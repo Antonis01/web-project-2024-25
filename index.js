@@ -513,12 +513,13 @@ app.get('/get-invitations', (req, res) => {
     }
 
     const query = `
-        SELECT c.committee_id, c.role2, c.response2, c.invitation_date2, t.title AS thesisTitle,
-               c.role3, c.response3, c.invitation_date3
-        FROM Committees AS c
-        JOIN Theses AS t ON c.thesis_id = t.thesis_id
-        WHERE (c.teacher_am2 = ? OR c.teacher_am3 = ?)
-        `;
+    SELECT c.committee_id, c.role2, c.response2, c.invitation_date2, t.title AS thesisTitle,
+           c.role3, c.response3, c.invitation_date3, c.teacher_am2 as teacherAM2, c.teacher_am3 as teacherAM3
+    FROM Committees AS c
+    JOIN Theses AS t ON c.thesis_id = t.thesis_id
+    WHERE (c.teacher_am2 = ? AND c.response2 IS NULL)
+       OR (c.teacher_am3 = ? AND c.response3 IS NULL)
+`;
 
     db.query(query, [teacherAM, teacherAM], (err, results) => {
         if (err) {
@@ -527,7 +528,6 @@ app.get('/get-invitations', (req, res) => {
         }
 
         res.json({ success: true, data: results });
-        console.log(results);
     });
 });
 

@@ -1,3 +1,5 @@
+const { response } = require("express");
+
 document.getElementById('topicForm').addEventListener('submit', function(event) {
     event.preventDefault();
     
@@ -485,29 +487,41 @@ function loadInvitations() {
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('invitationsTableBody');
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = '';                
 
             if (data.success && data.data.length > 0) {
                 data.data.forEach(invitation => {
+                    
                     const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${invitation.thesisTitle || "Χωρίς Θέμα"}</td>
-                        <td>
-                            ${invitation.invitation_date2 || "Χωρίς Ημερομηνία"}<br>
-                            ${invitation.invitation_date3 || "Χωρίς Ημερομηνία"}<br>
-                        </td>
-                        <td>
-                            ${invitation.response2 || "Εκκρεμεί"}
-                            ${invitation.response3 || "Εκκρεμεί"}
-                        </td>
-                        <td>
-                            <button class="accept-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'accept')">Αποδοχή</button>
-                            <button class="reject-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'reject')">Απόρριψη</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
+
+                    if (invitation.teacherAM2 != null) {
+                        row.innerHTML = `
+                            <td>${invitation.thesisTitle || "Χωρίς Θέμα"}</td>
+                            <td>${invitation.invitation_date2 || "Χωρίς Ημερομηνία"}</td>
+                            <td>${invitation.response2 || "Εκκρεμεί"}</td>
+                            <td>
+                                <button class="accept-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'accept')">Αποδοχή</button>
+                                <button class="reject-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'reject')">Απόρριψη</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+
+                    } 
+                    else if (invitation.teacherAM3 != null) {
+                        row.innerHTML = `
+                            <td>${invitation.thesisTitle || "Χωρίς Θέμα"}</td>
+                            <td>${invitation.invitation_date3 || "Χωρίς Ημερομηνία"}</td>
+                            <td>${invitation.response3 || "Εκκρεμεί"}</td>
+                            <td>
+                                <button class="accept-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'accept')">Αποδοχή</button>
+                                <button class="reject-btn" onclick="handleInvitationResponse(${invitation.committee_id}, 'reject')">Απόρριψη</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    } 
                 });
-            } else {
+            } 
+            else {
                 tableBody.innerHTML = '<tr><td colspan="4">Δεν υπάρχουν ενεργές προσκλήσεις.</td></tr>';
             }
         })
@@ -527,7 +541,6 @@ function handleInvitationResponse(committeeId, action) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(`${action === 'accept' ? 'Accepted' : 'Rejected'} invitation ID: ${committeeId}`);
             loadInvitations();
         } else {
             alert(`Error: ${data.message}`);
