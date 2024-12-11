@@ -1,5 +1,3 @@
-const { response } = require("express");
-
 document.getElementById('topicForm').addEventListener('submit', function(event) {
     event.preventDefault();
     
