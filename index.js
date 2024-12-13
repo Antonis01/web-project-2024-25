@@ -256,6 +256,25 @@ app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
+app.get('/get-thesis/:id', (req, res) => {
+    const query = 'SELECT * FROM Theses WHERE thesis_id = ?';
+    console.log("get-thesis test111111111111111111111111111111");
+    db.query(query, [req.params.id], (err, results) => {
+        if (err) {
+            console.error('Error fetching thesis:', err);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return;
+        }
+        if (results.length === 0) {
+            res.status(404).json({ success: false, message: 'Thesis not found' });
+            return;
+        }
+        res.json({ success: true, data: results[0] });
+    });
+});
+
+
+
 // Route handler for fetching theses by partial title
 app.get('/search-theses/:title', (req, res) => {
     const query = 'SELECT * FROM Theses WHERE title LIKE ?';
