@@ -288,7 +288,7 @@ const debounceSearchThesis = debounce(function() {
         return;
     }
 
-    sendRequest(`/get-theses-title?subject=${encodeURIComponent(subject)}`, 'GET')
+    sendRequest(`/search-theses/${encodeURIComponent(subject)}`, 'GET')
         .then(response => {
             const resultsContainer = document.getElementById("thesisSearchResults");
             resultsContainer.innerHTML = ""; // Clear previous results
@@ -308,6 +308,10 @@ const debounceSearchThesis = debounce(function() {
             } else {
                 resultsContainer.innerHTML = "No results found.";
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("thesisSearchResults").innerHTML = "An error occurred while searching.";
         });
 }, 300);
 
@@ -328,7 +332,7 @@ const debounceSearchStudentByAm = debounce(function() {
                 response.data.forEach(student => {
                     const suggestionItem = document.createElement("div");
                     suggestionItem.className = "suggestion-item";
-                    suggestionItem.textContent = student.student_am;
+                    suggestionItem.textContent = student.student_name + " " + student.student_am;
                     suggestionItem.onclick = () => {
                         document.getElementById("studentAM").value = student.student_am;
                         document.getElementById("hiddenStudentId").value = student.student_am; // Store student ID in hidden field
@@ -359,10 +363,10 @@ const debounceSearchStudentByName = debounce(function() {
                 response.data.forEach(student => {
                     const suggestionItem = document.createElement("div");
                     suggestionItem.className = "suggestion-item";
-                    suggestionItem.textContent = student.student_name;
+                    suggestionItem.textContent = student.student_name + " " + student.student_am;
                     suggestionItem.onclick = () => {
                         document.getElementById("studentName").value = student.student_name;
-                        document.getElementById("hiddenStudentAM").value = student.student_am; // Store student am in hidden field
+                        document.getElementById("hiddenStudentId").value = student.student_am; // Store student AM in hidden field
                         suggestionsContainer.innerHTML = "";
                     };
                     suggestionsContainer.appendChild(suggestionItem);
@@ -370,27 +374,35 @@ const debounceSearchStudentByName = debounce(function() {
             } else {
                 suggestionsContainer.innerHTML = "No results found.";
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("studentNameSuggestions").innerHTML = "An error occurred while searching.";
         });
 }, 300);
 
-// Assign topic
-function assignTopic() {
-    const am = document.getElementById("studentAM").value.trim();
-    const subject = document.getElementById("subject").value.trim();
+function assignTheses() {
+    const thesisId = document.getElementById('thesisId').value;
+    const studentAm = document.getElementById('hiddenStudentId').value;
 
-    if ( !am || !subject ) {
-        alert("Συμπληρώστε όλα τα πεδία.");
+    console.log('Assigning thesis:', thesisId, 'to student:', studentAm); // Add this line
+
+    if (!thesisId || !studentAm) {
+        alert('Please select a thesis and a student.');
         return;
     }
 
-    const data = { am, subject };
-    sendRequest('/assign-topic', 'POST', data)
+    sendRequest('/assign-theses', 'POST', { thesisId, studentAm })
         .then(response => {
             if (response.success) {
-                alert("Η ανάθεση ολοκληρώθηκε με επιτυχία!");
+                alert('Thesis assigned successfully');
             } else {
-                alert("Η ανάθεση απέτυχε: " + response.message);
+                alert('Error assigning thesis: ' + response.message);
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while assigning the thesis.');
         });
 }
 

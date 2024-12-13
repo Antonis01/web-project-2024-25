@@ -256,22 +256,22 @@ app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
-// Route handler for assigning a thesis to a student
-app.get('/get-thesis/:id', (req, res) => {
-    const query = 'SELECT * FROM Theses WHERE thesis_id = ?';
-    console.log("get-thesis test111111111111111111111111111111");
-    db.query(query, [req.params.id], (err, results) => {
+// Route handler for fetching theses by partial title
+app.get('/search-theses/:title', (req, res) => {
+    const query = 'SELECT * FROM Theses WHERE title LIKE ?';
+    const searchTerm = `%${req.params.title}%`;
+    console.log("Searching theses with title like:", searchTerm);
+    db.query(query, [searchTerm], (err, results) => {
         if (err) {
-            console.error('Error fetching thesis:', err);
+            console.error('Error searching theses:', err);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
         if (results.length === 0) {
-            res.status(404).json({ success: false, message: 'Thesis not found' });
+            res.status(404).json({ success: false, message: 'No theses found' });
             return;
         }
-
-        res.json({ success: true, data: results[0] });
+        res.json({ success: true, data: results });
     });
 });
 
@@ -352,7 +352,7 @@ app.get("/search-student", (req, res) => {
     let queryParams = [];
 
     if (am) {
-        query = 'SELECT student_am FROM Students WHERE student_am LIKE ?';
+        query = 'SELECT student_name, student_am FROM Students WHERE student_am LIKE ?';
         queryParams = [`%${am}%`];
     } else if (studentName) {
         query = 'SELECT student_name, student_am FROM Students WHERE student_name LIKE ?';
@@ -634,70 +634,20 @@ app.post('/update-thesis', upload.single('file'), (req, res) => {
 });
 
 // Assign a thesis to a student
-app.post("/assign-topic", (req, res) => {
-    const { am, subject } = req.body;
+app.post("/assign-theses", (req, res) => {
+    const { thesisId, studentAm } = req.body;
 
-    // Check if the student AM exists in the students table and get the student_id
-    const query = `
-        SELECT student_am FROM Students WHERE student_am = ?
-        `;
-        
-    db.query(query, [am], (err, studentResults) => {
+    if (!thesisId || !studentAm) {
+        return res.status(400).json({ success: false, message: 'Missing thesisId or studentAm' });
+    }
+
+    const query = 'UPDATE Theses SET student_am = ? WHERE thesis_id = ?';
+    db.query(query, [studentAm, thesisId], (err, results) => {
         if (err) {
-            console.error("Error checking student:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
-        } 
-        else if (studentResults.length === 0) {
-            return res.status(400).json({ success: false, message: 'Student AM does not exist' });
+            console.error('Error assigning thesis:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-
-        const studentAM = studentResults[0].student_am;
-
-        // Check if the thesis is available
-        const queryCheck = `
-            SELECT thesis_id 
-            FROM Theses 
-            WHERE title = ? 
-        `;
-        
-        db.query(queryCheck, [subject], (err, thesisResults) => {
-            if (err) {
-                console.error("Error checking thesis:", err);
-                return res.status(500).json({ success: false, message: "Internal Server Error" });
-            } 
-            else if (thesisResults.length === 0) {
-                return res.status(404).json({ success: false, message: "Το θέμα δεν είναι διαθέσιμο." });
-            }
-
-            const thesisId = thesisResults[0].thesis_id;
-            
-            const queryAssign = `
-                UPDATE Theses 
-                SET status = 'Υπό Ανάθεση', student_am = ? 
-                WHERE thesis_id = ?
-            `;
-
-            db.query(queryAssign, [studentAM, thesisId], (err) => {
-                if (err) {
-                    console.error("Error assigning thesis:", err);
-                    return res.status(500).json({ success: false, message: "Internal Server Error" });
-                }
-
-                const queryAssignments = `
-                    INSERT INTO Assignments (student_am, thesis_id, assigned_date) 
-                    VALUES (?, ?, NOW())
-                `;
-
-                db.query(queryAssignments, [studentAM, thesisId], (err) => {
-                    if (err) {
-                        console.error("Error inserting assignment:", err);
-                        return res.status(500).json({ success: false, message: "Internal Server Error" });
-                    }
-                });
-
-                res.json({ success: true, message: "Το θέμα ανατέθηκε επιτυχώς στον φοιτητή." });
-            });
-        });
+        res.json({ success: true, message: 'Thesis assigned successfully' });
     });
 });
 
