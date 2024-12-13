@@ -609,6 +609,9 @@ function fetchThesesForManagement() {
                                 <ul id="notesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of notes -->
                                 </ul>
+                                ${thesis.role === 'Επιβλέπων' ? `
+                                <button onclick="changeStatus(${thesis.thesis_id}, 'Υπό Εξέταση')">Change Status to Υπό Εξέταση</button>
+                                ` : ''}
                             </div>` : ''}
                         </div>
                     `;
@@ -689,6 +692,28 @@ function fetchNotes(thesisId) {
             console.error('Error:', error);
             alert('An error occurred while fetching the notes.');
         });
+}
+
+// Function to change the status of a thesis
+function changeStatus(thesisId, newStatus) {
+    fetch(`/change-status/${thesisId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Status changed successfully!');
+            fetchThesesForManagement(); // Refresh the list of theses
+        } else {
+            alert('Error changing status: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while changing the status.');
+    });
 }
 
 // Fetch theses for management when the page loads

@@ -780,6 +780,43 @@ app.get('/get-notes/:thesis_id', (req, res) => {
     });
 });
 
+// Route handler for changing the status of a thesis
+app.post('/change-status/:id', (req, res) => {
+    const thesisId = req.params.id;
+    const newStatus = req.body.status;
+    const teacherAM = req.session.user.teacher_am;
+
+    // Check if the current teacher is the supervisor
+    const checkSupervisorQuery = `
+        SELECT * FROM Committees 
+        WHERE thesis_id = ? AND teacher_am = ? AND role = 'Επιβλέπων'
+    `;
+    db.query(checkSupervisorQuery, [thesisId, teacherAM], (err, results) => {
+        if (err) {
+            console.error("Error checking supervisor:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+        if (results.length === 0) {
+            return res.status(403).json({ success: false, message: "You are not the supervisor of this thesis." });
+        }
+
+        // Change the status of the thesis
+        const changeStatusQuery = `
+            UPDATE Theses 
+            SET status = 'Υπο εξέταση' 
+            WHERE thesis_id = ?
+        `;
+        db.query(changeStatusQuery, [newStatus, thesisId], (err) => {
+            if (err) {
+                console.error("Error changing status:", err);
+                return res.status(500).json({ success: false, message: "Internal Server Error" });
+            }
+
+            res.json({ success: true, message: "Status changed successfully!" });
+        });
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
