@@ -273,8 +273,6 @@ app.get('/get-thesis/:id', (req, res) => {
     });
 });
 
-
-
 // Route handler for fetching theses by partial title
 app.get('/search-theses/:title', (req, res) => {
     const query = 'SELECT * FROM Theses WHERE title LIKE ?';
@@ -521,8 +519,6 @@ app.get('/active-theses', (req, res) => {
     });
 });
 
-
-
 app.get('/get-invitations', (req, res) => {
     const teacherAM = req.session.user.am;
 
@@ -550,6 +546,39 @@ app.get('/get-invitations', (req, res) => {
     });
 });
 
+app.get('/get-statistics', (req, res) => {
+    const teacherAM = req.session.user.am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT DATEDIFF(t.final_submission_date, c.response_date) AS completionTime
+        FROM Committees c
+        JOIN Theses t ON c.thesis_id = t.thesis_id
+        WHERE c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων' AND t.teacher_am = ?
+        AND c.response_date IS NOT NULL AND t.final_submission_date IS NOT NULL
+    `;
+
+    db.query(query, [teacherAM, teacherAM], (err, results) => {
+        if (err) {
+            console.error('Error fetching statistics:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        console.log('Results:', results);
+
+        // Calculate the average completion time in Days
+        const totalCompletionTimeInDays = results.reduce((acc, row) => acc + row.completionTime, 0);
+        console.log(totalCompletionTimeInDays);
+
+        // Convert the days to months
+        const avgCompletionTimeInMonths = (totalCompletionTimeInDays / results.length) / 30.44;
+        res.json({ success: true, data: { avgCompletionTimeInMonths } });
+        console.log({ avgCompletionTimeInMonths });
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

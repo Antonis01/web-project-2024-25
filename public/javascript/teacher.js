@@ -217,7 +217,7 @@ function fetchActiveThesesSection() {
     sendRequest('/active-theses', 'GET')
         .then(response => {
             console.log('Active theses response:', response);
-            const activeThesesListSection = document.getElementById('activeThesesListSection');
+            const activeThesesListSection = document.getElementById('activeThesesList');
             activeThesesListSection.innerHTML = ''; // Clear the current list
 
             if (response.success) {
