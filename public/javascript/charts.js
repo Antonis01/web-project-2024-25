@@ -1,7 +1,6 @@
 fetch('/get-statistics')
     .then(response => response.json())
     .then(data => {
-        console.log('Received data:', data.data); // Log the received data
         createChart(data.data);
     })
     .catch(error => {
@@ -13,7 +12,7 @@ function createChart(data) {
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Μέσος χρόνος περάτωσης διπλωματικών (Μήνες)'], // Ensure labels match the data
+            labels: ['Μέσος χρόνος περάτωσης διπλωματικών (Μήνες)'],
             datasets: [
                 {
                     label: 'Επιβλέπων',
