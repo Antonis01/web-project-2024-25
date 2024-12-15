@@ -554,28 +554,56 @@ app.get('/get-statistics', (req, res) => {
     }
 
     const query = `
-        SELECT DATEDIFF(t.final_submission_date, c.response_date) AS completionTime
+        SELECT 
+            DATEDIFF(t.final_submission_date, c.response_date) AS completionTime1,
+            DATEDIFF(t.final_submission_date, c.response_date2) AS completionTime2,
+            DATEDIFF(t.final_submission_date, c.response_date3) AS completionTime3
         FROM Committees c
         JOIN Theses t ON c.thesis_id = t.thesis_id
-        WHERE c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων' AND t.teacher_am = ?
-        AND c.response_date IS NOT NULL AND t.final_submission_date IS NOT NULL
+        WHERE 
+            (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
+            (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Επιβλέπων') OR
+            (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Επιβλέπων') AND
+            (c.response_date IS NOT NULL OR c.response_date2 IS NOT NULL OR c.response_date3 IS NOT NULL) AND
+            t.final_submission_date IS NOT NULL
     `;
 
-    db.query(query, [teacherAM, teacherAM], (err, results) => {
+    db.query(query, [teacherAM, teacherAM, teacherAM], (err, results) => {
         if (err) {
             console.error('Error fetching statistics:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
 
-        console.log('Results:', results);
+        const totalDays = results.reduce((acc, row) => {
+            let total = 0;
+            
+            if (row.completionTime1) 
+                total += row.completionTime1;
+            if (row.completionTime2) 
+                total += row.completionTime2;
+            if (row.completionTime3) 
+                total += row.completionTime3;
+            
+            return acc + total;
+        }, 0);
 
-        // Calculate the average completion time in Days
-        const totalCompletionTimeInDays = results.reduce((acc, row) => acc + row.completionTime, 0);
-        console.log(totalCompletionTimeInDays);
+        const cnt = results.reduce((acc, row) => {
+            let cnt = 0;
+            
+            if (row.completionTime1) 
+                cnt++;
+            if (row.completionTime2) 
+                cnt++;
+            if (row.completionTime3) 
+                cnt++;
+            
+            return acc + cnt;
+        }, 0);
+        const avgCompletionTimeInMonths = (totalDays / cnt) / 30.44;
+        const test = 5; 
+        const test2 = 6;
 
-        // Convert the days to months
-        const avgCompletionTimeInMonths = (totalCompletionTimeInDays / results.length) / 30.44;
-        res.json({ success: true, data: { avgCompletionTimeInMonths } });
+        res.json({ success: true, data: { avgCompletionTimeInMonths, test, test2 } });
         console.log({ avgCompletionTimeInMonths });
     });
 });
