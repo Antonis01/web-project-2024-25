@@ -547,8 +547,7 @@ app.get('/get-invitations', (req, res) => {
 });
 
 app.get('/get-thesis-st', (req, res) => {
-    const studentAm = req.user.student_am; // Από το session του χρήστη
-
+    const studentAm = req.session.user.am; 
     if (!studentAm) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
     }
@@ -569,7 +568,6 @@ app.get('/get-thesis-st', (req, res) => {
         if (results.length > 0) {
             const thesis = results[0];
 
-            // Υπολογισμός χρόνου από την ανάθεση
             const currentDate = new Date();
             let timeSinceAssignment = null;
 
@@ -583,7 +581,8 @@ app.get('/get-thesis-st', (req, res) => {
                 success: true,
                 thesis: {
                     ...thesis,
-                    time_since_assignment: timeSinceAssignment
+                    time_since_assignment: timeSinceAssignment,
+                    committee: [] 
                 }
             });
         } else {

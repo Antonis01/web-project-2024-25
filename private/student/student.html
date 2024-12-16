@@ -35,9 +35,10 @@
         <ul id="thesisDetailsList">
         <!-- Η λίστα θα ενημερώνεται δυναμικά -->
         </ul>
-        <button id="fetchThesisButton" onclick="fetchThesisSt()">Προβολή Θέματος</button>
-
-        <div id="editProfile" class="forms" style="display:none; position: relative";>
+        <button type="button" onclick="fetchThesisSt()">Προβολή Θέματος</button>
+    </div>
+        
+    <div id="editProfile" class="forms" style="display:none; position: relative";>
             <button class="close-button"&times; onclick="toggleElement('editProfile')" >x</button>
             <h2>Επεξεργασία Προφίλ</h2>
             <form id="profileForm">
@@ -54,9 +55,9 @@
 
                 <button type="submit">Αποθήκευση Αλλαγών</button>
             </form>
-        </div>
+    </div>
        
-        <div id="diploManagement" class="forms" style="display:none; position: relative";>
+    <div id="diploManagement" class="forms" style="display:none; position: relative";>
             <button class="close-button"&times; onclick="toggleElement('diploManagement')" >x</button>
             <h2>Διαχείριση Διπλωματικής Εργασίας</h2>
                             <p>Ανάλογα με την κατάσταση της διπλωματικής εργασίας σας, μπορείτε να εκτελέσετε τις εξής ενέργειες:</p>
@@ -68,5 +69,6 @@
      </div>       
 
     <script src="/public/javascript/topbar_buttons.js"></script>
+    <script src="/public/javascript/student.js"></script>
 </body>
 </html>
