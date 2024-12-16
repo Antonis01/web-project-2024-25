@@ -908,7 +908,7 @@ app.get('/get-notes/:thesis_id', (req, res) => {
 app.post('/change-status/:id', (req, res) => {
     const thesisId = req.params.id;
     const newStatus = req.body.status;
-    const teacherAM = req.session.user.teacher_am;
+    const teacherAM = req.session.user.am;
 
     // Check if the current teacher is the supervisor
     const checkSupervisorQuery = `
@@ -930,7 +930,7 @@ app.post('/change-status/:id', (req, res) => {
             SET status = 'Υπο εξέταση' 
             WHERE thesis_id = ?
         `;
-        db.query(changeStatusQuery, [newStatus, thesisId], (err) => {
+        db.query(changeStatusQuery, [thesisId], (err) => {
             if (err) {
                 console.error("Error changing status:", err);
                 return res.status(500).json({ success: false, message: "Internal Server Error" });
