@@ -546,6 +546,52 @@ app.get('/get-invitations', (req, res) => {
     });
 });
 
+app.get('/get-thesis-st', (req, res) => {
+    const studentAm = req.user.student_am; // Από το session του χρήστη
+
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT thesis_id, title, summary, status, pdf_path, 
+               teacher_am, student_am, final_submission_date
+        FROM Theses
+        WHERE student_am = ?
+    `;
+
+    db.query(query, [studentAm], (err, results) => {
+        if (err) {
+            console.error('Error fetching thesis:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length > 0) {
+            const thesis = results[0];
+
+            // Υπολογισμός χρόνου από την ανάθεση
+            const currentDate = new Date();
+            let timeSinceAssignment = null;
+
+            if (thesis.assignment_date) {
+                const assignmentDate = new Date(thesis.assignment_date);
+                const diffTime = Math.abs(currentDate - assignmentDate);
+                timeSinceAssignment = `${Math.ceil(diffTime / (1000 * 60 * 60 * 24))} ημέρες`;
+            }
+
+            return res.json({
+                success: true,
+                thesis: {
+                    ...thesis,
+                    time_since_assignment: timeSinceAssignment
+                }
+            });
+        } else {
+            res.json({ success: false, message: 'No thesis found for the student.' });
+        }
+    });
+});
+
 app.get('/get-statistics', (req, res) => {
     const teacherAM = req.session.user.am;
 

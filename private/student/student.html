@@ -20,32 +20,22 @@
         </div>  
     </div>
 
+    <div class="sideMenu">
+        <img src="/public/images/upatras-logo.gif" alt="upatras Logo" class="upatras-logo">
+                    <button class="dropdownButton" onclick="toggleElement('topicDiplomatic')">Θέμα Διπλωματικής</button>
+                    <button class="dropdownButton" onclick="toggleElement('editProfile')">Επεξεργασία Προφίλ</button>
+                    <button class="dropdownButton" onclick="toggleElement('diploManagement')">Διαχείρηση Διπλωματικής</button>
+                    <button class="dropdownButton" onclick="logout()">Logout</button>
+    </div>
+
     <div id="topicDiplomatic" class="forms" style="display:none; position: relative";>
         <button class="close-button"&times; onclick="toggleElement('topicDiplomatic')" >x</button>
-        <h2>Λεπτομέριες διπλωματικής</h2>
-          <form id="topicDiplo">
-          
-                <label for="topicTitle">Θέμα:</label>
-                <input type="text" id="topicTitle" disabled>
-                
-                <label for="topicDescription">Περιγραφή:</label>
-                <textarea id="topicDescription" rows="5" disabled></textarea>
-
-                <label for="attachment">Συνημμένο Αρχείο:</label>
-                <a id="attachment" href="#" target="_blank">Κατεβάστε το αρχείο</a>
-
-                <label for="committee">Μέλη Τριμελούς Επιτροπής:</label>
-                <ul id="committee">
-                    <li>Μέλος 1</li>
-                    <li>Μέλος 2</li>
-                    <li>Μέλος 3</li>
-                </ul>
-
-                <p><strong>Ημερομηνία ανάθεσης:</strong> <span id="assignmentDate">-</span></p>
-                <p><strong>Χρόνος από την ανάθεση:</strong> <span id="timeSinceAssignment">-</span></p>
-           </form>
-        </div>
-    
+            
+        <h2>Προβολή Θέματος</h2>
+        <ul id="thesisDetailsList">
+        <!-- Η λίστα θα ενημερώνεται δυναμικά -->
+        </ul>
+        <button id="fetchThesisButton" onclick="fetchThesisSt()">Προβολή Θέματος</button>
 
         <div id="editProfile" class="forms" style="display:none; position: relative";>
             <button class="close-button"&times; onclick="toggleElement('editProfile')" >x</button>
