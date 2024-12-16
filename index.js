@@ -562,8 +562,8 @@ app.get('/get-statistics', (req, res) => {
         JOIN Theses t ON c.thesis_id = t.thesis_id
         WHERE 
             (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
-            (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Επιβλέπων') OR
-            (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Επιβλέπων') AND
+            (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+            (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') AND
             (c.response_date IS NOT NULL OR c.response_date2 IS NOT NULL OR c.response_date3 IS NOT NULL) AND
             t.final_submission_date IS NOT NULL
     `;
@@ -599,12 +599,79 @@ app.get('/get-statistics', (req, res) => {
             
             return acc + cnt;
         }, 0);
-        const avgCompletionTimeInMonths = (totalDays / cnt) / 30.44;
-        const test = 5; 
-        const test2 = 6;
+        const avgCompletionTimeInMonthsTotal = (totalDays / cnt) / 30.44;
+        
+        query2 = `
+            SELECT
+                DATEDIFF(t.final_submission_date, c.response_date) AS completionTime1
+            FROM Committees c
+            JOIN Theses t ON c.thesis_id = t.thesis_id
+            WHERE 
+                (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') AND
+                c.response_date IS NOT NULL AND
+                t.final_submission_date IS NOT NULL
+        `;
 
-        res.json({ success: true, data: { avgCompletionTimeInMonths, test, test2 } });
-        console.log({ avgCompletionTimeInMonths });
+        db.query(query2, [teacherAM], (err, results) => {
+            if (err) {
+                console.error('Error fetching statistics:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+
+            const totalDays = results.reduce((acc, row) => {
+                return acc + row.completionTime1;
+            }, 0);
+
+            const avgCompletionTimeInMonths1 = (totalDays / results.length) / 30.44;
+
+            query3 = `
+                SELECT
+                    DATEDIFF(t.final_submission_date, c.response_date2) AS completionTime2,
+                    DATEDIFF(t.final_submission_date, c.response_date3) AS completionTime3
+                FROM Committees c
+                JOIN Theses t ON c.thesis_id = t.thesis_id
+                WHERE 
+                    (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+                    (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') AND
+                    (c.response_date2 IS NOT NULL OR c.response_date3 IS NOT NULL) AND
+                    t.final_submission_date IS NOT NULL
+            `;
+
+            db.query(query3, [teacherAM, teacherAM], (err, results) => {
+                if(err) {
+                    console.error('Error fetching statistics:', err);
+                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                }
+
+                const totalDays = results.reduce((acc, row) => {
+                    let total = 0;
+                    
+                    if (row.completionTime2) 
+                        total += row.completionTime2;
+                    if (row.completionTime3) 
+                        total += row.completionTime3;
+                    
+                    return acc + total;
+                }, 0);
+
+                const cnt = results.reduce((acc, row) => {
+                    let cnt = 0;
+                    
+                    if (row.completionTime2) 
+                        cnt++;
+                    if (row.completionTime3) 
+                        cnt++;
+                    
+                    return acc + cnt;
+                }, 0);
+
+                const avgCompletionTimeInMonths2 = (totalDays / cnt) / 30.44;
+
+
+                res.json({ success: true, data: { avgCompletionTimeInMonthsTotal, avgCompletionTimeInMonths1, avgCompletionTimeInMonths2 } });
+                console.log({ avgCompletionTimeInMonthsTotal, avgCompletionTimeInMonths1, avgCompletionTimeInMonths2 });
+            });
+        });     
     });
 });
 /*

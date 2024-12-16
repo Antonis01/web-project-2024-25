@@ -15,22 +15,22 @@ function createChart(data) {
             labels: ['Μέσος χρόνος περάτωσης διπλωματικών (Μήνες)'],
             datasets: [
                 {
-                    label: 'Επιβλέπων',
-                    data: [data.avgCompletionTimeInMonths],
+                    label: 'Επιβλέπων και Μέλος Τριμελούς',
+                    data: [data.avgCompletionTimeInMonthsTotal],
                     backgroundColor: 'rgba(0, 255, 255, 0.2)',
                     borderColor: 'rgb(0, 0, 0)',
                     borderWidth: 1
                 },
                 {
-                    label: 'Μέλος Τριμελούς',
-                    data: [data.test],
+                    label: 'Επιβλέπων ',
+                    data: [data.avgCompletionTimeInMonths1],
                     backgroundColor: 'rgba(85, 0, 255, 0.2)',
                     borderColor: 'rgb(0, 0, 0)',
                     borderWidth: 1
                 },
                 {
-                    label: 'Επιβλέπων και Μέλος Τριμελούς',
-                    data: [data.test2],
+                    label: 'Μέλος Τριμελούς',
+                    data: [data.avgCompletionTimeInMonths2],
                     backgroundColor: 'rgba(0, 255, 42, 0.2)',
                     borderColor: 'rgb(0, 0, 0)',
                     borderWidth: 1
