@@ -1,6 +1,13 @@
 let chart;
 
+function setCanvasSize() {
+    const canvas = document.getElementById('canvas');
+    canvas.width = 400;
+    canvas.height = 400;
+}
+
 function timeChart() {
+    setCanvasSize();
     fetch('/get-statistics-time')
         .then(response => response.json())
         .then(data => {
@@ -51,6 +58,7 @@ function timeChart() {
 }
 
 function gradeChart() {
+    setCanvasSize();
     fetch('/get-statistics-grades')
         .then(response => response.json())
         .then(data => {
@@ -102,6 +110,7 @@ function gradeChart() {
 } 
 
 function countThesisChart(){
+    setCanvasSize();
     fetch('/get-statistics-count')
         .then(response => response.json())
         .then(data => {
