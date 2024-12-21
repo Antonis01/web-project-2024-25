@@ -100,3 +100,54 @@ function gradeChart() {
             console.error('Error fetching statistics:', error);
         });
 } 
+
+function countThesisChart(){
+    fetch('/get-statistics-count')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched data:', data); // Log the fetched data
+
+            const ctx = document.getElementById('canvas').getContext('2d');
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Αριθμός πτυχιακών'],
+                    datasets: [
+                        {
+                            label: 'Επιβλέπων και Μέλος Τριμελούς',
+                            data: [data.data.countTotal],
+                            backgroundColor: 'rgba(0, 255, 255, 0.2)',
+                            borderColor: 'rgb(0, 0, 0)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Επιβλέπων ',
+                            data: [data.data.count1],
+                            backgroundColor: 'rgba(85, 0, 255, 0.2)',
+                            borderColor: 'rgb(0, 0, 0)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Μέλος Τριμελούς',
+                            data: [data.data.count2],
+                            backgroundColor: 'rgba(0, 255, 42, 0.2)',
+                            borderColor: 'rgb(0, 0, 0)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching statistics:', error);
+        });
+}

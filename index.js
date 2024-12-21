@@ -755,6 +755,39 @@ app.get('/get-statistics-grades', (req, res) => {
     });
 });
 
+app.get('/get-statistics-count', (req, res) => {
+    const teacherAM = req.session.user.am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT
+            COUNT(CASE WHEN c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων' THEN 1 ELSE NULL END) AS count1,
+            COUNT(CASE WHEN (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+                           (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN 1 ELSE NULL END) AS count2,
+            COUNT(CASE WHEN (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
+                           (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+                           (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN 1 ELSE NULL END) AS countTotal
+        FROM Committees c
+        JOIN Theses t ON c.thesis_id = t.thesis_id
+        WHERE 
+            (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
+            (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+            (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος')
+    `;
+    db.query(query, [teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM], (err, results) => {
+        if (err) {
+            console.error('Error fetching statistics:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        res.json({ success: true, data: results[0] });
+        console.log(results[0]);
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
