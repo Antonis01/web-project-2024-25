@@ -143,7 +143,9 @@
     <div id="formStatistics" class="forms" style="display:none; position: relative">
         <button class="close-button"&times; onclick="toggleElement('formStatistics')" >x</button>
         <h2>Στατιστικά</h2>
-        <canvas id="avgCmpltTime" width="400" height="400"></canvas>          
+        <button type="button" onclick="timeChart()">Χρόνος περάτωσης</button>
+        <button type="button" onclick="gradeChart()">Βαθμοί </button>       
+        <canvas id="canvas" width="400" height="400"></canvas>   
     </div>
 
     <div id="dipolamaticsManagement" class="forms" style="display:none; position: relative">

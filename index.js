@@ -591,7 +591,7 @@ app.get('/get-thesis-st', (req, res) => {
     });
 });
 
-app.get('/get-statistics', (req, res) => {
+app.get('/get-statistics-time', (req, res) => {
     const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
@@ -644,7 +644,7 @@ app.get('/get-statistics', (req, res) => {
             
             return acc + cnt;
         }, 0);
-        const avgCompletionTimeInMonthsTotal = (totalDays / cnt) / 30.44;
+        const avgCompletionTimeTotal = (totalDays / cnt) / 30.44;
         
         query2 = `
             SELECT
@@ -667,7 +667,7 @@ app.get('/get-statistics', (req, res) => {
                 return acc + row.completionTime1;
             }, 0);
 
-            const avgCompletionTimeInMonths1 = (totalDays / results.length) / 30.44;
+            const avgCompletionTime1 = (totalDays / results.length) / 30.44;
 
             query3 = `
                 SELECT
@@ -710,15 +710,51 @@ app.get('/get-statistics', (req, res) => {
                     return acc + cnt;
                 }, 0);
 
-                const avgCompletionTimeInMonths2 = (totalDays / cnt) / 30.44;
+                const avgCompletionTime2 = (totalDays / cnt) / 30.44;
 
 
-                res.json({ success: true, data: { avgCompletionTimeInMonthsTotal, avgCompletionTimeInMonths1, avgCompletionTimeInMonths2 } });
-                console.log({ avgCompletionTimeInMonthsTotal, avgCompletionTimeInMonths1, avgCompletionTimeInMonths2 });
+                res.json({ success: true, data: { avgCompletionTimeTotal, avgCompletionTime1, avgCompletionTime2 } });
+                console.log({ avgCompletionTimeTotal, avgCompletionTime1, avgCompletionTime2 });
             });
         });     
     });
 });
+
+app.get('/get-statistics-grades', (req, res) => {
+    const teacherAM = req.session.user.am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT 
+            AVG(CASE WHEN c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων' THEN g.grade ELSE NULL END) AS avgGrade1,
+            AVG(CASE WHEN (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR 
+                        (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN g.grade ELSE NULL END) AS avgGrade2,
+            AVG(CASE WHEN (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
+                        (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+                        (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN g.grade ELSE NULL END) AS avgGradeTotal
+        FROM Grades g
+        JOIN Theses t ON g.thesis_id = t.thesis_id
+        JOIN Committees c ON t.thesis_id = c.thesis_id
+        WHERE 
+            (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
+            (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
+            (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος')
+    `;
+
+    db.query(query, [teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM], (err, results) => {
+        if (err) {
+            console.error('Error fetching statistics:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        res.json({ success: true, data: results[0] });
+        console.log(results[0]);
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
