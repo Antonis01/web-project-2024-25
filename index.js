@@ -553,10 +553,23 @@ app.get('/get-thesis-st', (req, res) => {
     }
 
     const query = `
-        SELECT thesis_id, title, summary, status, pdf_path, 
-               teacher_am, student_am, final_submission_date
-        FROM Theses
-        WHERE student_am = ?
+        SELECT 
+            t.title, 
+            t.summary, 
+            t.status, 
+            t.pdf_path, 
+            t.final_submission_date,
+            t1.teacher_name AS teacher_name,
+            t2.teacher_name AS teacher_name2,
+            t3.teacher_name AS teacher_name3,
+            DATEDIFF(CURRENT_DATE, a.assigned_date) AS days_since_assignment
+        FROM Theses t
+        LEFT JOIN Committees c ON t.thesis_id = c.thesis_id
+        LEFT JOIN Teachers t1 ON c.teacher_am = t1.teacher_am
+        LEFT JOIN Teachers t2 ON c.teacher_am2 = t2.teacher_am
+        LEFT JOIN Teachers t3 ON c.teacher_am3 = t3.teacher_am
+        LEFT JOIN Assignments a ON t.thesis_id = a.thesis_id
+        WHERE t.student_am = ? AND t.status != 'Ακυρωμένη'
     `;
 
     db.query(query, [studentAm], (err, results) => {
@@ -564,6 +577,8 @@ app.get('/get-thesis-st', (req, res) => {
             console.error('Error fetching thesis:', err);
             return res.status(500).json({ success: false, message: 'Database error' });
         }
+
+        console.log(results);
 
         if (results.length > 0) {
             const thesis = results[0];

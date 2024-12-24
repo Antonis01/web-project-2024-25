@@ -16,8 +16,11 @@ function fetchThesisSt() {
                   <strong>Σύνοψη:</strong> ${thesis.summary || "Χωρίς Περιγραφή"}<br>
                   <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
                   <strong>Κατάσταση:</strong> ${thesis.status || "Χωρίς Κατάσταση"}<br>
-                  <strong>Μέλη Τριμελούς Επιτροπής:</strong> ${thesis.committee.map(member => member.name).join(', ') || "Δεν υπάρχουν"}<br>
-                  <strong>Χρόνος από Ανάθεση:</strong> ${thesis.final_submission_date || "Χωρίς Δεδομένα"}<br>
+                  <strong>Επιβλέπων Καθηγητής:</strong> ${thesis.teacher_name || "Χωρίς Δεδομένα"}<br>
+                  <strong>Μέλος Τριμελούς Επιτροπής:</strong> ${thesis.teacher_name2 || "Χωρίς Δεδομένα"}<br>
+                  <strong>Μέλος Τριμελούς Επιτροπής:</strong> ${thesis.teacher_name3 || "Χωρίς Δεδομένα"}<br>
+                  <strong>Χρόνος από Ανάθεση:</strong> ${thesis.days_since_assignment || "Χωρίς Δεδομένα"} Days<br>
+                  <strong>Ημερομηνία Τελικής Υποβολής:</strong> ${thesis.final_submission_date || "Χωρίς Δεδομένα"}<br>
                 </div>
                 `;
                 thesisDetailsList.appendChild(titleItem);
