@@ -33,3 +33,9 @@ INSERT INTO Assignments (assignment_id, thesis_id, student_am, assigned_date, st
 INSERT INTO Committees (committee_id, thesis_id, assignment_id, teacher_am, role, response, invitation_date, response_date, teacher_am2, role2, response2, invitation_date2, response_date2, teacher_am3, role3, response3, invitation_date3, response_date3) VALUES
 (1, 5, 1, 1, 'Επιβλέπων', 'Αποδοχή', '2024-11-28', '2024-11-28', 4, 'Μέλος', 'Αποδοχή', '2024-11-28', '2024-11-28', 9, 'Μέλος', 'Αποδοχή', '2024-11-28', '2024-11-28'),
 (2, 12, NULL, 1, 'Επιβλέπων', NULL, NULL, NULL, NULL, 'Επιβλέπων', NULL, NULL, NULL, NULL, 'Επιβλέπων', NULL, NULL, NULL);
+
+INSERT INTO Presentations (thesis_id, presentation_date, presentation_time, presentation_type, presentation_location, presentation_link)
+VALUES (1, '2023-12-15', '10:00:00', 'in-person', 'Room 101', NULL);
+
+INSERT INTO Presentations (thesis_id, presentation_date, presentation_time, presentation_type, presentation_location, presentation_link)
+VALUES (2, '2023-12-16', '11:00:00', 'online', NULL, 'https://example.com/meeting-link');

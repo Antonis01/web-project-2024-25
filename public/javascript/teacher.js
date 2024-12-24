@@ -571,6 +571,8 @@ function fetchThesesForManagement() {
 
             if (data.success) {
                 data.data.forEach(thesis => {
+                    console.log('Thesis Data:', thesis); // Debugging: Log thesis data
+
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <div class="thesis-title">
@@ -613,6 +615,16 @@ function fetchThesesForManagement() {
                                 <button onclick="changeStatus(${thesis.thesis_id}, 'Υπό Εξέταση')">Change Status to Υπό Εξέταση</button>
                                 ` : ''}
                             </div>` : ''}
+                            ${thesis.status === 'Υπό Εξέταση' ? `
+                            <div class="draft-section">
+                                <h3>Draft Text</h3>
+                                <p>${thesis.draft_text}</p>
+                            </div>` : ''}
+                            ${thesis.presentation_date && thesis.presentation_time && (thesis.presentation_location || thesis.presentation_link) ? `
+                            <div class="announcement-section">
+                                <button onclick="generateAnnouncement(${thesis.thesis_id})">Generate Announcement</button>
+                                <div id="announcementText-${thesis.thesis_id}" class="announcement-text"></div>
+                            </div>` : ''}
                         </div>
                     `;
                     diploManagement.appendChild(listItem);
@@ -629,6 +641,24 @@ function fetchThesesForManagement() {
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while fetching the theses.');
+        });
+}
+
+// Function to generate and display the announcement text
+function generateAnnouncement(thesisId) {
+    fetch(`/generate-announcement/${thesisId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const announcementText = document.getElementById(`announcementText-${thesisId}`);
+                announcementText.innerHTML = `<pre>${data.announcement}</pre>`;
+            } else {
+                alert('Failed to generate announcement: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while generating the announcement.');
         });
 }
 

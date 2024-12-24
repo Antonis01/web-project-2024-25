@@ -788,6 +788,69 @@ app.get('/get-statistics-count', (req, res) => {
     });
 });
 
+// Route handler for generating and displaying the announcement text
+app.get('/generate-announcement/:id', (req, res) => {
+    const thesisId = req.params.id;
+    const teacherAM = req.session.user.teacher_am;
+
+    // Check if the current teacher is the supervisor
+    const checkSupervisorQuery = `
+        SELECT * FROM Committees 
+        WHERE thesis_id = ? AND teacher_am = ? AND role = 'Επιβλέπων'
+    `;
+    db.query(checkSupervisorQuery, [thesisId, teacherAM], (err, results) => {
+        if (err) {
+            console.error("Error checking supervisor:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+        if (results.length === 0) {
+            return res.status(403).json({ success: false, message: "You are not the supervisor of this thesis." });
+        }
+
+        // Fetch the thesis details including presentation details
+        const fetchThesisQuery = `
+            SELECT Theses.title, Theses.student_am, Presentations.presentation_date, Presentations.presentation_time, Presentations.presentation_type, Presentations.presentation_location, Presentations.presentation_link
+            FROM Theses
+            JOIN Presentations ON Theses.thesis_id = Presentations.thesis_id
+            WHERE Theses.thesis_id = ?
+        `;
+        db.query(fetchThesisQuery, [thesisId], (err, results) => {
+            if (err) {
+                console.error("Error fetching thesis details:", err);
+                return res.status(500).json({ success: false, message: "Internal Server Error" });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ success: false, message: "Thesis not found." });
+            }
+
+            const thesis = results[0];
+            if (!thesis.presentation_date || !thesis.presentation_time || (!thesis.presentation_location && !thesis.presentation_link)) {
+                return res.status(400).json({ success: false, message: "Presentation details are incomplete." });
+            }
+
+            let announcementText = `
+                Ανακοίνωση Παρουσίασης Διπλωματικής Εργασίας
+                Τίτλος: ${thesis.title}
+                Φοιτητής: ${thesis.student_am}
+                Ημερομηνία: ${thesis.presentation_date}
+                Ώρα: ${thesis.presentation_time}
+            `;
+
+            if (thesis.presentation_type === 'in-person') {
+                announcementText += `
+                    Τοποθεσία: ${thesis.presentation_location}
+                `;
+            } else if (thesis.presentation_type === 'online') {
+                announcementText += `
+                    Σύνδεσμος: ${thesis.presentation_link}
+                `;
+            }
+
+            res.json({ success: true, announcement: announcementText });
+        });
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

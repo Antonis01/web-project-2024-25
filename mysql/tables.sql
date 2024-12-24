@@ -106,3 +106,14 @@ CREATE TABLE Grades (
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id),
     FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
+
+CREATE TABLE Presentations (
+    presentation_id INT AUTO_INCREMENT PRIMARY KEY,
+    thesis_id INT NOT NULL,
+    presentation_date DATE NOT NULL,
+    presentation_time TIME NOT NULL,
+    presentation_type ENUM('in-person', 'online') NOT NULL,
+    presentation_location VARCHAR(255) DEFAULT NULL,
+    presentation_link VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
