@@ -3,12 +3,10 @@ function fetchThesisSt() {
         .then(response => response.json())
         .then(data => {
             const thesisDetailsList = document.getElementById('thesisDetailsList');
-            thesisDetailsList.innerHTML = ''; // Καθαρισμός προηγούμενων δεδομένων
-
+            thesisDetailsList.innerHTML = '';
             if (data.success) {
                 const thesis = data.thesis;
 
-                // Δημιουργία στοιχείων λίστας για κάθε πεδίο
                 const titleItem = document.createElement('li');
                 titleItem.innerHTML = `
                 <div class="thesis-details">
