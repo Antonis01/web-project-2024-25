@@ -48,3 +48,65 @@ function viewPDF(pdfPath, container) {
         container.appendChild(pdfViewer);
     }
 }
+
+ 
+function fetchProfileSt() {
+    fetch('/get-profile-st')
+        .then(response => response.json())
+        .then(data => {
+            const profileDetails = document.getElementById('profileDetails');
+            profileDetails.innerHTML = '';
+
+            if (data.success) {
+                const profile = data.profile;
+
+                profileDetails.innerHTML = `
+                <div class="profile-details">
+                    <strong>Διεύθυνση:</strong> ${profile.home_address || "Χωρίς Δεδομένα"}<br>
+                    <strong>Email:</strong> ${profile.email || "Χωρίς Δεδομένα"}<br>
+                    <strong>Κινητό Τηλέφωνο:</strong> ${profile.mobile_phone || "Χωρίς Δεδομένα"}<br>
+                    <strong>Σταθερό Τηλέφωνο:</strong> ${profile.landline_phone || "Χωρίς Δεδομένα"}<br>
+                </div>
+                `;
+            } else {
+                profileDetails.innerHTML = '<div>Δεν βρέθηκαν στοιχεία προφίλ για τον φοιτητή.</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching profile:', error);
+            alert('Σφάλμα κατά την προβολή του προφίλ.');
+        });
+}
+
+function saveProfileSt() {
+    const homeAddress = document.getElementById("home_address").value;
+    const email = document.getElementById("email").value;
+    const mobilePhone = document.getElementById("mobile_phone").value;
+    const landlinePhone = document.getElementById("landline_phone").value;
+
+    fetch('/update-profile-st', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            home_address: homeAddress,
+            email: email,
+            mobile_phone: mobilePhone,
+            landline_phone: landlinePhone,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Τα στοιχεία του προφίλ σας αποθηκεύτηκαν με επιτυχία!");
+                fetchProfileSt(); // Ενημέρωση των δεδομένων
+            } else {
+                alert("Σφάλμα κατά την αποθήκευση: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving profile:', error);
+            alert('Σφάλμα κατά την αποθήκευση του προφίλ.');
+        });
+}

@@ -866,6 +866,34 @@ app.get('/generate-announcement/:id', (req, res) => {
     });
 });
 
+app.get('/get-profile-st', (req, res) => {
+    const studentAm = req.session.user?.am;
+
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT home_address, email, mobile_phone, landline_phone
+        FROM Students
+        WHERE student_am = ?
+    `;
+
+    db.query(query, [studentAm], (err, results) => {
+        if (err) {
+            console.error('Error fetching profile:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.json({ success: false, message: 'No profile found for the student.' });
+        }
+
+        return res.json({ success: true, profile: results[0] });
+    });
+});
+
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1180,6 +1208,34 @@ app.delete('/delete-thesis/:id', (req, res) => {
             });
         });
     });
+});
+
+app.post('/update-profile-st', (req, res) => {
+    const studentAm = req.session.user?.am; // Αναγνωριστικό φοιτητή από το session
+    const { home_address, email, mobile_phone, landline_phone } = req.body;
+
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        UPDATE Students
+        SET home_address = ?, email = ?, mobile_phone = ?, landline_phone = ?
+        WHERE student_am = ?
+    `;
+
+    db.query(
+        query,
+        [home_address, email, mobile_phone, landline_phone, studentAm],
+        (err, result) => {
+            if (err) {
+                console.error('Error updating profile:', err);
+                return res.status(500).json({ success: false, message: 'Database error' });
+            }
+
+            return res.json({ success: true, message: 'Profile updated successfully' });
+        }
+    );
 });
 
 

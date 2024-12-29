@@ -37,25 +37,29 @@
         </ul>
         <button type="button" onclick="fetchThesisSt()">Προβολή Θέματος</button>
     </div>
-        
-    <div id="editProfile" class="forms" style="display:none; position: relative";>
-            <button class="close-button"&times; onclick="toggleElement('editProfile')" >x</button>
-            <h2>Επεξεργασία Προφίλ</h2>
-            <form id="profileForm">
-                <label for="address">Ταχυδρομική Διεύθυνση:</label>
-                <input type="text" id="address" name="address" required>
-
-                <label for="email">Email Επικοινωνίας:</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="mobilePhone">Κινητό Τηλέφωνο:</label>
-                <input type="text" id="mobilePhone" name="mobilePhone" required>
-
-                <input type="text" id="landlinePhone" name="landlinePhone">
-
-                <button type="submit">Αποθήκευση Αλλαγών</button>
-            </form>
-    </div>
+    
+    <div id="editProfile" class="forms" style="display:none; position: relative;">
+        <button class="close-button" onclick="toggleElement('editProfile')">x</button>
+    
+        <div id="profileDetails" class="profile-container"></div>
+    
+        <form id="profileForm">
+            <label>Διεύθυνση:</label>
+            <input type="text" name="home_address" id="home_address" />
+    
+            <label>Email:</label>
+            <input type="email" name="email" id="email" />
+    
+            <label>Κινητό Τηλέφωνο:</label>
+            <input type="text" name="mobile_phone" id="mobile_phone" />
+    
+            <label>Σταθερό Τηλέφωνο:</label>
+            <input type="text" name="landline_phone" id="landline_phone" />
+    
+            <button type="button" onclick="saveProfileSt()">Αποθήκευση</button>
+        </form>
+    </div>   
+   
        
     <div id="diploManagement" class="forms" style="display:none; position: relative";>
             <button class="close-button"&times; onclick="toggleElement('diploManagement')" >x</button>

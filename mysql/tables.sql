@@ -23,6 +23,9 @@ CREATE TABLE Students (
     student_password VARCHAR(30) DEFAULT 'unknown' NOT NULL,
     student_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    home_address VARCHAR(100) DEFAULT 'unknown' NOT NULL,
+    mobile_phone VARCHAR(15) DEFAULT 'unknown' NOT NULL,
+    landline_phone VARCHAR(15) DEFAULT 'unknown' NOT NULL,
     UNIQUE (student_username),
     PRIMARY KEY (student_am),
     FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE ON UPDATE CASCADE
