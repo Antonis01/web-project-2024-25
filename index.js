@@ -894,6 +894,46 @@ app.get('/get-profile-st', (req, res) => {
 });
 
 
+// Route handler for fetching grades for a specific thesis
+app.get('/get-grades/:thesis_id', (req, res) => {
+    const thesis_id = req.params.thesis_id;
+    const teacherAM = req.session.user.am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    // Check if the current teacher is a member of the committee
+    const checkCommitteeQuery = `
+        SELECT * FROM Committees 
+        WHERE thesis_id = ? AND (teacher_am = ? OR teacher_am2 = ? OR teacher_am3 = ?)
+    `;
+    db.query(checkCommitteeQuery, [thesis_id, teacherAM, teacherAM, teacherAM], (err, results) => {
+        if (err) {
+            console.error("Error checking committee membership:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+        if (results.length === 0) {
+            return res.status(403).json({ success: false, message: "You are not a member of the committee for this thesis." });
+        }
+
+        // Fetch the grades
+        const fetchGradesQuery = `
+            SELECT g.teacher_am, t.teacher_name, g.grade
+            FROM Grades g
+            JOIN Teachers t ON g.teacher_am = t.teacher_am
+            WHERE g.thesis_id = ?
+        `;
+        db.query(fetchGradesQuery, [thesis_id], (err, results) => {
+            if (err) {
+                console.error("Error fetching grades:", err);
+                return res.status(500).json({ success: false, message: "Internal Server Error" });
+            }
+            res.json({ success: true, data: results });
+        });
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1157,6 +1197,45 @@ app.post('/change-status/:id', (req, res) => {
             }
 
             res.json({ success: true, message: "Status changed successfully!" });
+        });
+    });
+});
+
+// Route handler for submitting a grade
+app.post('/submit-grade', (req, res) => {
+    const { thesis_id, grade } = req.body;
+    const teacherAM = req.session.user.am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    // Check if the current teacher is a member of the committee
+    const checkCommitteeQuery = `
+        SELECT * FROM Committees 
+        WHERE thesis_id = ? AND (teacher_am = ? OR teacher_am2 = ? OR teacher_am3 = ?)
+    `;
+    db.query(checkCommitteeQuery, [thesis_id, teacherAM, teacherAM, teacherAM], (err, results) => {
+        if (err) {
+            console.error("Error checking committee membership:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+        if (results.length === 0) {
+            return res.status(403).json({ success: false, message: "You are not a member of the committee for this thesis." });
+        }
+
+        // Insert or update the grade
+        const insertOrUpdateGradeQuery = `
+            INSERT INTO Grades (thesis_id, teacher_am, grade)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE grade = VALUES(grade)
+        `;
+        db.query(insertOrUpdateGradeQuery, [thesis_id, teacherAM, grade], (err) => {
+            if (err) {
+                console.error("Error submitting grade:", err);
+                return res.status(500).json({ success: false, message: "Internal Server Error" });
+            }
+            res.json({ success: true, message: 'Grade submitted successfully!' });
         });
     });
 });

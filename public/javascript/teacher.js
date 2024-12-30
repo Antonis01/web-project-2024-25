@@ -619,12 +619,21 @@ function fetchThesesForManagement() {
                             <div class="draft-section">
                                 <h3>Draft Text</h3>
                                 <p>${thesis.draft_text}</p>
-                            </div>` : ''}
+                            </div>
                             ${thesis.presentation_date && thesis.presentation_time && (thesis.presentation_location || thesis.presentation_link) ? `
                             <div class="announcement-section">
                                 <button onclick="generateAnnouncement(${thesis.thesis_id})">Generate Announcement</button>
                                 <div id="announcementText-${thesis.thesis_id}" class="announcement-text"></div>
                             </div>` : ''}
+                            <div class="grades-section">
+                                <h3>Grades</h3>
+                                <input type="number" id="gradeInput-${thesis.thesis_id}" placeholder="Enter your grade">
+                                <button onclick="submitGrade(${thesis.thesis_id})">Submit Grade</button>
+                                <ul id="gradesList-${thesis.thesis_id}">
+                                    <!-- Dynamically populated list of grades -->
+                                </ul>
+                            </div>
+                            ` : ''}
                         </div>
                     `;
                     diploManagement.appendChild(listItem);
@@ -659,6 +668,64 @@ function generateAnnouncement(thesisId) {
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred while generating the announcement.');
+        });
+}
+
+// Function to submit a grade
+function submitGrade(thesisId) {
+    const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
+
+    if (!grade) {
+        alert('Please enter a grade.');
+        return;
+    }
+
+    fetch('/submit-grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thesis_id: thesisId, grade: grade })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Grade submitted successfully!');
+            fetchGrades(thesisId); // Refresh the list of grades
+        } else {
+            alert('Error submitting grade: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the grade.');
+    });
+}
+
+// Function to fetch and display grades for a specific thesis
+function fetchGrades(thesisId) {
+    fetch(`/get-grades/${thesisId}`)
+        .then(response => response.json())
+        .then(data => {
+            const gradesList = document.getElementById(`gradesList-${thesisId}`);
+            gradesList.innerHTML = ''; // Clear the current list
+
+            if (data.success) {
+                data.data.forEach(grade => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="grade-item">
+                            <strong>Teacher:</strong> ${grade.teacher_name}<br>
+                            <strong>Grade:</strong> ${grade.grade}
+                        </div>
+                    `;
+                    gradesList.appendChild(listItem);
+                });
+            } else {
+                alert('Error fetching grades: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while fetching the grades.');
         });
 }
 
