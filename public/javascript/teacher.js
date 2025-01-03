@@ -629,6 +629,7 @@ function fetchThesesForManagement() {
                                 <h3>Grades</h3>
                                 <input type="number" id="gradeInput-${thesis.thesis_id}" placeholder="Enter your grade">
                                 <button onclick="submitGrade(${thesis.thesis_id})">Submit Grade</button>
+                                <button onclick="fetchGrades(${thesis.thesis_id})">View Submitted Grades</button>
                                 <ul id="gradesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of grades -->
                                 </ul>
