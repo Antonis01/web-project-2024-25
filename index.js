@@ -893,6 +893,65 @@ app.get('/get-profile-st', (req, res) => {
     });
 });
 
+app.get('/get-active-theses', (req, res) => {
+    const statusFilter = ['Ενεργή', 'Υπό Εξέταση']; // Καταστάσεις που θέλουμε
+    const secretaryAM = req.session.user.am; // Αναγνωριστικό Γραμματείας
+
+    if (!secretaryAM) {
+        console.error('User is not authenticated or session is invalid');
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+       }
+       
+    const query = `
+      SELECT Theses.thesis_id, Theses.title, Theses.summary, Theses.status,
+        a.assigned_date, 
+        DATEDIFF(NOW(), a.assigned_date) AS days_since_assignment,
+        t1.teacher_name AS teacher_name, Committees.role,
+        t2.teacher_name AS teacher2_name, Committees.role2,
+        t3.teacher_name AS teacher3_name, Committees.role3
+      FROM Theses
+       LEFT JOIN Assignments a ON Theses.thesis_id = a.thesis_id
+       LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id
+       LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
+       LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
+       LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
+      WHERE Theses.status IN ('Ενεργή', 'Υπό Εξέταση');
+
+`; 
+
+    db.query(query, statusFilter, (err, results) => {
+        if (err) {
+            console.error('Error fetching theses:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        // Μορφοποίηση δεδομένων
+        const theses = results.map(thesis => ({
+            thesis_id: thesis.thesis_id,
+            title: thesis.title,
+            summary: thesis.summary,
+            status: thesis.status,
+            days_since_assignment: thesis.assigned_date ? thesis.days_since_assignment : null,
+            committee: [
+                {
+                    teacher_name: thesis.teacher_name,
+                    role: thesis.role
+                },
+                {
+                    teacher_name: thesis.teacher2_name,
+                    role: thesis.role2
+                },
+                {
+                    teacher_name: thesis.teacher3_name,
+                    role: thesis.role3
+                }
+            ]
+        }));
+
+        res.json({ success: true, data: theses });
+    });
+});
+
 
 // Route handler for fetching grades for a specific thesis
 app.get('/get-grades/:thesis_id', (req, res) => {
@@ -1224,32 +1283,18 @@ app.post('/submit-grade', (req, res) => {
             return res.status(403).json({ success: false, message: "You are not a member of the committee for this thesis." });
         }
 
-        // Check if the teacher has already submitted a grade
-        const checkGradeQuery = `
-            SELECT * FROM Grades 
-            WHERE thesis_id = ? AND teacher_am = ?
+        // Insert or update the grade
+        const insertOrUpdateGradeQuery = `
+            INSERT INTO Grades (thesis_id, teacher_am, grade)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE grade = VALUES(grade)
         `;
-        db.query(checkGradeQuery, [thesis_id, teacherAM], (err, gradeResults) => {
+        db.query(insertOrUpdateGradeQuery, [thesis_id, teacherAM, grade], (err) => {
             if (err) {
-                console.error("Error checking existing grade:", err);
+                console.error("Error submitting grade:", err);
                 return res.status(500).json({ success: false, message: "Internal Server Error" });
             }
-            if (gradeResults.length > 0) {
-                return res.status(400).json({ success: false, message: "You have already submitted a grade for this thesis." });
-            }
-
-            // Insert the grade
-            const insertGradeQuery = `
-                INSERT INTO Grades (thesis_id, teacher_am, grade)
-                VALUES (?, ?, ?)
-            `;
-            db.query(insertGradeQuery, [thesis_id, teacherAM, grade], (err) => {
-                if (err) {
-                    console.error("Error submitting grade:", err);
-                    return res.status(500).json({ success: false, message: "Internal Server Error" });
-                }
-                res.json({ success: true, message: 'Grade submitted successfully!' });
-            });
+            res.json({ success: true, message: 'Grade submitted successfully!' });
         });
     });
 });
