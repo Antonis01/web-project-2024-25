@@ -104,10 +104,11 @@ CREATE TABLE Grades (
     grade_id INT PRIMARY KEY AUTO_INCREMENT,
     thesis_id INT,
     teacher_am INT,
-    grade DECIMAL(3, 2) NOT NULL,
+    grade DECIMAL(4, 2) NOT NULL,
     criteria TEXT,
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id),
-    FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am)
+    FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am),
+    CHECK (grade >= 0.0 AND grade <= 10.0)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
 
 CREATE TABLE Presentations (
