@@ -110,3 +110,88 @@ function saveProfileSt() {
             alert('Σφάλμα κατά την αποθήκευση του προφίλ.');
         });
 }
+
+function thesesStatus(){
+    return fetch('/get-theses-status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                return data.theses.map(thesis => thesis.status);
+            } else {
+                console.error('Error fetching theses status:', data.message);
+                return [];
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching theses status:', error);
+            return [];
+        });
+}
+
+document.getElementById("diploManagement").addEventListener("click", function(event){
+    thesesStatus().then(statuses => {
+        if (statuses.includes('Υπό Ανάθεση')) {
+            inviteTeacher();
+        } else if (statuses.includes('Υπό Εξέταση')) {
+            alert("Υπό Εξέταση");
+        } else if (statuses.includes('Περατωμένη')) {
+            alert("Περατωμένη");
+        } else {
+            alert("Δεν μπορείτε να δείτε την διαχείριση διπλωματικής");
+        }
+    });
+});
+
+function inviteTeacher() {
+    fetch('/get-teacher-info')
+    .then(response => response.json())
+    .then(data => {
+        const teacherDataElement = document.getElementById('teacherData');
+        teacherDataElement.innerHTML = '';
+        if (data.success) {
+            data.teachers.forEach(teacher => {
+                const teacherItem = document.createElement('div');
+                teacherItem.classList.add('teacher-details');
+                teacherItem.innerHTML = `
+                    <strong>Όνομα Καθηγητή:</strong> ${teacher.teacher_name || "Χωρίς Δεδομένα"}<br>
+                    <strong>AM:</strong> ${teacher.teacher_am || "Χωρίς Δεδομένα"}<br>
+                    <strong>Email:</strong> ${teacher.email || "Χωρίς Δεδομένα"}<br>
+                    <button onclick="submitTeacherInvitations('${teacher.teacher_am}')">Πρόσκληση</button>
+                    <br> 
+                    `;
+                teacherDataElement.appendChild(teacherItem);
+            });
+        } else {
+            teacherDataElement.innerHTML = '<div>Δεν βρέθηκαν δεδομένα καθηγητών.</div>';
+        }
+    })
+    .catch(error => {
+        alert('Σφάλμα κατά την ανάκτηση των δεδομένων των καθηγητών.');
+    });
+}
+
+
+function submitTeacherInvitations(teacherAm) {
+    fetch('/invite-teacher', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            teacher_am: teacherAm,
+            thesis_id: "14",
+            role: 'Μέλος' 
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Η πρόσκληση απεστάλη με επιτυχία!");
+        } else {
+            alert("Σφάλμα κατά την αποστολή της πρόσκλησης: " + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Σφάλμα κατά την αποστολή της πρόσκλησης.');
+    });
+}

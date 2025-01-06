@@ -993,6 +993,49 @@ app.get('/get-grades/:thesis_id', (req, res) => {
     });
 });
 
+
+app.get('/get-theses-status', (req, res) => {
+    const studentAm = req.session.user.am;
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT  
+            t.status
+        FROM Theses t
+        LEFT JOIN Committees c ON t.thesis_id = c.thesis_id
+        LEFT JOIN Teachers t1 ON c.teacher_am = t1.teacher_am
+        LEFT JOIN Teachers t2 ON c.teacher_am2 = t2.teacher_am
+        LEFT JOIN Teachers t3 ON c.teacher_am3 = t3.teacher_am
+        LEFT JOIN Assignments a ON t.thesis_id = a.thesis_id
+        WHERE t.student_am = ? AND t.status != 'Ακυρωμένη'
+    `;
+
+    db.query(query, [studentAm], (err, results) => {
+        if (err) {
+            console.error('Error fetching theses status:', err); 
+            return res.status(500).json({ success: false, message: 'Database query error' });
+        }
+        console.log('Theses status results:', results); 
+        res.json({ success: true, theses: results });
+    });
+});
+
+app.get('/get-teacher-info', (req, res) => {
+    const query = 'SELECT teacher_name, teacher_am, email FROM Teachers';
+    
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching teacher info:', err);
+            res.status(500).json({ success: false, message: 'Error fetching teacher info' });
+        } 
+            
+        res.json({ success: true, teachers: results });
+        console.log('Teacher info:', results);
+        
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1299,6 +1342,21 @@ app.post('/submit-grade', (req, res) => {
     });
 });
 
+app.post('/invite-teacher', (req, res) => {
+    const { thesis_id, teacher_am, role } = req.body;
+
+    const query = `
+        INSERT INTO Committees (thesis_id, teacher_am2, role2)
+        VALUES (?, ?, ?)
+    `;
+    db.query(query, [thesis_id, teacher_am, role], (err) => {
+        if (err) {
+            console.error('Error inviting teacher:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Teacher invited successfully!' });
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
