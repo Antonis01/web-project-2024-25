@@ -1356,6 +1356,45 @@ app.post('/submit-grade', (req, res) => {
     });
 });
 
+// Route handler for updating a grade
+app.post('/update-grade', (req, res) => {
+    const { thesis_id, grade } = req.body;
+    const teacherAM = req.session.user.am;
+
+    if (!teacherAM) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    // Check if the teacher has already submitted a grade
+    const checkGradeQuery = `
+        SELECT * FROM Grades 
+        WHERE thesis_id = ? AND teacher_am = ?
+    `;
+    db.query(checkGradeQuery, [thesis_id, teacherAM], (err, gradeResults) => {
+        if (err) {
+            console.error("Error checking existing grade:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error" });
+        }
+        if (gradeResults.length === 0) {
+            return res.status(400).json({ success: false, message: "You have not submitted a grade for this thesis." });
+        }
+
+        // Update the grade
+        const updateGradeQuery = `
+            UPDATE Grades 
+            SET grade = ?
+            WHERE thesis_id = ? AND teacher_am = ?
+        `;
+        db.query(updateGradeQuery, [grade, thesis_id, teacherAM], (err) => {
+            if (err) {
+                console.error("Error updating grade:", err);
+                return res.status(500).json({ success: false, message: "Internal Server Error" });
+            }
+            res.json({ success: true, message: 'Grade updated successfully!' });
+        });
+    });
+});
+
 app.post('/invite-teacher', (req, res) => {
     const { thesis_id, teacher_am, role } = req.body;
 

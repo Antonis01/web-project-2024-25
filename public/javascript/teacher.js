@@ -630,6 +630,7 @@ function fetchThesesForManagement() {
                                 <input type="number" id="gradeInput-${thesis.thesis_id}" placeholder="Enter your grade">
                                 <button onclick="submitGrade(${thesis.thesis_id})">Submit Grade</button>
                                 <button onclick="fetchGrades(${thesis.thesis_id})">View Submitted Grades</button>
+                                <button onclick="updateGrade(${thesis.thesis_id})">Update Grade</button>
                                 <ul id="gradesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of grades -->
                                 </ul>
@@ -698,6 +699,35 @@ function submitGrade(thesisId) {
     .catch(error => {
         console.error('Error:', error);
         alert('An error occurred while submitting the grade.');
+    });
+}
+
+// Function to update a grade
+function updateGrade(thesisId) {
+    const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
+
+    if (!grade) {
+        alert('Please enter a grade.');
+        return;
+    }
+
+    fetch('/update-grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thesis_id: thesisId, grade: grade })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Grade updated successfully!');
+            fetchGrades(thesisId); // Refresh the list of grades
+        } else {
+            alert('Error updating grade: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the grade.');
     });
 }
 
