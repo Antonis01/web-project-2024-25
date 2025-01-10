@@ -16,6 +16,7 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const multer = require('multer');
 const { Parser } = require('json2csv');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
@@ -27,6 +28,11 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(express.json());
+
+app.use(fileUpload());
+
 
 /*
 -------------------------------------------------------------------------------------
@@ -1395,6 +1401,66 @@ app.post('/update-grade', (req, res) => {
     });
 });
 
+// Διαδρομή για εισαγωγή JSON δεδομένων
+app.post('/import-json', (req, res) => {
+    if (!req.files || !req.files.jsonFile) {
+        return res.status(400).send('No file uploaded.');
+    }
+
+    try {
+        const jsonFile = req.files.jsonFile;
+        const jsonData = JSON.parse(jsonFile.data.toString());
+
+        // Εισαγωγή δεδομένων στη βάση
+        const insertStudents = 'INSERT INTO Students (student_am, role_id, student_username, student_password, student_name, email, home_address, mobile_phone, landline_phone) VALUES ?';
+        const insertTeachers = 'INSERT INTO Teachers (teacher_am, role_id, teacher_username, teacher_password, teacher_name, email) VALUES ?';
+
+        const studentData = jsonData.students.map(student => [
+            student.student_am,
+            student.role_id,
+            student.student_username,
+            student.student_password,
+            student.student_name,
+            student.email,
+            student.home_address,
+            student.mobile_phone,
+            student.landline_phone
+        ]);
+
+        const teacherData = jsonData.teachers.map(teacher => [
+            teacher.teacher_am,
+            teacher.role_id,
+            teacher.teacher_username,
+            teacher.teacher_password,
+            teacher.teacher_name,
+            teacher.email
+        ]);
+
+        // Εκτέλεση ερωτήματος για εισαγωγή φοιτητών
+        db.query(insertStudents, [studentData], (err) => {
+            if (err) {
+                console.error('Error inserting students:', err);
+                return res.status(500).send('Error inserting students into the database.');
+            }
+
+            // Εκτέλεση ερωτήματος για εισαγωγή διδασκόντων
+            db.query(insertTeachers, [teacherData], (err) => {
+                if (err) {
+                    console.error('Error inserting teachers:', err);
+                    return res.status(500).send('Error inserting teachers into the database.');
+                }
+
+                res.send({ message: 'JSON uploaded and processed successfully!' });
+            });
+        });
+    } catch (error) {
+        console.error('Error processing JSON file:', error);
+        res.status(400).send('Invalid JSON file.');
+    }
+});
+
+  
+  
 app.post('/invite-teacher', (req, res) => {
     const { thesis_id, teacher_am, role } = req.body;
 

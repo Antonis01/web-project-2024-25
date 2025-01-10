@@ -44,3 +44,34 @@ function toggleDetails(button) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', fetchActiveTheses);
+
+async function uploadJSON() {
+  const jsonFileInput = document.getElementById('jsonFile');
+  if (!jsonFileInput.files.length) {
+      alert('Please select a JSON file.');
+      return;
+  }
+
+  const formData = new FormData();
+  formData.append('jsonFile', jsonFileInput.files[0]);
+
+  try {
+      const response = await fetch('http://localhost:8080/import-json', {
+          method: 'POST',
+          body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+          alert(result.message);
+      } else {
+          alert(`Error: ${result.message}`);
+      }
+  } catch (err) {
+      console.error('Error uploading JSON:', err);
+      alert('Error uploading JSON.');
+  }
+}
+
