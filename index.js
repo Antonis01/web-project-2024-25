@@ -1326,18 +1326,32 @@ app.post('/submit-grade', (req, res) => {
             return res.status(403).json({ success: false, message: "You are not a member of the committee for this thesis." });
         }
 
-        // Insert or update the grade
-        const insertOrUpdateGradeQuery = `
-            INSERT INTO Grades (thesis_id, teacher_am, grade)
-            VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE grade = VALUES(grade)
+        // Check if the teacher has already submitted a grade
+        const checkGradeQuery = `
+            SELECT * FROM Grades 
+            WHERE thesis_id = ? AND teacher_am = ?
         `;
-        db.query(insertOrUpdateGradeQuery, [thesis_id, teacherAM, grade], (err) => {
+        db.query(checkGradeQuery, [thesis_id, teacherAM], (err, gradeResults) => {
             if (err) {
-                console.error("Error submitting grade:", err);
+                console.error("Error checking existing grade:", err);
                 return res.status(500).json({ success: false, message: "Internal Server Error" });
             }
-            res.json({ success: true, message: 'Grade submitted successfully!' });
+            if (gradeResults.length > 0) {
+                return res.status(400).json({ success: false, message: "You have already submitted a grade for this thesis." });
+            }
+
+            // Insert the grade
+            const insertGradeQuery = `
+                INSERT INTO Grades (thesis_id, teacher_am, grade)
+                VALUES (?, ?, ?)
+            `;
+            db.query(insertGradeQuery, [thesis_id, teacherAM, grade], (err) => {
+                if (err) {
+                    console.error("Error submitting grade:", err);
+                    return res.status(500).json({ success: false, message: "Internal Server Error" });
+                }
+                res.json({ success: true, message: 'Grade submitted successfully!' });
+            });
         });
     });
 });
