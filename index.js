@@ -179,6 +179,41 @@ function getTeacherId(req, res, next) {
     });
 }
 
+function checkAndUpdateThesisStatus(thesis_id) {
+    const query = `
+        SELECT response2, response3
+        FROM Committees
+        WHERE thesis_id = ?
+    `;
+
+    db.query(query, [thesis_id], (err, results) => {
+        if (err) {
+            console.error('Error checking committee responses:', err);
+            return;
+        }
+
+        if (results.length > 0) {
+            const { response2, response3 } = results[0];
+
+            if (response2 === 'Αποδοχή' && response3 === 'Αποδοχή') {
+                const updateQuery = `
+                    UPDATE Theses
+                    SET status = 'Ενεργή'
+                    WHERE thesis_id = ? AND status = 'Υπό Ανάθεση'
+                `;
+
+                db.query(updateQuery, [thesis_id], (err) => {
+                    if (err) {
+                        console.error('Error updating thesis status:', err);
+                    } else {
+                        console.log(`Thesis ${thesis_id} status updated to 'Ενεργή'`);
+                    }
+                });
+            }
+        }
+    });
+}
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1042,6 +1077,30 @@ app.get('/get-teacher-info', (req, res) => {
         
     });
 });
+
+app.get('/get-thesis-id', (req, res) => {
+    const studentAm = req.session.user.am;
+
+    const query = `
+        SELECT thesis_id
+        FROM Theses
+        WHERE student_am = ?
+    `;
+
+    db.query(query, [studentAm], (err, results) => {
+        if (err) {
+            console.error('Error fetching thesis_id:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Thesis not found for the student' });
+        }
+
+        res.json({ success: true, thesis_id: results[0].thesis_id });
+        console.log('Thesis id:', results[0].thesis_id);
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1200,6 +1259,21 @@ app.post('/accept-invitation/:id', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
+        
+        const thesisQuery = `
+            SELECT thesis_id FROM Committees WHERE committee_id = ?
+        `;
+        db.query(thesisQuery, [committeeId], (err, results) => {
+            if (err) {
+                console.error('Error fetching thesis id:', err);
+                res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return;
+            }
+
+            const thesis_id = results[0].thesis_id;
+            checkAndUpdateThesisStatus(thesis_id);
+        });
+
         res.json({ success: true, message: 'Invitation accepted successfully!' });
     });
 });
@@ -1464,16 +1538,50 @@ app.post('/import-json', (req, res) => {
 app.post('/invite-teacher', (req, res) => {
     const { thesis_id, teacher_am, role } = req.body;
 
-    const query = `
-        INSERT INTO Committees (thesis_id, teacher_am2, role2)
-        VALUES (?, ?, ?)
-    `;
-    db.query(query, [thesis_id, teacher_am, role], (err) => {
+    const invitationDate = new Date();
+
+    const check = 'SELECT teacher_am2, teacher_am3, response2, response3 FROM Committees WHERE thesis_id = ?';
+    db.query(check, [thesis_id], (err, result) => {
         if (err) {
-            console.error('Error inviting teacher:', err);
+            console.error('Error checking teacher:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-        res.json({ success: true, message: 'Teacher invited successfully!' });
+
+        if (result.length === 0) {
+            return res.status(404).json({ success: false, message: 'Thesis not found' });
+        }
+
+        let query;
+        let queryParams;
+
+        if (!result[0].teacher_am2 || result[0].response2 === 'Απόρριψη') {
+            query = `
+                UPDATE Committees
+                SET teacher_am2 = ?, role2 = ?, invitation_date2 = ?, response2 = NULL, response_date2 = NULL
+                WHERE thesis_id = ?
+            `;
+            queryParams = [teacher_am, role, invitationDate, thesis_id];
+            
+        } else if (!result[0].teacher_am3 || result[0].response3 === 'Απόρριψη') {
+            query = `
+                UPDATE Committees
+                SET teacher_am3 = ?, role3 = ?, invitation_date3 = ?, response3 = NULL, response_date3 = NULL
+                WHERE thesis_id = ?
+            `;
+            queryParams = [teacher_am, role, invitationDate, thesis_id];
+
+        } else {
+            return res.status(400).json({ success: false, message: 'Δεν υπάεχει διαθέσημη θέση' });
+        }
+
+        db.query(query, queryParams, (err) => {
+            if (err) {
+                console.error('Error inviting teacher:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+
+            res.json({ success: true, message: 'Teacher invited successfully!' });
+        });
     });
 });
 /*
