@@ -456,14 +456,9 @@ app.get('/search-theses', getTeacherId, (req, res) => {
         queryParams.push(statusFilter);
     }
 
-    if (roleFilter && roleFilter !== 'all') {
-        query += ' AND (Committees.role = ? OR Committees.role2 = ? OR Committees.role3 = ?)';
-        queryParams.push(roleFilter, roleFilter, roleFilter);
-    }
-
-    if (teacherId) {
-        query += ' AND (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)';
-        queryParams.push(teacherId, teacherId, teacherId);
+    if (roleFilter && roleFilter !== 'all' && teacherId) {
+        query += ' AND ((Committees.role = ? AND Committees.teacher_am = ?) OR (Committees.role2 = ? AND Committees.teacher_am2 = ?) OR (Committees.role3 = ? AND Committees.teacher_am3 = ?))';
+        queryParams.push(roleFilter, teacherId, roleFilter, teacherId, roleFilter, teacherId);
     }
 
     db.query(query, queryParams, (err, results) => {

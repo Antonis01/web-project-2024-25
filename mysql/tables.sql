@@ -67,7 +67,6 @@ CREATE TABLE Assignments (
 CREATE TABLE Committees (
     committee_id INT PRIMARY KEY AUTO_INCREMENT,
     thesis_id INT,
-    assignment_id INT,
     teacher_am INT,
     role ENUM('Επιβλέπων', 'Μέλος') NOT NULL,
     response ENUM('Αποδοχή', 'Απόρριψη') DEFAULT NULL,
@@ -87,7 +86,6 @@ CREATE TABLE Committees (
     FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am),
     FOREIGN KEY (teacher_am2) REFERENCES Teachers(teacher_am),
     FOREIGN KEY (teacher_am3) REFERENCES Teachers(teacher_am),
-    FOREIGN KEY (assignment_id) REFERENCES Assignments(assignment_id)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
 
 CREATE TABLE Notes (
