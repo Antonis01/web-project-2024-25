@@ -16,7 +16,7 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const multer = require('multer');
 const { Parser } = require('json2csv');
-const fileUpload = require('express-fileupload');
+//const fileUpload = require('express-fileupload');
 
 const app = express();
 
@@ -29,9 +29,9 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use(express.json());
+//app.use(express.json());
 
-app.use(fileUpload());
+//app.use(fileUpload());
 
 
 /*
@@ -440,13 +440,13 @@ app.get('/search-theses', getTeacherId, (req, res) => {
                t1.teacher_name AS teacher_name, Committees.role,
                t2.teacher_name AS teacher2_name, Committees.role2,
                t3.teacher_name AS teacher3_name, Committees.role3,
-               s.student_am AS student_am
+               Students.student_am AS student_am
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
         LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
         LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
         LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-        LEFT JOIN Students s ON Theses.student_am = s.student_am
+        LEFT JOIN Students ON Theses.student_am = Students.student_am
         WHERE 1=1
     `;
     const queryParams = [];
@@ -457,13 +457,13 @@ app.get('/search-theses', getTeacherId, (req, res) => {
     }
 
     if (roleFilter && roleFilter !== 'all') {
-        query += ' AND Committees.role = ?';
-        queryParams.push(roleFilter);
+        query += ' AND (Committees.role = ? OR Committees.role2 = ? OR Committees.role3 = ?)';
+        queryParams.push(roleFilter, roleFilter, roleFilter);
     }
 
     if (teacherId) {
-        query += ' AND Committees.teacher_am = ?';
-        queryParams.push(teacherId);
+        query += ' AND (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)';
+        queryParams.push(teacherId, teacherId, teacherId);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -1129,8 +1129,8 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
     const teacher_am = req.session.user.am;
 
     const query = `
-        INSERT INTO Theses (title, summary, pdf_path, teacher_am)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO Theses (title, summary, pdf_path, teacher_am, status)
+        VALUES (?, ?, ?, ?, 'Υπό Ανάθεση')
     `;
     
     const values = [title, description, pdfPath, teacher_am || null];
@@ -1154,6 +1154,7 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
                 return;
             }
         });
+        
         res.json({ success: true, message: 'Thesis added successfully!' });
     });
 });
@@ -1217,7 +1218,16 @@ app.post("/assign-theses", (req, res) => {
             console.error('Error assigning thesis:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-        res.json({ success: true, message: 'Thesis assigned successfully' });
+
+        const query2 = 'INSERT INTO Assignments (thesis_id, student_am, assigned_date, status) VALUES (?, ?, NOW(), "Προσωρινή")';
+        db.query(query2, [thesisId, studentAm], (err) => {
+            if (err) {
+                console.error('Error inserting assignment:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+        
+            res.json({ success: true, message: 'Thesis assigned successfully' });
+        });
     });
 });
 
