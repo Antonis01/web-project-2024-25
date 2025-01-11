@@ -482,13 +482,13 @@ app.get('/export-theses', getTeacherId, (req, res) => {
                t1.teacher_name AS teacher_name, Committees.role,
                t2.teacher_name AS teacher2_name, Committees.role2,
                t3.teacher_name AS teacher3_name, Committees.role3,
-               s.student_am AS student_am
+               Students.student_am AS student_am
         FROM Theses 
         LEFT JOIN Committees ON Theses.thesis_id = Committees.thesis_id 
         LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
         LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
         LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-        LEFT JOIN Students s ON Theses.student_am = s.student_am
+        LEFT JOIN Students ON Theses.student_am = Students.student_am
         WHERE 1=1
     `;
     const queryParams = [];
@@ -498,14 +498,9 @@ app.get('/export-theses', getTeacherId, (req, res) => {
         queryParams.push(statusFilter);
     }
 
-    if (roleFilter && roleFilter !== 'all') {
-        query += ' AND Committees.role = ?';
-        queryParams.push(roleFilter);
-    }
-
-    if (teacherId) {
-        query += ' AND Committees.teacher_am = ?';
-        queryParams.push(teacherId);
+    if (roleFilter && roleFilter !== 'all' && teacherId) {
+        query += ' AND ((Committees.role = ? AND Committees.teacher_am = ?) OR (Committees.role2 = ? AND Committees.teacher_am2 = ?) OR (Committees.role3 = ? AND Committees.teacher_am3 = ?))';
+        queryParams.push(roleFilter, teacherId, roleFilter, teacherId, roleFilter, teacherId);
     }
 
     db.query(query, queryParams, (err, results) => {
