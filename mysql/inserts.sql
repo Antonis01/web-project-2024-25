@@ -35,7 +35,7 @@ INSERT INTO Committees (committee_id, thesis_id, assignment_id, teacher_am, role
 (2, 12, NULL, 1, 'Επιβλέπων', NULL, NULL, NULL, NULL, 'Επιβλέπων', NULL, NULL, NULL, NULL, 'Επιβλέπων', NULL, NULL, NULL);
 
 INSERT INTO Presentations (thesis_id, presentation_date, presentation_time, presentation_type, presentation_location, presentation_link)
-VALUES (1, '2023-12-15', '10:00:00', 'in-person', 'Room 101', NULL);
+VALUES (5, '2023-12-15', '10:00:00', 'in-person', 'Room 101', NULL);
 
 INSERT INTO Presentations (thesis_id, presentation_date, presentation_time, presentation_type, presentation_location, presentation_link)
-VALUES (2, '2023-12-16', '11:00:00', 'online', NULL, 'https://example.com/meeting-link');
+VALUES (6, '2023-12-16', '11:00:00', 'online', NULL, 'https://example.com/meeting-link');

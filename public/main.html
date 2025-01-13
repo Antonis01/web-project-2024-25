@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Διπλωματικές Εργασίες</title>
-    <link rel="stylesheet" type="text/css" href="/public/css/global.css">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="/public/css/global.css">
 </head>
 <body>
     <div class="topBar">
@@ -13,50 +13,56 @@
             <button class="rightButton" onclick="toggleLoginForm()">Login</button>
         </div>
     </div>
-    
-
     <div class="content">
-        <div class="announcementBoard">
-            <img src="/public/images/upatras-full-logo.jpg" alt="upatras full Logo" class="upatras-full-logo">
+        <div class="container">
+            <div class="announcementBoard">
+                <img src="/public/images/upatras-full-logo.jpg" alt="upatras full Logo" class="upatras-full-logo">
+            </div>
+            <div class="announcementBoard">
+                <h2>Announcement Board</h2>
+                <h3> Προσεχείς παρουσιάσεις Διπλωματικών</h3>
+                <div id="announcementsContainer"></div>
+            </div>
+            <div class="loginPage" id="loginForm" style="display:none;">
+                <form id="loginForm">
+                    <input type="text" name="username" size="30" id="username" placeholder="username" required> <br> <br>
+                    <input type="password" name="password" size="30" id="password" placeholder="password" required> <br> <br> 
+                    <button type="submit" name="Login" id="Login">Login</button>
+                </form>
+            </div>
         </div>
-
-        <div class="announcementBoard">
-            <h2>Announcement Board</h2>
-            <ul>
-                <li>Announcement 1</li>
-                <li>Announcement 2</li>
-                <li>Announcement 3</li>
-            </ul>
-        </div>
-        <div class="timetable">
-            <h2>Timetable</h2>
-            <table>
-                <tr>
-                    <th>Time</th>
-                    <th>Event</th>
-                </tr>
-                <tr>
-                    <td>09:00 - 10:00</td>
-                    <td>Event 1</td>
-                </tr>
-                <tr>
-                    <td>10:00 - 11:00</td>
-                    <td>Event 2</td>
-                </tr>
-                <tr>
-                    <td>11:00 - 12:00</td>
-                    <td>Event 3</td>
-                </tr>
-            </table>
-        </div>
-        <div class="loginPage" id="loginForm" style="display:none;">
-            <form id="loginForm">
-                <input type="text" name="username" size="30" id="username" placeholder="username" required> <br> <br>
-                <input type="password" name="password" size="30" id="password" placeholder="password" required> <br> <br> 
-                <button type="submit" name="Login" id="Login">Login</button>
-            </form>
-        </div>
-    
-        <script src="/public/javascript/topbar_buttons.js"></script>
-    </body>
+    </div>
+    <script src="/public/javascript/topbar_buttons.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/announcements?startDate=2023-01-01&endDate=2023-12-31&format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('announcementsContainer');
+                    if (data.success) {
+                        data.data.forEach(announcement => {
+                            const div = document.createElement('div');
+                            div.classList.add('announcement');
+                            div.innerHTML = `
+                                <h3>${announcement.title}</h3>
+                                <p>Student: ${announcement.student_name}</p>
+                                <p>Date: ${announcement.presentation_date}</p>
+                                <p>Time: ${announcement.presentation_time}</p>
+                                <p>Type: ${announcement.presentation_type}</p>
+                                <p>Location: ${announcement.presentation_location}</p>
+                                ${announcement.presentation_type === 'online' ? `<p>Link: <a href="${announcement.presentation_link}">${announcement.presentation_link}</a></p>` : ''}
+                            `;
+                            container.appendChild(div);
+                        });
+                    } else {
+                        container.innerHTML = '<p>No announcements found for the specified date range.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching announcements:', error);
+                    document.getElementById('announcementsContainer').innerHTML = '<p>Error fetching announcements.</p>';
+                });
+        });
+    </script>
+</body>
 </html>
