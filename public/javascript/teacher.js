@@ -61,12 +61,12 @@ function fetchTheses() {
 }
 
 function toggleDetails(button) {
-    const details = button.parentElement.nextElementSibling;
-    if (details.style.display === 'none') {
-        details.style.display = 'block';
+    const thesisDetails = button.closest('.thesis-title').nextElementSibling;
+    if (thesisDetails.style.display === 'none' || thesisDetails.style.display === '') {
+        thesisDetails.style.display = 'block';
         button.textContent = 'Hide details';
     } else {
-        details.style.display = 'none';
+        thesisDetails.style.display = 'none';
         button.textContent = 'Show details';
     }
 }
@@ -559,7 +559,6 @@ function handleInvitationResponse(committeeId, action) {
     .catch(err => console.error(`Error processing ${action} invitation:`, err));
 }
 
-// Fetch and display theses for management
 function fetchThesesForManagement() {
     const statusFilter = document.getElementById('statusFilterManagement').value;
 
@@ -577,8 +576,10 @@ function fetchThesesForManagement() {
                     listItem.innerHTML = `
                         <div class="thesis-title">
                             <strong>Title:</strong> ${thesis.title}
-                            <button onclick="toggleDetails(this)">Show details</button>
-                            ${thesis.role === 'Επιβλέπων' ? `<button onclick="cancelAssignment(${thesis.thesis_id})">Cancel Assignment</button>` : ''}
+                            <div class="button-container">
+                                <button class="action-button" onclick="toggleDetails(this)">Show details</button>
+                                ${thesis.committee.some(member => member.role === 'Επιβλέπων' && member.teacher_am === data.teacher_am) ? `<button class="action-button" onclick="cancelAssignment(${thesis.thesis_id})">Cancel Assignment</button>` : ''}
+                            </div>
                         </div>
                         <div class="thesis-details" style="display: none;">
                             <strong>Summary:</strong> ${thesis.summary}<br>
@@ -593,6 +594,7 @@ function fetchThesesForManagement() {
                                     ${thesis.committee.map(member => `
                                         <li>
                                             <strong>Teacher:</strong> ${member.teacher_name}<br>
+                                            <strong>AM:</strong> ${member.teacher_am}<br>
                                             <strong>Role:</strong> ${member.role}<br>
                                             <strong>Invitation Date:</strong> ${member.invitation_date}<br>
                                             <strong>Response:</strong> ${member.response}<br>
@@ -611,7 +613,7 @@ function fetchThesesForManagement() {
                                 <ul id="notesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of notes -->
                                 </ul>
-                                ${thesis.role === 'Επιβλέπων' ? `
+                                ${thesis.committee.some(member => member.role === 'Επιβλέπων' && member.teacher_am === data.teacher_am) ? `
                                 <button onclick="changeStatus(${thesis.thesis_id}, 'Υπό Εξέταση')">Change Status to Υπό Εξέταση</button>
                                 ` : ''}
                             </div>` : ''}
@@ -654,6 +656,9 @@ function fetchThesesForManagement() {
             alert('An error occurred while fetching the theses.');
         });
 }
+
+// Fetch theses for management when the page loads
+document.addEventListener('DOMContentLoaded', fetchThesesForManagement);
 
 // Function to generate and display the announcement text
 function generateAnnouncement(thesisId) {

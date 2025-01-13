@@ -333,7 +333,6 @@ app.get('/search-theses/:title', (req, res) => {
     });
 });
 
-// Route handler for retrieving theses for management
 app.get('/get-theses', (req, res) => {
     const statusFilter = req.query.status;
     const teacherAM = req.session.user.am;
@@ -355,18 +354,18 @@ app.get('/get-theses', (req, res) => {
         LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
         LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
         LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-        WHERE (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)
+        WHERE 1
     `;
-    const queryParams = [teacherAM, teacherAM, teacherAM];
+    const queryParams = [];
 
     if (statusFilter && statusFilter !== 'Όλες') {
         query += ' AND Theses.status = ?';
         queryParams.push(statusFilter);
     }
 
-    if (statusFilter === 'Υπό Ανάθεση') {
-        query += ' AND ( Committees.role = "Επιβλέπων" AND Committees.teacher_am = ?)';
-        queryParams.push(teacherAM);
+    if (statusFilter && statusFilter === 'Υπό Ανάθεση') {
+        query += ' AND (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)';
+        queryParams.push(teacherAM, teacherAM, teacherAM);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -381,6 +380,7 @@ app.get('/get-theses', (req, res) => {
                 committee: [
                     {
                         teacher_name: thesis.teacher_name,
+                        teacher_am: thesis.teacher_am,
                         role: thesis.role,
                         invitation_date: thesis.invitation_date,
                         response: thesis.response,
@@ -388,6 +388,7 @@ app.get('/get-theses', (req, res) => {
                     },
                     {
                         teacher_name: thesis.teacher2_name,
+                        teacher_am: thesis.teacher_am2,
                         role: thesis.role2,
                         invitation_date: thesis.invitation_date2,
                         response: thesis.response2,
@@ -395,6 +396,7 @@ app.get('/get-theses', (req, res) => {
                     },
                     {
                         teacher_name: thesis.teacher3_name,
+                        teacher_am: thesis.teacher_am3,
                         role: thesis.role3,
                         invitation_date: thesis.invitation_date3,
                         response: thesis.response3,
@@ -404,7 +406,7 @@ app.get('/get-theses', (req, res) => {
             };
         });
 
-        res.json({ success: true, data: theses });
+        res.json({ success: true, data: theses, teacher_am: teacherAM });
     });
 });
 
@@ -1040,7 +1042,6 @@ app.get('/get-grades/:thesis_id', (req, res) => {
 
 app.get('/get-theses-status', (req, res) => {
     const studentAm = req.session.user.am;
-    const statusFilter = req.query.status;
 
     if (!studentAm) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
@@ -1239,18 +1240,36 @@ app.post("/assign-theses", (req, res) => {
 // Route handler for cancelling an assignment
 app.post('/cancel-assignment/:id', (req, res) => {
     const thesisId = req.params.id;
-    const query = `
-        UPDATE Theses 
-        SET status = 'Ακυρωμένη', student_am = NULL 
-        WHERE thesis_id = ?
+    const teacherAM = req.session.user.am;
+
+    // Check if the current teacher is the supervisor
+    const checkSupervisorQuery = `
+        SELECT * FROM Committees 
+        WHERE thesis_id = ? AND teacher_am = ? AND role = 'Επιβλέπων'
     `;
-    db.query(query, [thesisId], (err) => {
+    db.query(checkSupervisorQuery, [thesisId, teacherAM], (err, results) => {
         if (err) {
-            console.error("Error cancelling assignment:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            console.error('Error checking supervisor role:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        if (results.length === 0) {
+            return res.status(403).json({ success: false, message: 'Only the supervisor can cancel the assignment' });
         }
 
-        res.json({ success: true, message: "Assignment cancelled successfully!" });
+        // Cancel the assignment
+        const cancelAssignmentQuery = `
+            UPDATE Theses 
+            SET status = 'Ακυρωμένη', student_am = NULL 
+            WHERE thesis_id = ?
+        `;
+        db.query(cancelAssignmentQuery, [thesisId], (err) => {
+            if (err) {
+                console.error('Error cancelling assignment:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+
+            res.json({ success: true, message: "Assignment cancelled successfully!" });
+        });
     });
 });
 
