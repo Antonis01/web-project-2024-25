@@ -75,3 +75,65 @@ async function uploadJSON() {
   }
 }
 
+// Λειτουργία: Καταχώρηση ΑΠ για Ενεργή Διπλωματική
+async function submitActiveThesis() {
+    const thesisId = document.getElementById('thesis-id-active').value;
+    const gsNumber = document.getElementById('gs-number').value;
+    const gsYear = document.getElementById('gs-year').value;
+
+    try {
+        const response = await fetch(`${API_URL}/theses/active`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ thesis_id: thesisId, gs_number: gsNumber, gs_year: gsYear })
+        });
+
+        const result = await response.json();
+        alert(result.message || "Επιτυχής καταχώρηση!");
+    } catch (error) {
+        console.error('Σφάλμα:', error);
+        alert("Αποτυχία καταχώρησης.");
+    }
+}
+
+// Λειτουργία: Ακύρωση Διπλωματικής
+async function cancelThesis() {
+    const thesisId = document.getElementById('thesis-id-cancel').value;
+    const gsNumber = document.getElementById('gs-number-cancel').value;
+    const gsYear = document.getElementById('gs-year-cancel').value;
+    const reason = document.getElementById('cancellation-reason').value;
+
+    try {
+        const response = await fetch(`${API_URL}/theses/cancel`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ thesis_id: thesisId, gs_number: gsNumber, gs_year: gsYear, cancellation_reason: reason })
+        });
+
+        const result = await response.json();
+        alert(result.message || "Επιτυχής ακύρωση!");
+    } catch (error) {
+        console.error('Σφάλμα:', error);
+        alert("Αποτυχία ακύρωσης.");
+    }
+}
+
+// Λειτουργία: Περάτωση Διπλωματικής
+async function completeThesis() {
+    const thesisId = document.getElementById('thesis-id-complete').value;
+    const submissionLink = document.getElementById('submission-link').value;
+
+    try {
+        const response = await fetch(`${API_URL}/theses/complete`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ thesis_id: thesisId, submission_link: submissionLink })
+        });
+
+        const result = await response.json();
+        alert(result.message || "Επιτυχής περάτωση!");
+    } catch (error) {
+        console.error('Σφάλμα:', error);
+        alert("Αποτυχία περάτωσης.");
+    }
+}
