@@ -355,13 +355,18 @@ app.get('/get-theses', (req, res) => {
         LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
         LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
         LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-        WHERE Committees.role = 'Επιβλέπων' AND Committees.teacher_am = ?
+        WHERE (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)
     `;
-    const queryParams = [teacherAM];
+    const queryParams = [teacherAM, teacherAM, teacherAM];
 
     if (statusFilter && statusFilter !== 'Όλες') {
         query += ' AND Theses.status = ?';
         queryParams.push(statusFilter);
+    }
+
+    if (statusFilter === 'Υπό Ανάθεση') {
+        query += ' AND ( Committees.role = "Επιβλέπων" AND Committees.teacher_am = ?)';
+        queryParams.push(teacherAM);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -449,16 +454,20 @@ app.get('/search-theses', getTeacherId, (req, res) => {
         LEFT JOIN Students ON Theses.student_am = Students.student_am
         WHERE 1=1
     `;
+
     const queryParams = [];
 
-    if (statusFilter && statusFilter !== 'Όλες') {
-        query += ' AND Theses.status = ?';
-        queryParams.push(statusFilter);
+    if (roleFilter && roleFilter !== 'all') {
+        query += ` AND ((Committees.role = ? AND Committees.teacher_am = ?) OR (Committees.role2 = ? AND Committees.teacher_am2 = ?) OR (Committees.role3 = ? AND Committees.teacher_am3 = ?))`;
+        queryParams.push(roleFilter, teacherId, roleFilter, teacherId, roleFilter, teacherId);
+    } else {
+        query += ` AND (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)`;
+        queryParams.push(teacherId, teacherId, teacherId);
     }
 
-    if (roleFilter && roleFilter !== 'all' && teacherId) {
-        query += ' AND ((Committees.role = ? AND Committees.teacher_am = ?) OR (Committees.role2 = ? AND Committees.teacher_am2 = ?) OR (Committees.role3 = ? AND Committees.teacher_am3 = ?))';
-        queryParams.push(roleFilter, teacherId, roleFilter, teacherId, roleFilter, teacherId);
+    if (statusFilter && statusFilter !== 'all') {
+        query += ' AND Theses.status = ?';
+        queryParams.push(statusFilter);
     }
 
     db.query(query, queryParams, (err, results) => {
