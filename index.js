@@ -500,16 +500,20 @@ app.get('/export-theses', getTeacherId, (req, res) => {
         LEFT JOIN Students ON Theses.student_am = Students.student_am
         WHERE 1=1
     `;
+
     const queryParams = [];
 
-    if (statusFilter && statusFilter !== 'Όλες') {
-        query += ' AND Theses.status = ?';
-        queryParams.push(statusFilter);
+    if (roleFilter && roleFilter !== 'all') {
+        query += ` AND ((Committees.role = ? AND Committees.teacher_am = ?) OR (Committees.role2 = ? AND Committees.teacher_am2 = ?) OR (Committees.role3 = ? AND Committees.teacher_am3 = ?))`;
+        queryParams.push(roleFilter, teacherId, roleFilter, teacherId, roleFilter, teacherId);
+    } else {
+        query += ` AND (Committees.teacher_am = ? OR Committees.teacher_am2 = ? OR Committees.teacher_am3 = ?)`;
+        queryParams.push(teacherId, teacherId, teacherId);
     }
 
-    if (roleFilter && roleFilter !== 'all' && teacherId) {
-        query += ' AND ((Committees.role = ? AND Committees.teacher_am = ?) OR (Committees.role2 = ? AND Committees.teacher_am2 = ?) OR (Committees.role3 = ? AND Committees.teacher_am3 = ?))';
-        queryParams.push(roleFilter, teacherId, roleFilter, teacherId, roleFilter, teacherId);
+    if (statusFilter && statusFilter !== 'all') {
+        query += ' AND Theses.status = ?';
+        queryParams.push(statusFilter);
     }
 
     db.query(query, queryParams, (err, results) => {
@@ -1036,6 +1040,8 @@ app.get('/get-grades/:thesis_id', (req, res) => {
 
 app.get('/get-theses-status', (req, res) => {
     const studentAm = req.session.user.am;
+    const statusFilter = req.query.status;
+
     if (!studentAm) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
     }

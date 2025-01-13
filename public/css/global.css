@@ -347,7 +347,7 @@ button.close-button:hover {
 }
 
 /* Responsive styles */
-@media (max-width: 600px) {
+@media (max-width: 1500px) {
     .topBar {
         padding: 5px 10px;
     }
@@ -399,7 +399,7 @@ button.close-button:hover {
 }
 
 /* Desktop styles */
-@media (min-width: 601px) {
+@media (min-width: 1501px) {
     .burgerMenu {
         display: none; 
     }
