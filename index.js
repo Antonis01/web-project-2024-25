@@ -16,6 +16,7 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const multer = require('multer');
 const { Parser } = require('json2csv');
+const xml2js = require('xml2js');
 //const fileUpload = require('express-fileupload');
 
 const app = express();
@@ -1104,6 +1105,46 @@ app.get('/get-thesis-id', (req, res) => {
 
         res.json({ success: true, thesis_id: results[0].thesis_id });
         console.log('Thesis id:', results[0].thesis_id);
+    });
+});
+
+// Route handler for fetching announcements within a specified date range
+app.get('/announcements', (req, res) => {
+    const { startDate, endDate, format } = req.query;
+
+    if (!startDate || !endDate) {
+        return res.status(400).json({ success: false, message: 'Missing startDate or endDate' });
+    }
+
+    const query = `
+        SELECT 
+            Theses.title, 
+            Students.student_name, 
+            Presentations.presentation_date, 
+            Presentations.presentation_time, 
+            Presentations.presentation_type, 
+            Presentations.presentation_location, 
+            Presentations.presentation_link
+        FROM Theses
+        JOIN Students ON Theses.student_am = Students.student_am
+        JOIN Presentations ON Theses.thesis_id = Presentations.thesis_id
+        WHERE Presentations.presentation_date BETWEEN ? AND ?
+    `;
+
+    db.query(query, [startDate, endDate], (err, results) => {
+        if (err) {
+            console.error('Error fetching announcements:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        if (format === 'xml') {
+            const builder = new xml2js.Builder();
+            const xml = builder.buildObject({ announcements: results });
+            res.header('Content-Type', 'application/xml');
+            res.send(xml);
+        } else {
+            res.json({ success: true, data: results });
+        }
     });
 });
 /*
