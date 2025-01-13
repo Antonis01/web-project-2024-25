@@ -1142,8 +1142,8 @@ app.post('/add-thesis', upload.single('file'), (req, res) => {
         }
 
         const query2 = `
-            INSERT INTO Committees (thesis_id, teacher_am, role)
-            VALUES (LAST_INSERT_ID(), ?, 'Επιβλέπων')
+            INSERT INTO Committees (thesis_id, teacher_am, role, response, invitation_date, response_date)
+            VALUES (LAST_INSERT_ID(), ?, 'Επιβλέπων', 'Αποδοχή', NOW(), NOW())
         `;
 
         db.query(query2, [teacher_am], (err) => {
