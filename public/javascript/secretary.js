@@ -18,8 +18,8 @@ function fetchActiveTheses() {
                             <strong>Κατάσταση:</strong> ${thesis.status || 'Χωρίς Κατάσταση'}<br>
                             <strong>Χρόνος Από Ανάθεση:</strong> ${thesis.days_since_assignment || 'Χωρίς Δεδομένα'} ημέρες<br>
                             <strong>Επιβλέπων Καθηγητής:</strong> ${thesis.teacher_name || "Χωρίς Δεδομένα"}<br>
-                            <strong>Μέλος Τριμελούς Επιτροπής:</strong> ${thesis.teacher_name2 || "Χωρίς Δεδομένα"}<br>
-                            <strong>Μέλος Τριμελούς Επιτροπής:</strong> ${thesis.teacher_name3 || "Χωρίς Δεδομένα"}<br>
+                            <strong>Μέλος Τριμελούς Επιτροπής 1:</strong> ${thesis.teacher2_name || "Χωρίς Δεδομένα"}<br>
+                            <strong>Μέλος Τριμελούς Επιτροπής 2:</strong> ${thesis.teacher3_name || "Χωρίς Δεδομένα"}<br>
                         </div>
                     `;
                     thesesList.appendChild(listItem);
@@ -29,19 +29,14 @@ function fetchActiveTheses() {
             }
         })
         .catch(error => {
-            console.error('Σφάλμα:', error);
-            alert('Προέκυψε σφάλμα κατά την φόρτωση των διπλωματικών.');
+            console.error('Error fetching active theses:', error);
+            thesesList.innerHTML = '<li>Σφάλμα κατά την ανάκτηση των διπλωματικών εργασιών.</li>';
         });
 }
+
 function toggleDetails(button) {
     const details = button.parentElement.nextElementSibling;
-    if (details.style.display === 'none') {
-        details.style.display = 'block';
-        button.textContent = 'Απόκρυψη Λεπτομερειών';
-    } else {
-        details.style.display = 'none';
-        button.textContent = 'Προβολή Λεπτομερειών';
-    }
+    details.style.display = details.style.display === 'none' ? 'block' : 'none';
 }
 
 document.addEventListener('DOMContentLoaded', fetchActiveTheses);

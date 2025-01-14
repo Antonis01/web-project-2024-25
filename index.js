@@ -947,8 +947,8 @@ app.get('/get-active-theses', (req, res) => {
     if (!secretaryAM) {
         console.error('User is not authenticated or session is invalid');
         return res.status(401).json({ success: false, message: 'Not authenticated' });
-       }
-       
+    }
+
     const query = `
       SELECT Theses.thesis_id, Theses.title, Theses.summary, Theses.status,
         a.assigned_date, 
@@ -962,43 +962,17 @@ app.get('/get-active-theses', (req, res) => {
        LEFT JOIN Teachers t1 ON Committees.teacher_am = t1.teacher_am
        LEFT JOIN Teachers t2 ON Committees.teacher_am2 = t2.teacher_am
        LEFT JOIN Teachers t3 ON Committees.teacher_am3 = t3.teacher_am
-      WHERE Theses.status IN ('Ενεργή', 'Υπό Εξέταση');
+      WHERE Theses.status IN ('Ενεργή', 'Υπό Εξέταση')
+    `;
 
-`; 
-
-    db.query(query, statusFilter, (err, results) => {
+    db.query(query, (err, results) => {
         if (err) {
-            console.error('Error fetching theses:', err);
+            console.error('Error fetching active theses:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-
-        // Μορφοποίηση δεδομένων
-        const theses = results.map(thesis => ({
-            thesis_id: thesis.thesis_id,
-            title: thesis.title,
-            summary: thesis.summary,
-            status: thesis.status,
-            days_since_assignment: thesis.assigned_date ? thesis.days_since_assignment : null,
-            committee: [
-                {
-                    teacher_name: thesis.teacher_name,
-                    role: thesis.role
-                },
-                {
-                    teacher_name: thesis.teacher2_name,
-                    role: thesis.role2
-                },
-                {
-                    teacher_name: thesis.teacher3_name,
-                    role: thesis.role3
-                }
-            ]
-        }));
-
-        res.json({ success: true, data: theses });
+        res.json({ success: true, data: results });
     });
 });
-
 
 // Route handler for fetching grades for a specific thesis
 app.get('/get-grades/:thesis_id', (req, res) => {
