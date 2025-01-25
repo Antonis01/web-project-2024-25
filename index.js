@@ -1122,6 +1122,39 @@ app.get('/announcements', (req, res) => {
         }
     });
 });
+
+app.get('/get-theses-for-assignment', (req, res) => {
+    const query = `
+        SELECT thesis_id, title, summary, status
+        FROM Theses
+        WHERE status = 'Υπό Ανάθεση' AND student_am IS NULL
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching theses for assignment:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, data: results });
+    });
+});
+
+app.get('/search-theses', (req, res) => {
+    const { status, role } = req.query;
+    const query = `
+        SELECT thesis_id, title, summary, status, student_am, final_submission_date, teacher_name
+        FROM Theses
+        WHERE status = 'Υπό Ανάθεση' AND student_am IS NULL
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching theses:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, data: results });
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
