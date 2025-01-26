@@ -1122,6 +1122,22 @@ app.get('/announcements', (req, res) => {
         }
     });
 });
+
+app.get('/get-theses-for-assignment', (req, res) => {
+    const query = `
+        SELECT thesis_id, title, summary, status
+        FROM Theses
+        WHERE status = 'Υπό Ανάθεση' AND student_am IS NULL
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching theses for assignment:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, data: results });
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1233,21 +1249,35 @@ app.post("/assign-theses", (req, res) => {
         return res.status(400).json({ success: false, message: 'Missing thesisId or studentAm' });
     }
 
-    const query = 'UPDATE Theses SET student_am = ? WHERE thesis_id = ?';
-    db.query(query, [studentAm, thesisId], (err, results) => {
+    // Check if the student is already assigned to another thesis
+    const checkQuery = 'SELECT * FROM Theses WHERE student_am = ?';
+    db.query(checkQuery, [studentAm], (err, results) => {
         if (err) {
-            console.error('Error assigning thesis:', err);
+            console.error('Error checking existing assignments:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
 
-        const query2 = 'INSERT INTO Assignments (thesis_id, student_am, assigned_date, status) VALUES (?, ?, NOW(), "Προσωρινή")';
-        db.query(query2, [thesisId, studentAm], (err) => {
+        if (results.length > 0) {
+            return res.status(400).json({ success: false, message: 'Student is already assigned to another thesis' });
+        }
+
+        // Proceed with the assignment if no existing assignment is found
+        const query = 'UPDATE Theses SET student_am = ? WHERE thesis_id = ?';
+        db.query(query, [studentAm, thesisId], (err, results) => {
             if (err) {
-                console.error('Error inserting assignment:', err);
+                console.error('Error assigning thesis:', err);
                 return res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
-        
-            res.json({ success: true, message: 'Thesis assigned successfully' });
+
+            const query2 = 'INSERT INTO Assignments (thesis_id, student_am, assigned_date, status) VALUES (?, ?, NOW(), "Προσωρινή")';
+            db.query(query2, [thesisId, studentAm], (err) => {
+                if (err) {
+                    console.error('Error inserting assignment:', err);
+                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                }
+
+                res.json({ success: true, message: 'Thesis assigned successfully' });
+            });
         });
     });
 });
