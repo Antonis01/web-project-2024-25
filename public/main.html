@@ -45,11 +45,11 @@
                             div.classList.add('announcement');
                             div.innerHTML = `
                                 <h3>${announcement.title}</h3>
-                                <p>Φοιτητής: ${announcement.student_name}</p>
-                                <p>Ημερομηνία παρουσίασης: ${announcement.presentation_date}</p>
-                                <p>Ώρα: ${announcement.presentation_time}</p>
-                                <p>Τρόπος παρουσίασης: ${announcement.presentation_type}</p>
-                                <p>Τοποθεσία : ${announcement.presentation_location}</p>
+                                <p>Student: ${announcement.student_name}</p>
+                                <p>Date: ${announcement.presentation_date}</p>
+                                <p>Time: ${announcement.presentation_time}</p>
+                                <p>Type: ${announcement.presentation_type}</p>
+                                <p>Location: ${announcement.presentation_location}</p>
                                 ${announcement.presentation_type === 'online' ? `<p>Link: <a href="${announcement.presentation_link}">${announcement.presentation_link}</a></p>` : ''}
                             `;
                             container.appendChild(div);
