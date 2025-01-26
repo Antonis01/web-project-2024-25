@@ -317,7 +317,7 @@ app.get('/get-thesis/:id', (req, res) => {
 
 // Route handler for fetching theses by partial title
 app.get('/search-theses/:title', (req, res) => {
-    const query = 'SELECT * FROM Theses WHERE title LIKE ?';
+    const query = 'SELECT * FROM Theses WHERE title LIKE ? AND student_am IS NULL';
     const searchTerm = `%${req.params.title}%`;
     console.log("Searching theses with title like:", searchTerm);
     db.query(query, [searchTerm], (err, results) => {
@@ -418,10 +418,18 @@ app.get("/search-student", (req, res) => {
     let queryParams = [];
 
     if (am) {
-        query = 'SELECT student_name, student_am FROM Students WHERE student_am LIKE ?';
+        query = `
+            SELECT s.student_name, s.student_am 
+            FROM Students s 
+            LEFT JOIN Theses t ON s.student_am = t.student_am 
+            WHERE s.student_am LIKE ? AND t.student_am IS NULL`;
         queryParams = [`%${am}%`];
     } else if (studentName) {
-        query = 'SELECT student_name, student_am FROM Students WHERE student_name LIKE ?';
+        query = `
+            SELECT s.student_name, s.student_am 
+            FROM Students s 
+            LEFT JOIN Theses t ON s.student_am = t.student_am 
+            WHERE s.student_name LIKE ? AND t.student_am IS NULL`;
         queryParams = [`%${studentName}%`];
     } else {
         res.status(400).json({ success: false, message: 'Missing search parameter' });
