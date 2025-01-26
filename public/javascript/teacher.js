@@ -407,33 +407,38 @@ function assignTheses() {
 }
 
 function searchThesesList() {
-    fetch('/search-theses')
+    const statusFilter = document.getElementById('statusFilter').value;
+    const roleFilter = document.getElementById('roleFilter').value;
+
+    fetch(`/search-theses?status=${statusFilter}&role=${roleFilter}`)
         .then(response => response.json())
         .then(data => {
             const diplomaListItems = document.getElementById('diplomaListItems');
             diplomaListItems.innerHTML = ''; // Clear the current list
 
-            if (data.success) {
-                data.data.forEach(theses => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        <div class="thesis-title">
-                            <strong>Title:</strong> ${theses.title}
-                            <button onclick="toggleDetails(this)">Show details</button>
-                        </div>
-                        <div class="thesis-details" style="display: none;">
-                            <strong>Summary:</strong> ${theses.summary}<br>
-                            <strong>Status:</strong> ${theses.status}<br>
-                            <strong>Student AM:</strong> ${theses.student_am}<br>
-                            <strong>Final Submission Date:</strong> ${theses.final_submission_date}<br>
-                            <strong>Instructor Name:</strong> ${theses.teacher_name}<br>
-                        </div>
-                    `;
-                    diplomaListItems.appendChild(listItem);
-                });
-            } else {
-                diplomaListItems.innerHTML = 'No results found.';
-            }
+            data.data.forEach(theses => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <div class="thesis-title">
+                        <strong>Title:</strong> ${theses.title}
+                        <button onclick="toggleDetails(this)">Show details</button>
+                    </div>
+                    <div class="thesis-details" style="display: none;">
+                        <strong>Summary:</strong> ${theses.summary}<br>
+                        <strong>Status:</strong> ${theses.status}<br>
+                        <strong>Student AM:</strong> ${theses.student_am}<br>
+                        <strong>Final Submission Date:</strong> ${theses.final_submission_date}<br>
+                        <strong>Instructor Name:</strong> ${theses.teacher_name}<br>
+                        <strong>Role:</strong> ${theses.role}<br>
+                        <strong>Instructor2 Name:</strong> ${theses.teacher2_name}<br>
+                        <strong>Role2:</strong> ${theses.role2}<br>
+                        <strong>Instructor3 Name:</strong> ${theses.teacher3_name}<br>
+                        <strong>Role3:</strong> ${theses.role3}<br>
+                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${theses.pdf_path}', this.parentElement)">View PDF</a><br>
+                    </div>
+                `;
+                diplomaListItems.appendChild(listItem);
+            });
         })
         .catch(error => {
             console.error('Error:', error);
@@ -846,34 +851,3 @@ function changeStatus(thesisId, newStatus) {
 
 // Fetch theses for management when the page loads
 document.addEventListener('DOMContentLoaded', fetchThesesForManagement);
-
-function fetchAvailableTheses() {
-    fetch('/get-theses-for-assignment')
-        .then(response => response.json())
-        .then(data => {
-            const thesisSearchResults = document.getElementById('thesisSearchResults');
-            thesisSearchResults.innerHTML = ''; // Clear previous results
-
-            if (data.success) {
-                data.data.forEach(thesis => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'suggestion-item';
-                    resultItem.textContent = thesis.title;
-                    resultItem.onclick = () => {
-                        document.getElementById('subject').value = thesis.title;
-                        document.getElementById('thesisId').value = thesis.thesis_id; // Store thesis ID
-                        thesisSearchResults.innerHTML = '';
-                    };
-                    thesisSearchResults.appendChild(resultItem);
-                });
-            } else {
-                thesisSearchResults.innerHTML = 'No results found.';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            thesisSearchResults.innerHTML = 'An error occurred while searching.';
-        });
-}
-
-document.getElementById('subject').addEventListener('input', debounce(fetchAvailableTheses, 300));

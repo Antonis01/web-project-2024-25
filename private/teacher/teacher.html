@@ -85,7 +85,7 @@
                 <div id="studentNameSuggestions" class="suggestions"></div>
             </div>
             <label for="subject">Θέμα:</label>
-            <input type="text" id="subject" name="subject" oninput="fetchAvailableTheses()" required>
+            <input type="text" id="subject" name="subject" oninput="debounceSearchThesis()" required>
             <input type="hidden" id="thesisId" name="thesisId">
             <input type="hidden" id="hiddenStudentId" name="hiddenStudentId">
             <div id="thesisSearchResults" class="suggestions"></div>
