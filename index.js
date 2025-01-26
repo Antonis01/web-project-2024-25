@@ -362,6 +362,9 @@ app.get('/get-theses', (req, res) => {
     if (statusFilter && statusFilter !== 'Όλες') {
         query += ' AND Theses.status = ?';
         queryParams.push(statusFilter);
+    } else {
+        query += ' AND Theses.teacher_am = ?';
+        queryParams.push(teacherAM);
     }
 
     if (statusFilter && statusFilter === 'Υπό Ανάθεση') {

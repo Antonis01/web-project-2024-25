@@ -567,7 +567,7 @@ function fetchThesesForManagement() {
         .then(data => {
             const diploManagement = document.getElementById('diploManagement');
             diploManagement.innerHTML = ''; // Clear the current list
-
+            
             if (data.success) {
                 data.data.forEach(thesis => {
                     console.log('Thesis Data:', thesis); // Debugging: Log thesis data
