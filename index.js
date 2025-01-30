@@ -1263,14 +1263,14 @@ app.post("/assign-theses", (req, res) => {
     db.query(query, [studentAm, thesisId], (err, results) => {
         if (err) {
             console.error('Error assigning thesis:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Έχει γίνει ανάθεση θέσης σε αυτό το φοιτητή' });
         }
 
         const query2 = 'INSERT INTO Assignments (thesis_id, student_am, assigned_date, status) VALUES (?, ?, NOW(), "Προσωρινή")';
         db.query(query2, [thesisId, studentAm], (err) => {
             if (err) {
                 console.error('Error inserting assignment:', err);
-                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return res.status(500).json({ success: false, message: 'Έχει γίνει ανάθεση θέσης σε αυτό το φοιτητή' });
             }
         
             res.json({ success: true, message: 'Thesis assigned successfully' });
