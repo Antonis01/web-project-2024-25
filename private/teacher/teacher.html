@@ -90,8 +90,17 @@
             <input type="hidden" id="hiddenStudentId" name="hiddenStudentId">
             <div id="thesisSearchResults" class="suggestions"></div>
             <button type="button" onclick="assignTheses()">Ανάθεση</button>
-            <button type="button" onclick="cancelAssignment()">Ακύρωση Ανάθεσης</button>
+            <button type="button" onclick="showPendingTheses()">Aναίρεση Ανάθεσης</button>
         </form>
+    </div>
+
+
+    <div id="pendingTheses" class="forms" style="display:none; position: relative">
+        <button class="close-button" onclick="toggleElement('pendingTheses')">&times;</button>
+        <h2>Υπό Ανάθεση Θέματα</h2>
+        <ul id="pendingThesesList">
+        
+        </ul>
     </div>
 
     <div id="thesesList" class="forms" style="display:none; position: relative">

@@ -1133,6 +1133,21 @@ app.get('/announcements', (req, res) => {
         }
     });
 });
+
+app.get('/get-pending-theses', (req, res) => {
+    const query = `
+        SELECT thesis_id, title 
+        FROM Theses 
+        WHERE status = 'Υπό Ανάθεση'
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching pending theses:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, data: results });
+    });
+});
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1642,6 +1657,24 @@ app.post('/invite-teacher', (req, res) => {
 
             res.json({ success: true, message: 'Teacher invited successfully!' });
         });
+    });
+});
+
+app.post('/erase-assignment/:id', (req, res) => {
+    const thesisId = req.params.id;
+
+    // Erase the assignment by setting student_am to NULL
+    const eraseAssignmentQuery = `
+        UPDATE Theses 
+        SET student_am = NULL 
+        WHERE thesis_id = ?
+    `;
+    db.query(eraseAssignmentQuery, [thesisId], (err) => {
+        if (err) {
+            console.error('Error erasing assignment:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Assignment erased successfully!' });
     });
 });
 

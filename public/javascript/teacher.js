@@ -851,3 +851,55 @@ function changeStatus(thesisId, newStatus) {
 
 // Fetch theses for management when the page loads
 document.addEventListener('DOMContentLoaded', fetchThesesForManagement);
+
+// Function to show pending theses
+function showPendingTheses() {
+    fetch('/get-pending-theses')
+        .then(response => response.json())
+        .then(data => {
+            const pendingThesesList = document.getElementById('pendingThesesList');
+            pendingThesesList.innerHTML = ''; // Clear the current list
+
+            if (data.success) {
+                data.data.forEach(thesis => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="thesis-title">
+                            <strong>Title:</strong> ${thesis.title}
+                            <button onclick="eraseAssignment(${thesis.thesis_id})">Αναίρεση Ανάθεσης</button>
+                        </div>
+                    `;
+                    pendingThesesList.appendChild(listItem);
+                });
+                toggleElement('pendingTheses');
+            } else {
+                pendingThesesList.innerHTML = 'No pending theses found.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching pending theses:', error);
+            alert('An error occurred while fetching the pending theses.');
+        });
+}
+
+// Function to erase assignment
+function eraseAssignment(thesisId) {
+    if (confirm('Are you sure you want to erase this assignment?')) {
+        fetch(`/erase-assignment/${thesisId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Assignment erased successfully!');
+                showPendingTheses(); // Refresh the list of pending theses
+            } else {
+                alert('Error erasing assignment: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while erasing the assignment.');
+        });
+    }
+}
