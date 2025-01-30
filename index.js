@@ -1254,25 +1254,41 @@ app.post('/update-thesis', upload.single('file'), (req, res) => {
 // Assign a thesis to a student
 app.post("/assign-theses", (req, res) => {
     const { thesisId, studentAm } = req.body;
+    const teacherAM = req.session.user.am;
 
     if (!thesisId || !studentAm) {
         return res.status(400).json({ success: false, message: 'Missing thesisId or studentAm' });
     }
 
-    const query = 'UPDATE Theses SET student_am = ? WHERE thesis_id = ?';
-    db.query(query, [studentAm, thesisId], (err, results) => {
+    const query = 'UPDATE Theses SET student_am = ? WHERE thesis_id = ? AND teacher_am = ?';
+    db.query(query, [studentAm, thesisId, teacherAM], (err, results) => {
         if (err) {
+            if (err.sqlState === '45000') {
+                return res.status(400).json({ success: false, message: err.message });
+            }
             console.error('Error assigning thesis:', err);
-            return res.status(500).json({ success: false, message: 'Έχει γίνει ανάθεση θέσης σε αυτό το φοιτητή' });
+            return res.status(500).json({ success: false, message: 'Δεν είστε ο επιβλέπων καθηγητής της διπλωματικής' });
         }
 
-        const query2 = 'INSERT INTO Assignments (thesis_id, student_am, assigned_date, status) VALUES (?, ?, NOW(), "Προσωρινή")';
-        db.query(query2, [thesisId, studentAm], (err) => {
+        if (results.affectedRows === 0) {
+            return res.status(400).json({ success: false, message: 'Δεν είστε ο επιβλέπων καθηγητής της διπλωματικής' });
+        }
+
+        const query2 = `
+            INSERT INTO Assignments (thesis_id, student_am, assigned_date, status)
+            SELECT ?, ?, NOW(), "Προσωρινή"
+            FROM Theses
+            WHERE thesis_id = ? AND teacher_am = ?
+        `;
+        db.query(query2, [thesisId, studentAm, thesisId, teacherAM], (err) => {
             if (err) {
+                if (err.sqlState === '45000') {
+                    return res.status(400).json({ success: false, message: err.message });
+                }
                 console.error('Error inserting assignment:', err);
-                return res.status(500).json({ success: false, message: 'Έχει γίνει ανάθεση θέσης σε αυτό το φοιτητή' });
+                return res.status(500).json({ success: false, message: 'Δεν είστε ο επιβλέπων καθηγητής της διπλωματικής' });
             }
-        
+
             res.json({ success: true, message: 'Thesis assigned successfully' });
         });
     });

@@ -11,7 +11,7 @@ BEGIN
     IF NEW.student_am IS NOT NULL THEN
         IF (SELECT COUNT(*) FROM Theses WHERE student_am = NEW.student_am) > 0 THEN
             SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Student already assigned to a thesis';
+            SET MESSAGE_TEXT = 'Ο φοιτητής έχει ήδη ανατεθεί σε άλλη διπλωματική εργασία';
         END IF;
     END IF;
 END ??
@@ -31,7 +31,7 @@ BEGIN
     IF NEW.student_am IS NOT NULL THEN
         IF (SELECT COUNT(*) FROM Theses WHERE student_am = NEW.student_am AND thesis_id != OLD.thesis_id) > 0 THEN
             SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Student already assigned to a thesis';
+            SET MESSAGE_TEXT = 'Ο φοιτητής έχει ήδη ανατεθεί σε άλλη διπλωματική εργασία';
         END IF;
     END IF;
 END ??
