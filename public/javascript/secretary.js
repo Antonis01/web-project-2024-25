@@ -70,65 +70,98 @@ async function uploadJSON() {
   }
 }
 
-// Λειτουργία: Καταχώρηση ΑΠ για Ενεργή Διπλωματική
-async function submitActiveThesis() {
-    const thesisId = document.getElementById('thesis-id-active').value;
-    const gsNumber = document.getElementById('gs-number').value;
-    const gsYear = document.getElementById('gs-year').value;
-
-    try {
-        const response = await fetch(`${API_URL}/theses/active`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ thesis_id: thesisId, gs_number: gsNumber, gs_year: gsYear })
+function fetchTheses() {
+    const selectedStatus = document.getElementById('statusFilter').value;
+    fetch(`/api/theses?status=${encodeURIComponent(selectedStatus)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayTheses(data.theses);
+            } else {
+                console.error('Error fetching theses');
+            }
         });
-
-        const result = await response.json();
-        alert(result.message || "Επιτυχής καταχώρηση!");
-    } catch (error) {
-        console.error('Σφάλμα:', error);
-        alert("Αποτυχία καταχώρησης.");
-    }
 }
 
-// Λειτουργία: Ακύρωση Διπλωματικής
-async function cancelThesis() {
-    const thesisId = document.getElementById('thesis-id-cancel').value;
-    const gsNumber = document.getElementById('gs-number-cancel').value;
-    const gsYear = document.getElementById('gs-year-cancel').value;
-    const reason = document.getElementById('cancellation-reason').value;
+// Δημιουργεί το UI για τις διπλωματικές
+function displayTheses(theses) {
+    const thesesList = document.getElementById('thesesList');
+    thesesList.innerHTML = '';
 
-    try {
-        const response = await fetch(`${API_URL}/theses/cancel`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ thesis_id: thesisId, gs_number: gsNumber, gs_year: gsYear, cancellation_reason: reason })
-        });
+    theses.forEach(thesis => {
+        const thesisDiv = document.createElement('div');
+        thesisDiv.id = `thesis_${thesis.thesis_id}`;
+        thesisDiv.innerHTML = `
+            <hr>
+            <p><strong>Τίτλος:</strong> ${thesis.title}</p>
+            <p><strong>Κατάσταση:</strong> <span id="status_${thesis.thesis_id}">${thesis.status}</span></p>
+            
 
-        const result = await response.json();
-        alert(result.message || "Επιτυχής ακύρωση!");
-    } catch (error) {
-        console.error('Σφάλμα:', error);
-        alert("Αποτυχία ακύρωσης.");
-    }
+            ${thesis.status === 'Ενεργή' ? `
+                <h4>Καταχώρηση ΑΠ ΓΣ για ανάθεση:</h4>
+               <input type="text" id="gsNumberAssignment_${thesis.thesis_id}" placeholder="ΑΠ ΓΣ Ανάθεσης">
+               <button onclick="submitGsNumberAssignment(${thesis.thesis_id})">Καταχώρηση</button>
+
+                <h4>Ακύρωση Ανάθεσης:</h4>
+                <input type="text" id="cancelGsNumber_${thesis.thesis_id}" placeholder="Αριθμός ΓΣ">
+                <input type="text" id="cancelGsYear_${thesis.thesis_id}" placeholder="Έτος ΓΣ">
+                <input type="text" id="cancelReason_${thesis.thesis_id}" placeholder="Λόγος Ακύρωσης">
+                <button onclick="cancelThesis(${thesis.thesis_id})">Ακύρωση</button>
+            ` : ''}
+        `;
+        thesesList.appendChild(thesisDiv);
+    });
 }
 
-// Λειτουργία: Περάτωση Διπλωματικής
-async function completeThesis() {
-    const thesisId = document.getElementById('thesis-id-complete').value;
-    const submissionLink = document.getElementById('submission-link').value;
+function submitGsNumberAssignment(thesisId) {
+    const gsNumberAssignment = document.getElementById(`gsNumberAssignment_${thesisId}`).value.trim();
 
-    try {
-        const response = await fetch(`${API_URL}/theses/complete`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ thesis_id: thesisId, submission_link: submissionLink })
-        });
-
-        const result = await response.json();
-        alert(result.message || "Επιτυχής περάτωση!");
-    } catch (error) {
-        console.error('Σφάλμα:', error);
-        alert("Αποτυχία περάτωσης.");
+    if (!gsNumberAssignment) {
+        alert("Συμπληρώστε τον αριθμό ΓΣ πριν την καταχώρηση.");
+        return;
     }
+
+    fetch('/api/assignment/gs_number', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thesis_id: thesisId, gs_number_assignment: gsNumberAssignment })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("ΑΠ Γενικής Συνέλευσης για ολοκλήρωση ανάθεσης καταχωρήθηκε επιτυχώς!");
+        } else {
+            alert(`Αποτυχία καταχώρησης: ${data.message}`);
+        }
+    })
+    .catch(error => {
+        console.error('Σφάλμα κατά την καταχώρηση του ΑΠ:', error);
+        alert("Σφάλμα κατά την καταχώρηση. Δοκιμάστε ξανά.");
+    });
+}
+
+
+
+function cancelThesis(thesisId) {
+    const gsNumber = document.getElementById(`cancelGsNumber_${thesisId}`).value;
+    const gsYear = document.getElementById(`cancelGsYear_${thesisId}`).value;
+    const reason = document.getElementById(`cancelReason_${thesisId}`).value;
+
+    if (!gsNumber || !gsYear || !reason) {
+        alert("Συμπληρώστε όλα τα πεδία πριν την ακύρωση.");
+        return;
+    }
+
+    fetch('/api/thesis/cancel', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thesis_id: thesisId, gs_number: gsNumber, gs_year: gsYear, cancellation_reason: reason })
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              fetchTheses(); // Επαναφόρτωση της λίστας διπλωματικών από τη βάση
+          } else {
+              alert("Αποτυχία ακύρωσης. Δοκιμάστε ξανά.");
+          }
+      });
 }

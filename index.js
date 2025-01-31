@@ -1159,6 +1159,30 @@ app.get('/get-pending-theses', (req, res) => {
         res.json({ success: true, data: results });
     });
 });
+
+app.get('/api/theses', (req, res) => {
+    const statusFilter = req.query.status;
+    let query = `
+        SELECT thesis_id, title, status 
+        FROM Theses 
+        WHERE status IN ('Ενεργή', 'Υπό Εξέταση')
+    `;
+
+    const queryParams = [];
+    if (statusFilter) {
+        query += ' AND status = ?';
+        queryParams.push(statusFilter);
+    }
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('Error fetching theses:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+        res.json({ success: true, theses: results });
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1786,82 +1810,62 @@ app.post('/set-presentation', (req, res) => {
 */
 
 // Route to approve a thesis (Ενεργή)
+app.put('/api/assignment/gs_number', (req, res) => { 
+    const { thesis_id, gs_number_assignment } = req.body;
 
-app.put('/api/thesis/approve', (req, res) => {
-    const { thesis_id, gs_number, gs_year } = req.body;
+    if (!thesis_id || !gs_number_assignment) {
+        return res.status(400).json({ success: false, message: 'Όλα τα πεδία είναι υποχρεωτικά.' });
+    }
 
     const query = `
-        UPDATE Theses 
-        SET status = 'Ενεργή', gs_number = ?, gs_year = ? 
-        WHERE thesis_id = ? AND status = 'Υπό Ανάθεση'
+    UPDATE Assignments AS a
+    LEFT JOIN Theses AS t ON a.thesis_id = t.thesis_id
+    SET a.gs_number_assignment = ?
+    WHERE t.thesis_id = ? 
+      AND a.status = 'Οριστική';
+
     `;
 
-    db.query(query, [gs_number, gs_year, thesis_id], (err, result) => {
+    db.query(query, [gs_number_assignment, thesis_id], (err, results) => {
         if (err) {
-            console.error('Error approving thesis:', err);
-            return res.status(500).json({ message: 'Error approving thesis' });
+            console.error('Σφάλμα κατά την καταχώρηση του ΑΠ:', err);
+            return res.status(500).json({ success: false, message: 'Σφάλμα στη βάση δεδομένων.' });
         }
-
-        res.json({ message: 'Thesis approved successfully' });
+        if (results.affectedRows > 0) {
+            res.json({ success: true, message: 'ΑΠ Γενικής Συνέλευσης για ολοκλήρωση ανάθεσης καταχωρήθηκε επιτυχώς!' });
+        } else {
+            res.status(400).json({ success: false, message: 'Δεν βρέθηκε ανάθεση με κατάσταση "Οριστική" για τη συγκεκριμένη διπλωματική.' });
+        }
     });
 });
 
-// Route to cancel a thesis (Ακυρωμένη)
+
+
 app.put('/api/thesis/cancel', (req, res) => {
     const { thesis_id, gs_number, gs_year, cancellation_reason } = req.body;
 
     const query = `
         UPDATE Theses 
-        SET status = 'Ακυρωμένη', gs_number = ?, gs_year = ?, cancellation_reason = ? 
-        WHERE thesis_id = ? AND status = 'Ενεργή'
+        SET status = 'Ακυρωμένη', gs_number = ?, gs_year = ?, cancellation_reason = ?
+        WHERE thesis_id = ? AND status = 'Ενεργή';
     `;
 
-    db.query(query, [gs_number, gs_year, cancellation_reason, thesis_id], (err, result) => {
+    db.query(query, [gs_number, gs_year, cancellation_reason, thesis_id], (err, results) => {
         if (err) {
             console.error('Error cancelling thesis:', err);
-            return res.status(500).json({ message: 'Error cancelling thesis' });
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-
-        res.json({ message: 'Thesis cancelled successfully' });
+        if (results.affectedRows > 0) {
+            res.json({ success: true, message: 'Thesis cancelled successfully!' });
+        } else {
+            res.status(400).json({ success: false, message: 'Η διπλωματική δεν βρέθηκε ή δεν είναι ενεργή.' });
+        }
     });
 });
 
-// Route to complete a thesis (Περατωμένη)
-app.put('/api/thesis/complete', (req, res) => {
-    const { thesis_id, submission_link } = req.body;
 
-    const checkQuery = `
-        SELECT g.grade_id 
-        FROM Grades g 
-        WHERE g.thesis_id = ?
-    `;
 
-    db.query(checkQuery, [thesis_id], (err, results) => {
-        if (err) {
-            console.error('Error checking grades:', err);
-            return res.status(500).json({ message: 'Error checking grades' });
-        }
 
-        if (results.length === 0) {
-            return res.status(400).json({ message: 'Grade not found for the thesis' });
-        }
-
-        const updateQuery = `
-            UPDATE Theses 
-            SET status = 'Περατωμένη', submission_link = ? 
-            WHERE thesis_id = ? AND status = 'Υπό Εξέταση'
-        `;
-
-        db.query(updateQuery, [submission_link, thesis_id], (err, result) => {
-            if (err) {
-                console.error('Error completing thesis:', err);
-                return res.status(500).json({ message: 'Error completing thesis' });
-            }
-
-            res.json({ message: 'Thesis marked as completed successfully' });
-        });
-    });
-});
 
 app.post('/update-profile-st', (req, res) => {
     const studentAm = req.session.user?.am; // Αναγνωριστικό φοιτητή από το session
