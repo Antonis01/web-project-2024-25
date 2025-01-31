@@ -207,9 +207,19 @@ function checkAndUpdateThesisStatus(thesis_id) {
                 db.query(updateQuery, [thesis_id], (err) => {
                     if (err) {
                         console.error('Error updating thesis status:', err);
-                    } else {
-                        console.log(`Thesis ${thesis_id} status updated to 'Ενεργή'`);
-                    }
+                    } 
+
+                    const updateQuery2 = `
+                        UPDATE Assignments
+                        SET status = 'Οριστική'
+                        WHERE thesis_id = ? AND status = 'Προσωρινή'
+                    `;
+
+                    db.query(updateQuery2, [thesis_id], (err) => {
+                        if (err) {
+                            console.error('Error updating assignment status:', err);
+                        }
+                    });
                 });
             }
         }
@@ -1699,8 +1709,8 @@ app.post('/erase-assignment/:id', (req, res) => {
         res.json({ success: true, message: 'Assignment erased successfully!' });
     });
 });
-
-app.post('/upload-thesis-draft', (req, res) => {
+    
+app.post('/set-presentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         console.error('No files were uploaded.');
         return res.status(400).json({ success: false, message: 'No files were uploaded.' });
@@ -1709,6 +1719,12 @@ app.post('/upload-thesis-draft', (req, res) => {
     const thesisDraft = req.files.thesisDraft;
     const thesisId = req.body.thesis_id;
     const studentAm = req.session.user.am;
+    const presentationDate = req.body.presentation_date;
+    const presentationTime = req.body.presentation_time;
+    const presentationType = req.body.presentation_type;
+    const presentationLocation = req.body.presentation_location;
+    const presentationLink = req.body.presentation_link;
+    const additionalLinks = req.body.additional_links;
 
     if (!thesisId) {
         console.error('Thesis ID is required.');
@@ -1746,13 +1762,11 @@ app.post('/upload-thesis-draft', (req, res) => {
             }
 
             const query = `
-                UPDATE Theses 
-                SET theses_pdf_draft_path = ? 
-                WHERE thesis_id = ?
-                AND student_am = ?
+                INSERT INTO Presentations (theses_pdf_draft_path, presentation_date, presentation_time, presentation_type, presentation_location, presentation_link, thesis_id, additional_links) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `;
 
-            db.query(query, [relativePath, thesisId, studentAm], (err) => {
+            db.query(query, [relativePath, presentationDate, presentationTime, presentationType, presentationLocation, presentationLink, thesisId, additionalLinks], (err) => {
                 if (err) {
                     console.error('Error updating thesis draft path:', err);
                     return res.status(500).json({ success: false, message: 'Internal Server Error' });

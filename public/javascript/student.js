@@ -131,11 +131,10 @@ function thesesStatus(){
 document.getElementById("diploManagement").addEventListener("click", function(event){
     thesesStatus().then(statuses => {
         if (statuses.includes('Υπό Ανάθεση')) {
-            if (!document.getElementById('teacherAmSelect')) {
-                inviteTeacher();
-            }
+            if (!document.getElementById('teacherAmSelect')) inviteTeacher();
+            
         } else if (statuses.includes('Υπό Εξέταση')) {
-            if( document.getElementById('pdfFileInput') == null) addUploadElements();
+            if( document.getElementById('pdfFileInput') == null) presentationElements();
 
         } else if (statuses.includes('Περατωμένη')) {
             alert("Περατωμένη");
@@ -244,22 +243,35 @@ function sendInvitation(teacherAm) {
     });
 }
 
-function addUploadElements() {
-    const container = document.getElementById('uploadContainer');
+function presentationElements() {
+    const form = document.getElementById('diploManagement');
 
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.id = 'pdfFileInput';
-    fileInput.accept = 'application/pdf';
+    const uploadForm = document.createElement('div');
+    uploadForm.className = 'upload-form';
 
-    const uploadButton = document.createElement('button');
-    uploadButton.innerText = 'Upload PDF';
-    uploadButton.onclick = uploadThesesDraft;
+    uploadForm.innerHTML = `
+        <input type="file" id="pdfFileInput" accept="application/pdf" class="upload-input">
+        <textarea id="additionalLinks" placeholder="Enter additional links" class="upload-textarea"></textarea>
+        <input type="date" id="examDate" class="upload-input">
+        <input type="time" id="examTime" class="upload-input">
+        <select id="examType" class="upload-select">
+            <option value="in-person">In-Person</option>
+            <option value="online">Online</option>
+        </select>
+        <textarea id="examLocation" placeholder="Enter exam location" class="upload-textarea" style="display: none;"></textarea>
+        <textarea id="examLink" placeholder="Enter exam link" class="upload-textarea" style="display: none;"></textarea>
+        <button type="button" class="upload-button" onclick="uploadPresentationData()">Upload Data</button>
+    `;
 
-    container.appendChild(fileInput);
-    container.appendChild(uploadButton);
+    form.appendChild(uploadForm);
+
+    document.getElementById('examType').addEventListener('change', function() {
+        const isOnline = this.value === 'online';
+        document.getElementById('examLocation').style.display = isOnline ? 'none' : 'block';
+        document.getElementById('examLink').style.display = isOnline ? 'block' : 'none';
+    });
 }
-function uploadThesesDraft() {
+function uploadPresentationData() {
     const pdfFileInput = document.getElementById('pdfFileInput');
     const file = pdfFileInput.files[0];
 
@@ -277,22 +289,24 @@ function uploadThesesDraft() {
         const formData = new FormData();
         formData.append('thesisDraft', file);
         formData.append('thesis_id', thesisID);
+        formData.append('presentation_date', document.getElementById('examDate').value);
+        formData.append('presentation_time', document.getElementById('examTime').value);
+        formData.append('presentation_type', document.getElementById('examType').value);
+        formData.append('presentation_location', document.getElementById('examLocation').value);
+        formData.append('presentation_link', document.getElementById('examLink').value);
+        formData.append('additional_links', document.getElementById('additionalLinks').value); 
 
-        fetch('/upload-thesis-draft', {
+        fetch('/set-presentation', {
             method: 'POST',
             body: formData,
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                alert('PDF uploaded successfully!');
-            } else {
-                alert('Error uploading PDF: ' + data.message);
-            }
+            alert(data.success ? 'Data uploaded successfully!' : 'Error uploading data: ' + data.message);
         })
         .catch(error => {
-            console.error('Error uploading PDF:', error);
-            alert('Error uploading PDF.');
+            console.error('Error uploading data:', error);
+            alert('Error uploading data.');
         });
     });
 }

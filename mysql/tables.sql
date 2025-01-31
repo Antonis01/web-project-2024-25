@@ -50,7 +50,6 @@ CREATE TABLE Theses (
     teacher_am INT,
     student_am INT,
     final_submission_date DATE DEFAULT NULL,
-    theses_pdf_draft_path VARCHAR(255),
     FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am),
     FOREIGN KEY (student_am) REFERENCES Students(student_am)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
@@ -118,5 +117,7 @@ CREATE TABLE Presentations (
     presentation_type ENUM('in-person', 'online') NOT NULL,
     presentation_location VARCHAR(255) DEFAULT NULL,
     presentation_link VARCHAR(255) DEFAULT NULL,
+    theses_pdf_draft_path VARCHAR(255),
+    additional_links VARCHAR(255),
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

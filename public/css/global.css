@@ -369,6 +369,41 @@ button.close-button:hover {
     gap: 10px;
 }
 
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.upload-input,
+.upload-textarea,
+.upload-select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.upload-button {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #343a46;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.upload-button:hover {
+    background-color: #555;
+}
+
 /* Responsive styles */
 @media (max-width: 1500px) {
     .topBar {
