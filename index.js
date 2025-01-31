@@ -997,44 +997,108 @@ app.get('/get-active-theses', (req, res) => {
 });
 
 // Route handler for fetching grades for a specific thesis
+
+// Route handler για ανάκτηση βαθμών και τελικού βαθμού
 app.get('/get-grades/:thesis_id', (req, res) => {
     const thesis_id = req.params.thesis_id;
-    const teacherAM = req.session.user.am;
+    const teacherAM = req.session.user ? req.session.user.am : null;
 
     if (!teacherAM) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
     }
 
-    // Check if the current teacher is a member of the committee
+    // Έλεγχος αν ο καθηγητής είναι στην επιτροπή
     const checkCommitteeQuery = `
         SELECT * FROM Committees 
         WHERE thesis_id = ? AND (teacher_am = ? OR teacher_am2 = ? OR teacher_am3 = ?)
     `;
+
     db.query(checkCommitteeQuery, [thesis_id, teacherAM, teacherAM, teacherAM], (err, results) => {
         if (err) {
             console.error("Error checking committee membership:", err);
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
         if (results.length === 0) {
-            return res.status(403).json({ success: false, message: "You are not a member of the committee for this thesis." });
+            return res.status(403).json({ success: false, message: "You are not a committee member for this thesis." });
         }
 
-        // Fetch the grades
+        // Ανάκτηση βαθμών από Grades
         const fetchGradesQuery = `
             SELECT g.teacher_am, t.teacher_name, g.grade
             FROM Grades g
             JOIN Teachers t ON g.teacher_am = t.teacher_am
             WHERE g.thesis_id = ?
         `;
-        db.query(fetchGradesQuery, [thesis_id], (err, results) => {
+
+        db.query(fetchGradesQuery, [thesis_id], (err, gradeResults) => {
             if (err) {
                 console.error("Error fetching grades:", err);
                 return res.status(500).json({ success: false, message: "Internal Server Error" });
             }
-            res.json({ success: true, data: results });
+
+            if (gradeResults.length === 0) {
+                return res.json({ success: false, message: "No grades available yet." });
+            }
+
+            // Υπολογισμός τελικού βαθμού
+            let avgGrade = gradeResults.reduce((sum, g) => sum + parseFloat(g.grade), 0) / gradeResults.length;
+            let finalGrade = avgGrade * 0.85;
+            let bonus = 0;
+            let bonusMessage = "No bonus applied.";
+
+            // Έλεγχος αν υπάρχει bonus
+            const timeQuery = `
+                SELECT a.assigned_date, t.final_submission_date
+                FROM Assignments a
+                JOIN Theses t ON a.thesis_id = t.thesis_id
+                WHERE a.thesis_id = ?;
+            `;
+
+            db.query(timeQuery, [thesis_id], (err, timeResults) => {
+                if (err) {
+                    console.error("Error fetching thesis dates:", err);
+                    return res.status(500).json({ success: false, message: "Internal Server Error" });
+                }
+
+                if (timeResults.length === 0 || !timeResults[0].final_submission_date) {
+                    return res.json({ success: false, message: "No submission date available." });
+                }
+
+                const assignedDate = new Date(timeResults[0].assigned_date);
+                const finalSubmissionDate = new Date(timeResults[0].final_submission_date);
+                const diffYears = (finalSubmissionDate - assignedDate) / (1000 * 60 * 60 * 24 * 365);
+
+                if (diffYears <= 1.5) {
+                    bonus = 1.5;
+                    finalGrade += bonus;
+                    bonusMessage = "Bonus 1.5 points applied for early submission!";
+                }
+
+                // ✅ Ενημέρωση final_grade στον Grades
+                const updateFinalGradeQuery = `
+                    UPDATE Theses SET final_grade = ? WHERE thesis_id = ?;
+                `;
+
+                db.query(updateFinalGradeQuery, [finalGrade.toFixed(2), thesis_id], (err, result) => {
+                    if (err) {
+                        console.error("Error updating final grade:", err);
+                        return res.status(500).json({ success: false, message: "Internal Server Error" });
+                    }
+
+                    res.json({ 
+                        success: true, 
+                        grades: gradeResults, 
+                        final_grade: finalGrade.toFixed(2), 
+                        bonusMessage 
+                    });
+                });
+            });
         });
     });
 });
+
+
+
 
 
 app.get('/get-theses-status', (req, res) => {
@@ -1570,6 +1634,7 @@ app.post('/submit-grade', (req, res) => {
 });
 
 // Route handler for updating a grade
+// ✔️ Update Grade
 app.post('/update-grade', (req, res) => {
     const { thesis_id, grade } = req.body;
     const teacherAM = req.session.user.am;
@@ -1578,35 +1643,22 @@ app.post('/update-grade', (req, res) => {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
     }
 
-    // Check if the teacher has already submitted a grade
-    const checkGradeQuery = `
-        SELECT * FROM Grades 
+    const updateGradeQuery = `
+        UPDATE Grades 
+        SET grade = ?
         WHERE thesis_id = ? AND teacher_am = ?
     `;
-    db.query(checkGradeQuery, [thesis_id, teacherAM], (err, gradeResults) => {
+
+    db.query(updateGradeQuery, [grade, thesis_id, teacherAM], (err) => {
         if (err) {
-            console.error("Error checking existing grade:", err);
+            console.error("Error updating grade:", err);
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
-        if (gradeResults.length === 0) {
-            return res.status(400).json({ success: false, message: "You have not submitted a grade for this thesis." });
-        }
-
-        // Update the grade
-        const updateGradeQuery = `
-            UPDATE Grades 
-            SET grade = ?
-            WHERE thesis_id = ? AND teacher_am = ?
-        `;
-        db.query(updateGradeQuery, [grade, thesis_id, teacherAM], (err) => {
-            if (err) {
-                console.error("Error updating grade:", err);
-                return res.status(500).json({ success: false, message: "Internal Server Error" });
-            }
-            res.json({ success: true, message: 'Grade updated successfully!' });
-        });
+        res.json({ success: true, message: 'Grade updated successfully!' });
     });
 });
+
+
 
 // Διαδρομή για εισαγωγή JSON δεδομένων
 app.post('/import-json', (req, res) => {

@@ -636,6 +636,10 @@ function fetchThesesForManagement() {
                                 <ul id="gradesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of grades -->
                                 </ul>
+                                 </ul>
+                                <div id="finalGrade-${thesis.thesis_id}">
+                                    <!-- Final grade and bonus info will be displayed here -->
+                               </div>
                             </div>
                             ` : ''}
                         </div>
@@ -679,6 +683,8 @@ function generateAnnouncement(thesisId) {
 }
 
 // Function to submit a grade
+// Συνάρτηση για υποβολή βαθμού
+// Function to submit a grade
 function submitGrade(thesisId) {
     const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
 
@@ -706,6 +712,8 @@ function submitGrade(thesisId) {
         alert('An error occurred while submitting the grade.');
     });
 }
+
+
 
 // Function to update a grade
 function updateGrade(thesisId) {
@@ -736,25 +744,28 @@ function updateGrade(thesisId) {
     });
 }
 
-// Function to fetch and display grades for a specific thesis
+// Function to fetch and display grades
 function fetchGrades(thesisId) {
     fetch(`/get-grades/${thesisId}`)
         .then(response => response.json())
         .then(data => {
             const gradesList = document.getElementById(`gradesList-${thesisId}`);
-            gradesList.innerHTML = ''; // Clear the current list
+            const finalGradeDiv = document.getElementById(`finalGrade-${thesisId}`);
+
+            gradesList.innerHTML = ''; // Clear list
+            finalGradeDiv.innerHTML = ''; // Clear final grade display
 
             if (data.success) {
-                data.data.forEach(grade => {
+                data.grades.forEach(grade => {
                     const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        <div class="grade-item">
-                            <strong>Teacher:</strong> ${grade.teacher_name}<br>
-                            <strong>Grade:</strong> ${grade.grade}
-                        </div>
-                    `;
+                    listItem.innerHTML = `<strong>Teacher:</strong> ${grade.teacher_name} - <strong>Grade:</strong> ${grade.grade}`;
                     gradesList.appendChild(listItem);
                 });
+
+                finalGradeDiv.innerHTML = `
+                    <h4>Final Grade: ${data.final_grade}</h4>
+                    <p>${data.bonusMessage}</p>
+                `;
             } else {
                 alert('Error fetching grades: ' + data.message);
             }
@@ -764,6 +775,9 @@ function fetchGrades(thesisId) {
             alert('An error occurred while fetching the grades.');
         });
 }
+
+
+
 
 // Function to add a note
 function addNoteHandler(event, thesisId) {

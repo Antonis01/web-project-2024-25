@@ -54,6 +54,7 @@ CREATE TABLE Theses (
     gs_number INT DEFAULT NULL AFTER status,
     gs_year INT DEFAULT NULL AFTER gs_number,
     cancellation_reason TEXT DEFAULT NULL AFTER gs_year,
+    final_grade DECIMAL(4,2) DEFAULT NULL,
     FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am),
     FOREIGN KEY (student_am) REFERENCES Students(student_am)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
