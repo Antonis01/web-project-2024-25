@@ -179,6 +179,8 @@ function getTeacherId(req, res, next) {
     });
 }
 
+// Middleware function to update the thesis status
+// to 'Ενεργή' if all committee members have accepted
 function checkAndUpdateThesisStatus(thesis_id) {
     const query = `
         SELECT response2, response3
@@ -1698,6 +1700,68 @@ app.post('/erase-assignment/:id', (req, res) => {
     });
 });
 
+app.post('/upload-thesis-draft', (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+        console.error('No files were uploaded.');
+        return res.status(400).json({ success: false, message: 'No files were uploaded.' });
+    }
+
+    const thesisDraft = req.files.thesisDraft;
+    const thesisId = req.body.thesis_id;
+    const studentAm = req.session.user.am;
+
+    if (!thesisId) {
+        console.error('Thesis ID is required.');
+        return res.status(400).json({ success: false, message: 'Thesis ID is required.' });
+    }
+
+    if (!studentAm) {
+        console.error('Student AM is required.');
+        return res.status(400).json({ success: false, message: 'Student AM is required.' });
+    }
+
+    const getTitleQuery = 'SELECT title FROM Theses WHERE thesis_id = ?';
+    db.query(getTitleQuery, [thesisId], (err, results) => {
+        if (err) {
+            console.error('Error fetching thesis title:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+
+        if (results.length === 0) {
+            console.error('Thesis not found.');
+            return res.status(404).json({ success: false, message: 'Thesis not found.' });
+        }
+
+        const thesisTitle = results[0].title.replace(/[^a-z0-9]/gi, '_').toLowerCase(); 
+        const currentDate = new Date().toISOString().split('T')[0]; 
+        const fileName = `${thesisTitle}_${studentAm}_${currentDate}.pdf`;
+        const uploadDir = 'theses_drafts';
+        const uploadPath = path.join(__dirname, uploadDir, fileName);
+        const relativePath = path.join(uploadDir, fileName);
+
+        thesisDraft.mv(uploadPath, (err) => {
+            if (err) {
+                console.error('Error uploading thesis draft:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+
+            const query = `
+                UPDATE Theses 
+                SET theses_pdf_draft_path = ? 
+                WHERE thesis_id = ?
+                AND student_am = ?
+            `;
+
+            db.query(query, [relativePath, thesisId, studentAm], (err) => {
+                if (err) {
+                    console.error('Error updating thesis draft path:', err);
+                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                }
+                res.json({ success: true, message: 'Thesis draft uploaded successfully!', path: relativePath });
+            });
+        });
+    });
+});
 
 /*
 -------------------------------------------------------------------------------------
@@ -1785,8 +1849,33 @@ app.put('/api/thesis/complete', (req, res) => {
     });
 });
 
+app.post('/update-profile-st', (req, res) => {
+    const studentAm = req.session.user?.am; // Αναγνωριστικό φοιτητή από το session
+    const { home_address, email, mobile_phone, landline_phone } = req.body;
 
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
 
+    const query = `
+        UPDATE Students
+        SET home_address = ?, email = ?, mobile_phone = ?, landline_phone = ?
+        WHERE student_am = ?
+    `;
+
+    db.query(
+        query,
+        [home_address, email, mobile_phone, landline_phone, studentAm],
+        (err, result) => {
+            if (err) {
+                console.error('Error updating profile:', err);
+                return res.status(500).json({ success: false, message: 'Database error' });
+            }
+
+            return res.json({ success: true, message: 'Profile updated successfully' });
+        }
+    );
+});
 
 /*
 -------------------------------------------------------------------------------------
@@ -1836,36 +1925,6 @@ app.delete('/delete-thesis/:id', (req, res) => {
         });
     });
 });
-
-app.post('/update-profile-st', (req, res) => {
-    const studentAm = req.session.user?.am; // Αναγνωριστικό φοιτητή από το session
-    const { home_address, email, mobile_phone, landline_phone } = req.body;
-
-    if (!studentAm) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
-    }
-
-    const query = `
-        UPDATE Students
-        SET home_address = ?, email = ?, mobile_phone = ?, landline_phone = ?
-        WHERE student_am = ?
-    `;
-
-    db.query(
-        query,
-        [home_address, email, mobile_phone, landline_phone, studentAm],
-        (err, result) => {
-            if (err) {
-                console.error('Error updating profile:', err);
-                return res.status(500).json({ success: false, message: 'Database error' });
-            }
-
-            return res.json({ success: true, message: 'Profile updated successfully' });
-        }
-    );
-});
-
-
 
 /*
 -------------------------------------------------------------------------------------

@@ -135,7 +135,8 @@ document.getElementById("diploManagement").addEventListener("click", function(ev
                 inviteTeacher();
             }
         } else if (statuses.includes('Υπό Εξέταση')) {
-            alert("Υπό Εξέταση");
+            if( document.getElementById('pdfFileInput') == null) addUploadElements();
+
         } else if (statuses.includes('Περατωμένη')) {
             alert("Περατωμένη");
         } else {
@@ -240,5 +241,58 @@ function sendInvitation(teacherAm) {
                 alert("Σφάλμα κατά την αποστολή της πρόσκλησης: " + data.message);
             }
         })
+    });
+}
+
+function addUploadElements() {
+    const container = document.getElementById('uploadContainer');
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'pdfFileInput';
+    fileInput.accept = 'application/pdf';
+
+    const uploadButton = document.createElement('button');
+    uploadButton.innerText = 'Upload PDF';
+    uploadButton.onclick = uploadThesesDraft;
+
+    container.appendChild(fileInput);
+    container.appendChild(uploadButton);
+}
+function uploadThesesDraft() {
+    const pdfFileInput = document.getElementById('pdfFileInput');
+    const file = pdfFileInput.files[0];
+
+    if (!file) {
+        alert('Please select a PDF file to upload.');
+        return;
+    }
+
+    getThesisID().then(thesisID => {
+        if (!thesisID) {
+            alert('Δεν βρέθηκε θέμα για τον φοιτητή.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('thesisDraft', file);
+        formData.append('thesis_id', thesisID);
+
+        fetch('/upload-thesis-draft', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('PDF uploaded successfully!');
+            } else {
+                alert('Error uploading PDF: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading PDF:', error);
+            alert('Error uploading PDF.');
+        });
     });
 }

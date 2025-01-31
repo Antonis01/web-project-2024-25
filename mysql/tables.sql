@@ -50,6 +50,7 @@ CREATE TABLE Theses (
     teacher_am INT,
     student_am INT,
     final_submission_date DATE DEFAULT NULL,
+    theses_pdf_draft_path VARCHAR(255),
     FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am),
     FOREIGN KEY (student_am) REFERENCES Students(student_am)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;

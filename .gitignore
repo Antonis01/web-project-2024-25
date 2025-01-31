@@ -1,6 +1,8 @@
 /uploads/*
 \uploads\*
 /uploads
-mysql/table2.sql
 to-do.txt
 check.txt
+/theses_drafts
+/theses_drafts/*
+\theses_drafts\*
