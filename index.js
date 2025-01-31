@@ -14,10 +14,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-const multer = require('multer');
 const { Parser } = require('json2csv');
 const xml2js = require('xml2js');
-//const fileUpload = require('express-fileupload');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
@@ -30,9 +29,9 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-//app.use(express.json());
+app.use(express.json());
 
-//app.use(fileUpload());
+app.use(fileUpload());
 
 
 /*
@@ -1157,61 +1156,69 @@ app.get('/get-pending-theses', (req, res) => {
 */
 
 // Route handler for the add-thesis form
-const upload = multer({ 
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, path.join(__dirname, 'uploads'));
-        },
-        filename: (req, file, cb) => {
-            const ext = path.extname(file.originalname);
-            cb(null, `file-${Date.now()}${ext}`);
-        }
-    })
-});
-
-// Route handler for the add-thesis form
-app.post('/add-thesis', upload.single('file'), (req, res) => {
+app.post('/add-thesis', (req, res) => {
     const { title, description } = req.body;
-    const pdfPath = req.file ? `uploads/${req.file.filename}` : null; // Store the relative path
     const teacher_am = req.session.user.am;
 
-    const query = `
-        INSERT INTO Theses (title, summary, pdf_path, teacher_am, status)
-        VALUES (?, ?, ?, ?, 'Υπό Ανάθεση')
-    `;
-    
-    const values = [title, description, pdfPath, teacher_am || null];
+    if (!req.files || !req.files.file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded.' });
+    }
 
-    db.query(query, values, (err, result) => {
+    const pdfFile = req.files.file;
+    const pdfPath = `uploads/${pdfFile.name}`;
+
+    pdfFile.mv(path.join(__dirname, pdfPath), (err) => {
         if (err) {
-            console.error('Error inserting thesis:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
-            return;
+            console.error('Error uploading file:', err);
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
 
-        const query2 = `
-            INSERT INTO Committees (thesis_id, teacher_am, role, response, invitation_date, response_date)
-            VALUES (LAST_INSERT_ID(), ?, 'Επιβλέπων', 'Αποδοχή', NOW(), NOW())
+        const query = `
+            INSERT INTO Theses (title, summary, pdf_path, teacher_am, status)
+            VALUES (?, ?, ?, ?, 'Υπό Ανάθεση')
         `;
-
-        db.query(query2, [teacher_am], (err) => {
-            if (err) {
-                console.error('Error inserting committee:', err);
-                res.status(500).json({ success: false, message: 'Internal Server Error' });
-                return;
-            }
-        });
         
-        res.json({ success: true, message: 'Thesis added successfully!' });
+        const values = [title, description, pdfPath, teacher_am || null];
+
+        db.query(query, values, (err, result) => {
+            if (err) {
+                console.error('Error inserting thesis:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+
+            const query2 = `
+                INSERT INTO Committees (thesis_id, teacher_am, role, response, invitation_date, response_date)
+                VALUES (LAST_INSERT_ID(), ?, 'Επιβλέπων', 'Αποδοχή', NOW(), NOW())
+            `;
+
+            db.query(query2, [teacher_am], (err) => {
+                if (err) {
+                    console.error('Error inserting committee:', err);
+                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                }
+                
+                res.json({ success: true, message: 'Thesis added successfully!' });
+            });
+        });
     });
 });
 
 // Route handler for updating a thesis
-// We use let instead of const because we will be appending to the query string
-// Route handler for updating a thesis
-app.post('/update-thesis', upload.single('file'), (req, res) => {
+app.post('/update-thesis', (req, res) => {
     const { thesis_id, title, description, teacher_am, student_am, final_submission_date, status } = req.body;
-    const pdfPath = req.file ? `uploads/${req.file.filename}` : null;
+
+    let pdfPath = null;
+    if (req.files && req.files.file) {
+        const pdfFile = req.files.file;
+        pdfPath = `uploads/${pdfFile.name}`;
+
+        pdfFile.mv(path.join(__dirname, pdfPath), (err) => {
+            if (err) {
+                console.error('Error uploading file:', err);
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
+        });
+    }
 
     let query = `
         UPDATE Theses
@@ -1231,8 +1238,7 @@ app.post('/update-thesis', upload.single('file'), (req, res) => {
     db.query(query, values, (err, result) => {
         if (err) {
             console.error('Error updating thesis:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
-            return;
+            return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
 
         const query2 = `
@@ -1243,10 +1249,10 @@ app.post('/update-thesis', upload.single('file'), (req, res) => {
         db.query(query2, [teacher_am, thesis_id], (err) => {
             if (err) {
                 console.error('Error updating committee:', err);
-                res.status(500).json({ success: false, message: 'Internal Server Error' });
-                return;
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
-            res.json({ success: true, message: 'Theses and Committee updated successfully!' });
+
+            res.json({ success: true, message: 'Thesis updated successfully!' });
         });
     });
 });
@@ -1605,17 +1611,17 @@ app.post('/import-json', (req, res) => {
         db.query(insertStudents, [studentData], (err) => {
             if (err) {
                 console.error('Error inserting students:', err);
-                return res.status(500).send('Error inserting students into the database.');
+                return res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
 
             // Εκτέλεση ερωτήματος για εισαγωγή διδασκόντων
             db.query(insertTeachers, [teacherData], (err) => {
                 if (err) {
                     console.error('Error inserting teachers:', err);
-                    return res.status(500).send('Error inserting teachers into the database.');
+                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
                 }
 
-                res.send({ message: 'JSON uploaded and processed successfully!' });
+                res.json({ success: true, message: 'Data imported successfully!' });
             });
         });
     } catch (error) {
@@ -1623,9 +1629,7 @@ app.post('/import-json', (req, res) => {
         res.status(400).send('Invalid JSON file.');
     }
 });
-
-  
-  
+    
 app.post('/invite-teacher', (req, res) => {
     const { thesis_id, teacher_am, role } = req.body;
 
