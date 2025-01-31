@@ -51,6 +51,9 @@ CREATE TABLE Theses (
     student_am INT,
     final_submission_date DATE DEFAULT NULL,
     theses_pdf_draft_path VARCHAR(255),
+    gs_number INT DEFAULT NULL AFTER status,
+    gs_year INT DEFAULT NULL AFTER gs_number,
+    cancellation_reason TEXT DEFAULT NULL AFTER gs_year,
     FOREIGN KEY (teacher_am) REFERENCES Teachers(teacher_am),
     FOREIGN KEY (student_am) REFERENCES Students(student_am)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
@@ -61,6 +64,7 @@ CREATE TABLE Assignments (
     student_am INT,
     assigned_date DATE DEFAULT CURRENT_DATE,
     status ENUM('Προσωρινή', 'Οριστική') NOT NULL,
+    gs_number_assignment  INT DEFAULT NULL AFTER status,
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id),
     FOREIGN KEY (student_am) REFERENCES Students(student_am)
 ) ENGINE = InnoDB CHARACTER SET greek COLLATE greek_general_ci;
