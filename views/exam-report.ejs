@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Πρακτικό Εξέτασης</title>
+</head>
+<body>
+    <h1>Πρακτικό Εξέτασης για <%= examReport.title %></h1>
+    <p><strong>Summary:</strong> <%= examReport.summary %></p>
+    <p><strong>Status:</strong> <%= examReport.status %></p>
+    <p><strong>Grade:</strong> <%= examReport.final_grade %></p>
+    <p><strong>Supervisor:</strong> <%= examReport.supervisor %></p>
+    <p><strong>Committee Member 1:</strong> <%= examReport.committee_member1 %></p>
+    <p><strong>Committee Member 2:</strong> <%= examReport.committee_member2 %></p>
+    <p><strong>Repository Link:</strong> <a href="<%= examReport.repository_link.startsWith('https') ? examReport.repository_link : 'https://' + examReport.repository_link %>" target="_blank"><%= examReport.repository_link %></a></p>
+</body>
+</html>

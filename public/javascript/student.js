@@ -134,7 +134,9 @@ document.getElementById("diploManagement").addEventListener("click", function(ev
             if (!document.getElementById('teacherAmSelect')) inviteTeacher();
             
         } else if (statuses.includes('Υπό Εξέταση')) {
-            if( document.getElementById('pdfFileInput') == null) presentationElements();
+            if( document.getElementById('pdfFileInput') == null) {
+                presentationElements();
+            }
 
         } else if (statuses.includes('Περατωμένη')) {
             alert("Περατωμένη");
@@ -244,7 +246,7 @@ function sendInvitation(teacherAm) {
 }
 
 function presentationElements() {
-    const form = document.getElementById('diploManagement');
+    const form = document.getElementById('presentationForm');
 
     const uploadForm = document.createElement('div');
     uploadForm.className = 'upload-form';
@@ -255,6 +257,7 @@ function presentationElements() {
         <input type="date" id="examDate" class="upload-input">
         <input type="time" id="examTime" class="upload-input">
         <select id="examType" class="upload-select">
+            <option value="">Select Exam Type</option>
             <option value="in-person">In-Person</option>
             <option value="online">Online</option>
         </select>
@@ -267,10 +270,15 @@ function presentationElements() {
 
     document.getElementById('examType').addEventListener('change', function() {
         const isOnline = this.value === 'online';
-        document.getElementById('examLocation').style.display = isOnline ? 'none' : 'block';
+        const isInPerson = this.value === 'in-person';
+        document.getElementById('examLocation').style.display = isInPerson ? 'block' : 'none';
         document.getElementById('examLink').style.display = isOnline ? 'block' : 'none';
     });
+
+    showRepositoryLinkForm();
+
 }
+
 function uploadPresentationData() {
     const pdfFileInput = document.getElementById('pdfFileInput');
     const file = pdfFileInput.files[0];
@@ -308,5 +316,62 @@ function uploadPresentationData() {
             console.error('Error uploading data:', error);
             alert('Error uploading data.');
         });
+    });
+}
+
+function showRepositoryLinkForm() {
+    const form = document.getElementById('presentationForm');
+
+    const uploadForm = document.createElement('div');
+    uploadForm.className = 'upload-form';
+
+    uploadForm.innerHTML = `
+        <input type="text" id="repositoryLink" placeholder="Enter repository link" class="upload-input">
+        <button type="button" class="upload-button" onclick="submitRepositoryLink()">Submit Link</button>
+        <button type="button" class="upload-button" onclick="viewExamReport()">View Exam Report</button>
+    `;
+
+    form.appendChild(uploadForm);
+}
+
+function submitRepositoryLink() {
+    const repositoryLink = document.getElementById('repositoryLink').value;
+
+    getThesisID().then(thesisID => {
+        if (!thesisID) {
+            alert('Δεν βρέθηκε θέμα για τον φοιτητή.');
+            return;
+        }
+
+        fetch('/submit-repository-link', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                thesis_id: thesisID,
+                repository_link: repositoryLink
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.success ? 'Repository link submitted successfully!' : 'Error submitting repository link: ' + data.message);
+        })
+        .catch(error => {
+            console.error('Error submitting repository link:', error);
+            alert('Error submitting repository link.');
+        });
+    });
+}
+function viewExamReport() {
+    getThesisID().then(thesisID => {
+        if (!thesisID) {
+            alert('Δεν βρέθηκε θέμα για τον φοιτητή.');
+            return;
+        }
+        window.open(`/exam-report/${thesisID}`, '_blank');
+    }).catch(error => {
+        console.error('Error fetching thesis ID:', error);
+        alert('Σφάλμα κατά την προβολή της αναφοράς εξέτασης.');
     });
 }

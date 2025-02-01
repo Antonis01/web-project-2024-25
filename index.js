@@ -33,6 +33,10 @@ app.use(express.json());
 
 app.use(fileUpload());
 
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 
 /*
 -------------------------------------------------------------------------------------
@@ -1247,6 +1251,48 @@ app.get('/api/theses', (req, res) => {
     });
 });
 
+app.get('/exam-report/:thesis_id', (req, res) => {
+    const thesisId = req.params.thesis_id;
+    const studentAm = req.session.user.am;
+
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        SELECT 
+            t.title, 
+            t.summary, 
+            t.status, 
+            t.final_grade, 
+            t1.teacher_name AS supervisor,
+            t2.teacher_name AS committee_member1,
+            t3.teacher_name AS committee_member2,
+            p.repository_link
+        FROM Theses t
+        LEFT JOIN Committees c ON t.thesis_id = c.thesis_id
+        LEFT JOIN Teachers t1 ON c.teacher_am = t1.teacher_am
+        LEFT JOIN Teachers t2 ON c.teacher_am2 = t2.teacher_am
+        LEFT JOIN Teachers t3 ON c.teacher_am3 = t3.teacher_am
+        LEFT JOIN Presentations p ON t.thesis_id = p.thesis_id
+        WHERE t.thesis_id = ? AND t.student_am = ? AND t.final_grade IS NOT NULL
+    `;
+
+    db.query(query, [thesisId, studentAm], (err, results) => {
+        if (err) {
+            console.error('Error fetching exam report:', err);
+            return res.status(500).json({ success: false, message: 'Error fetching exam report' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'Thesis not found' });
+        }
+
+        const examReport = results[0];
+        res.render('exam-report', { examReport });
+    });
+});
+
 /*
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -1945,6 +1991,30 @@ app.post('/update-profile-st', (req, res) => {
             return res.json({ success: true, message: 'Profile updated successfully' });
         }
     );
+});
+
+app.put('/submit-repository-link', (req, res) => {
+    const studentAm = req.session.user.am;
+    const { thesis_id, repository_link } = req.body;
+
+    if (!studentAm) {
+        return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    const query = `
+        UPDATE Presentations
+        SET repository_link = ?
+        WHERE thesis_id = ?
+    `;
+
+    db.query(query, [repository_link, thesis_id, studentAm], (err, result) => {
+        if (err) {
+            console.error('Error updating repository link:', err);
+            return res.status(500).json({ success: false, message: 'Error updating repository link' });
+        }
+
+        res.json({ success: true, message: 'Repository link updated successfully' });
+    });
 });
 
 /*
