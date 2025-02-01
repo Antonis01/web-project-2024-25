@@ -83,24 +83,29 @@ function fetchTheses() {
         });
 }
 
-// Δημιουργεί το UI για τις διπλωματικές
 function displayTheses(theses) {
     const thesesList = document.getElementById('thesesList');
     thesesList.innerHTML = '';
 
     theses.forEach(thesis => {
+        console.log("Processing thesis:", thesis);
+
         const thesisDiv = document.createElement('div');
         thesisDiv.id = `thesis_${thesis.thesis_id}`;
         thesisDiv.innerHTML = `
             <hr>
             <p><strong>Τίτλος:</strong> ${thesis.title}</p>
-            <p><strong>Κατάσταση:</strong> <span id="status_${thesis.thesis_id}">${thesis.status}</span></p>
-            
+            <p><strong>Κατάσταση:</strong> ${thesis.status}</p>
+
+            ${thesis.status === 'Υπό Εξέταση' ? `
+                ${thesis.final_grade ? `<p><strong>Βαθμός:</strong> ${thesis.final_grade}</p>` : '<p style="color:red;">Δεν έχει εισαχθεί βαθμός!</p>'}
+                ${thesis.repository_link ? `<p><strong>Σύνδεσμος:</strong> <a href="${thesis.repository_link}" target="_blank">${thesis.repository_link}</a></p>` : '<p style="color:red;">Δεν έχει εισαχθεί σύνδεσμος!</p>'}
+            ` : ''}
 
             ${thesis.status === 'Ενεργή' ? `
                 <h4>Καταχώρηση ΑΠ ΓΣ για ανάθεση:</h4>
-               <input type="text" id="gsNumberAssignment_${thesis.thesis_id}" placeholder="ΑΠ ΓΣ Ανάθεσης">
-               <button onclick="submitGsNumberAssignment(${thesis.thesis_id})">Καταχώρηση</button>
+                <input type="text" id="gsNumberAssignment_${thesis.thesis_id}" placeholder="ΑΠ ΓΣ Ανάθεσης">
+                <button onclick="submitGsNumberAssignment(${thesis.thesis_id})">Καταχώρηση</button>
 
                 <h4>Ακύρωση Ανάθεσης:</h4>
                 <input type="text" id="cancelGsNumber_${thesis.thesis_id}" placeholder="Αριθμός ΓΣ">
@@ -108,10 +113,65 @@ function displayTheses(theses) {
                 <input type="text" id="cancelReason_${thesis.thesis_id}" placeholder="Λόγος Ακύρωσης">
                 <button onclick="cancelThesis(${thesis.thesis_id})">Ακύρωση</button>
             ` : ''}
+
+            ${thesis.status === 'Υπό Εξέταση' && thesis.final_grade && thesis.repository_link ? `
+                <h4>Ολοκλήρωση Διπλωματικής:</h4>
+                <button onclick="completeThesis(${thesis.thesis_id})">Οριστική Περάτωση</button>
+            ` : ''}
         `;
         thesesList.appendChild(thesisDiv);
     });
 }
+
+function completeThesis(thesisId) {
+    if (!confirm("Είστε σίγουροι ότι θέλετε να ολοκληρώσετε αυτή τη διπλωματική;")) return;
+
+    fetch(`/api/theses/${thesisId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert(`Σφάλμα: ${data.message}`);
+                return;
+            }
+
+            const { final_grade, repository_link } = data.thesis;
+
+            if (!final_grade) {
+                alert("Δεν έχει εισαχθεί βαθμός!");
+                return;
+            }
+
+            if (!repository_link) {
+                alert("Δεν έχει εισαχθεί σύνδεσμος!");
+                return;
+            }
+
+            
+            fetch('/api/theses/complete', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ thesis_id: thesisId })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert("Η διπλωματική ολοκληρώθηκε επιτυχώς!");
+                    fetchTheses(); 
+                } else {
+                    alert(`Αποτυχία ολοκλήρωσης: ${result.message}`);
+                }
+            })
+            .catch(error => {
+                console.error("Σφάλμα κατά την ολοκλήρωση:", error);
+                alert("Σφάλμα! Δοκιμάστε ξανά.");
+            });
+        })
+        .catch(error => {
+            console.error("Σφάλμα στο API:", error);
+            alert("Αποτυχία φόρτωσης δεδομένων διπλωματικής.");
+        });
+}
+
 
 function submitGsNumberAssignment(thesisId) {
     const gsNumberAssignment = document.getElementById(`gsNumberAssignment_${thesisId}`).value.trim();
@@ -159,9 +219,32 @@ function cancelThesis(thesisId) {
     }).then(response => response.json())
       .then(data => {
           if (data.success) {
-              fetchTheses(); // Επαναφόρτωση της λίστας διπλωματικών από τη βάση
+              fetchTheses(); 
           } else {
               alert("Αποτυχία ακύρωσης. Δοκιμάστε ξανά.");
           }
       });
+}
+
+function completeThesis(thesisId) {
+    if (!confirm("Είστε σίγουροι ότι θέλετε να ολοκληρώσετε αυτή τη διπλωματική;")) return;
+
+    fetch('/api/theses/complete', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thesis_id: thesisId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Η διπλωματική ολοκληρώθηκε επιτυχώς!");
+            fetchTheses(); 
+        } else {
+            alert(`Αποτυχία ολοκλήρωσης: ${data.message}`);
+        }
+    })
+    .catch(error => {
+        console.error("Σφάλμα κατά την ολοκλήρωση της διπλωματικής:", error);
+        alert("Σφάλμα κατά την ολοκλήρωση. Δοκιμάστε ξανά.");
+    });
 }

@@ -1078,7 +1078,7 @@ app.get('/get-grades/:thesis_id', (req, res) => {
                     bonusMessage = "Bonus 1.5 points applied for early submission!";
                 }
 
-                // ✅ Ενημέρωση final_grade στον Grades
+                //  Ενημέρωση final_grade στον Grades
                 const updateFinalGradeQuery = `
                     UPDATE Theses SET final_grade = ? WHERE thesis_id = ?;
                 `;
@@ -1230,22 +1230,29 @@ app.get('/get-pending-theses', (req, res) => {
 
 app.get('/api/theses', (req, res) => {
     const statusFilter = req.query.status;
+
     let query = `
-        SELECT thesis_id, title, status 
-        FROM Theses 
-        WHERE status IN ('Ενεργή', 'Υπό Εξέταση')
+        SELECT 
+            t.thesis_id, 
+            t.title, 
+            t.status, 
+            t.final_grade, 
+            p.repository_link 
+        FROM Theses t
+        LEFT JOIN Presentations p ON t.thesis_id = p.thesis_id
+        WHERE t.status IN ('Ενεργή', 'Υπό Εξέταση')
     `;
 
     const queryParams = [];
     if (statusFilter) {
-        query += ' AND status = ?';
+        query += ' AND t.status = ?';
         queryParams.push(statusFilter);
     }
 
     db.query(query, queryParams, (err, results) => {
         if (err) {
-            console.error('Error fetching theses:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            console.error('Σφάλμα στη φόρτωση των διπλωματικών:', err);
+            return res.status(500).json({ success: false, message: 'Σφάλμα στη βάση δεδομένων.' });
         }
         res.json({ success: true, theses: results });
     });
@@ -1961,6 +1968,62 @@ app.put('/api/thesis/cancel', (req, res) => {
     });
 });
 
+app.put('/api/theses/complete', (req, res) => {
+    const { thesis_id } = req.body;
+
+    if (!thesis_id) {
+        return res.status(400).json({ success: false, message: "Λείπει το ID της διπλωματικής." });
+    }
+
+    // Έλεγχος αν υπάρχουν final_grade και repository_link
+    const checkQuery = `
+        SELECT t.final_grade, p.repository_link
+        FROM Theses t
+        INNER JOIN Presentations p ON t.thesis_id = p.thesis_id
+        WHERE t.thesis_id = ? 
+          AND t.status = 'Υπό Εξέταση'
+          AND t.final_grade IS NOT NULL
+          AND p.repository_link IS NOT NULL
+    `;
+
+    db.query(checkQuery, [thesis_id], (err, results) => {
+        if (err) {
+            console.error("Σφάλμα στον έλεγχο των δεδομένων:", err);
+            return res.status(500).json({ success: false, message: "Σφάλμα στη βάση δεδομένων." });
+        }
+
+        console.log("Αποτελέσματα από το checkQuery:", results); // Debugging
+
+        if (results.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Η διπλωματική δεν μπορεί να ολοκληρωθεί: λείπει βαθμός ή σύνδεσμος.",
+                final_grade: results[0]?.final_grade || "Δεν υπάρχει",
+                repository_link: results[0]?.repository_link || "Δεν υπάρχει"
+            });
+        }
+
+        // Ενημέρωση της κατάστασης της διπλωματικής
+        const updateQuery = `
+            UPDATE Theses 
+            SET status = 'Περατωμένη' 
+            WHERE thesis_id = ? AND status = 'Υπό Εξέταση'
+        `;
+
+        db.query(updateQuery, [thesis_id], (updateErr, updateResults) => {
+            if (updateErr) {
+                console.error("Σφάλμα κατά την ενημέρωση της κατάστασης:", updateErr);
+                return res.status(500).json({ success: false, message: "Σφάλμα στη βάση δεδομένων." });
+            }
+
+            if (updateResults.affectedRows > 0) {
+                res.json({ success: true, message: "Η διπλωματική ολοκληρώθηκε επιτυχώς!" });
+            } else {
+                res.status(400).json({ success: false, message: "Η διπλωματική δεν πληροί τις προϋποθέσεις για ολοκλήρωση." });
+            }
+        });
+    });
+});
 
 
 
