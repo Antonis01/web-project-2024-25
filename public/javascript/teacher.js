@@ -10,7 +10,7 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Thesis added successfully!');
+            alert('Επιτυχής καταχώρηση Διπλωματικής!');
             // Fetch and display the updated list of theses
             fetchTheses();
         } else {
