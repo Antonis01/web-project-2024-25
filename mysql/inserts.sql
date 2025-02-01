@@ -19,12 +19,12 @@ INSERT INTO Students (student_am, role_id, student_username, student_password, s
 
 -- Insert statements for teachers (with required fields only)
 INSERT INTO Teachers (teacher_am, role_id, teacher_username, teacher_password, teacher_name, email) VALUES
-(1, 1, 'akomninos@ceid.upatras.gr', '1234', 'Andreas Komninos', 'akomninos@ceid.upatras.gr'),
-(7, 1, 'vasfou@ceid.upatras.gr', '1234', 'Vasilis Foukaras', 'vasfou@ceid.upatras.gr'),
-(8, 1, 'karras@nterti.com', '1234', 'Basilis Karras', 'karras@nterti.com'),
-(9, 1, 'eleni@ceid.gr', '1234', 'Eleni Voyiatzaki', 'eleni@ceid.gr'),
-(10, 1, 'hozier@ceid.upatras.gr', '1234', 'Andrew Hozier Byrne', 'hozier@ceid.upatras.gr'),
-(11, 1, 'nikos.korobos12@gmail.com', '1234', 'Nikos Korobos', 'nikos.korobos12@gmail.com');
+(1, 1, '1', '1234', 'Andreas Komninos', 'akomninos@ceid.upatras.gr'),
+(7, 1, '2', '1234', 'Vasilis Foukaras', 'vasfou@ceid.upatras.gr'),
+(8, 1, '8', '1234', 'Basilis Karras', 'karras@nterti.com'),
+(9, 1, '9', '1234', 'Eleni Voyiatzaki', 'eleni@ceid.gr'),
+(10, 1, '10', '1234', 'Andrew Hozier Byrne', 'hozier@ceid.upatras.gr'),
+(11, 1, '11', '1234', 'Nikos Korobos', 'nikos.korobos12@gmail.com');
 
 INSERT INTO Secretary (secretary_am, role_id, secretary_username, secretary_password) VALUES
 (2, 3, 'secretary', '1234');
