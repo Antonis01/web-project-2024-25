@@ -125,5 +125,6 @@ CREATE TABLE Presentations (
     presentation_link VARCHAR(255) DEFAULT NULL,
     theses_pdf_draft_path VARCHAR(255),
     additional_links VARCHAR(255),
+    repository_link VARCHAR(255),
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
