@@ -29,6 +29,7 @@ function fetchThesisSt() {
         .catch(error => {
             console.error('Error fetching thesis:', error);
             alert('Σφάλμα κατά την προβολή του θέματος.');
+            thesisDetailsList.innerHTML = '<li>Δεν βρέθηκε θέμα για τον φοιτητή.</li>';
         });
 }
 
@@ -134,12 +135,12 @@ document.getElementById("diploManagement").addEventListener("click", function(ev
             if (!document.getElementById('teacherAmSelect')) inviteTeacher();
             
         } else if (statuses.includes('Υπό Εξέταση')) {
-            if( document.getElementById('pdfFileInput') == null) {
-                presentationElements();
-            }
+            if( document.getElementById('pdfFileInput') == null) presentationElements();
+            
 
         } else if (statuses.includes('Περατωμένη')) {
-            alert("Περατωμένη");
+            if (document.getElementById('completedTheses').children.length === 0) thesesCompleted();
+            
         } else {
             alert("Δεν μπορείτε να δείτε την διαχείριση διπλωματικής");
         }
@@ -374,4 +375,17 @@ function viewExamReport() {
         console.error('Error fetching thesis ID:', error);
         alert('Σφάλμα κατά την προβολή της αναφοράς εξέτασης.');
     });
+}
+
+function thesesCompleted() {
+    const form = document.getElementById('completedTheses');
+
+    const completedForm = document.createElement('div');
+    completedForm.className = 'completed-form';
+
+    completedForm.innerHTML = `
+        <button type="button" class="upload-button" onclick="viewExamReport()">View Exam Report</button>
+    `;
+    form.appendChild(completedForm);
+
 }
