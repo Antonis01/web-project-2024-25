@@ -22,7 +22,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
                 const response = JSON.parse(xhr.responseText);
                 window.location.href = response.redirect;
             } else {
-                alert('Invalid username or password');
+                alert('Λανθασμένο username ή κωδικός πρόσβασης');
             }
         }
     };
@@ -30,7 +30,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
 });
 
 function logout() {
-    if (confirm("Are you sure you want to logout?")) {
+    if (confirm("Είστε σίγουρος ότι θέλετε να αποσυνδεθήτε")) {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/logout', true);
         xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
@@ -40,7 +40,7 @@ function logout() {
                     const response = JSON.parse(xhr.responseText);
                     window.location.href = response.redirect;
                 } else {
-                    alert('Error logging out');
+                    alert('Σφάλμα κατά την αποσύνδεση');
                 }
             }
         };
@@ -99,13 +99,13 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Thesis added successfully!');
+            alert('Επιτυχής προσθήλη διπλωματικής!');
         } else {
             alert('Error adding thesis: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while adding the thesis.');
+        alert('Σφάλμα.');
     });
 });

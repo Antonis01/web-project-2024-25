@@ -121,7 +121,7 @@ app.post('/login', (req, res) => {
 
     const checkCredentials = (index) => {
         if (index >= roles.length) {
-            res.status(401).json({ message: 'Invalid username or password' });
+            res.status(401).json({ message: 'Λανθασμένο username ή Κωδικός' });
             return;
         }
 
@@ -221,7 +221,7 @@ function checkAndUpdateThesisStatus(thesis_id) {
 
                     db.query(updateQuery2, [thesis_id], (err) => {
                         if (err) {
-                            console.error('Error updating assignment status:', err);
+                            console.error('Σφάλμα κατά την ενημέρωση:', err);
                         }
                     });
                 });
@@ -342,7 +342,7 @@ app.get('/search-theses/:title', (req, res) => {
             return;
         }
         if (results.length === 0) {
-            res.status(404).json({ success: false, message: 'No theses found' });
+            res.status(404).json({ success: false, message: 'Δεν βρέθηκαν διπλωματικές' });
             return;
         }
         res.json({ success: true, data: results });
@@ -390,7 +390,7 @@ app.get('/get-theses', (req, res) => {
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error fetching theses:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα' });
         }
 
         const theses = results.map(thesis => {
@@ -457,7 +457,7 @@ app.get("/search-student", (req, res) => {
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error("Error searching student:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            return res.status(500).json({ success: false, message: "Σφάλμα" });
         }
 
         res.json({ success: true, data: results });
@@ -502,7 +502,7 @@ app.get('/search-theses', getTeacherId, (req, res) => {
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error searching theses:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            res.status(500).json({ success: false, message: 'Σφάλμα' });
             return;
         }
         res.json({ success: true, data: results });
@@ -548,7 +548,7 @@ app.get('/export-theses', getTeacherId, (req, res) => {
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('Error exporting theses:', err);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            res.status(500).json({ success: false, message: 'Σφάλμα' });
             return;
         }
 
@@ -568,7 +568,7 @@ app.get('/export-theses', getTeacherId, (req, res) => {
             res.attachment('theses.json');
             res.send(JSON.stringify(results, null, 2));
         } else {
-            res.status(400).json({ success: false, message: 'Invalid format' });
+            res.status(400).json({ success: false, message: 'Μη Έγκυρο format' });
         }
     });
 });
@@ -584,10 +584,10 @@ app.get('/active-theses', (req, res) => {
     db.query(query, (err, results) => {
         if (err) {
             console.error("Error fetching active theses:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            return res.status(500).json({ success: false, message: "Σφάλμα" });
         }
 
-        //console.log('Active theses results:', results);
+    
         res.json({ success: true, data: results });
     });
 });
@@ -597,7 +597,7 @@ app.get('/get-invitations', (req, res) => {
 
     if (!teacherAM) {
         console.error('Teacher AM not found in session');
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -622,7 +622,7 @@ app.get('/get-invitations', (req, res) => {
 app.get('/get-thesis-st', (req, res) => {
     const studentAm = req.session.user.am; 
     if (!studentAm) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -648,7 +648,7 @@ app.get('/get-thesis-st', (req, res) => {
     db.query(query, [studentAm], (err, results) => {
         if (err) {
             console.error('Error fetching thesis:', err);
-            return res.status(500).json({ success: false, message: 'Database error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα στην βάση' });
         }
 
         console.log(results);
@@ -674,7 +674,7 @@ app.get('/get-thesis-st', (req, res) => {
                 }
             });
         } else {
-            res.json({ success: false, message: 'No thesis found for the student.' });
+            res.json({ success: false, message: 'Δεν βρέθηκαν διπλωματικές για τον φοιτητή.' });
         }
     });
 });
@@ -683,7 +683,7 @@ app.get('/get-statistics-time', (req, res) => {
     const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -704,7 +704,7 @@ app.get('/get-statistics-time', (req, res) => {
     db.query(query, [teacherAM, teacherAM, teacherAM], (err, results) => {
         if (err) {
             console.error('Error fetching statistics:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα' });
         }
 
         const totalDays = results.reduce((acc, row) => {
@@ -748,7 +748,7 @@ app.get('/get-statistics-time', (req, res) => {
         db.query(query2, [teacherAM], (err, results) => {
             if (err) {
                 console.error('Error fetching statistics:', err);
-                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return res.status(500).json({ success: false, message: 'Σφάλμα' });
             }
 
             const totalDays = results.reduce((acc, row) => {
@@ -773,7 +773,7 @@ app.get('/get-statistics-time', (req, res) => {
             db.query(query3, [teacherAM, teacherAM], (err, results) => {
                 if(err) {
                     console.error('Error fetching statistics:', err);
-                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                    return res.status(500).json({ success: false, message: 'Σφάλμα' });
                 }
 
                 const totalDays = results.reduce((acc, row) => {
@@ -812,7 +812,7 @@ app.get('/get-statistics-grades', (req, res) => {
     const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -835,7 +835,7 @@ app.get('/get-statistics-grades', (req, res) => {
     db.query(query, [teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM], (err, results) => {
         if (err) {
             console.error('Error fetching statistics:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα'});
         }
 
         res.json({ success: true, data: results[0] });
@@ -847,7 +847,7 @@ app.get('/get-statistics-count', (req, res) => {
     const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -868,7 +868,7 @@ app.get('/get-statistics-count', (req, res) => {
     db.query(query, [teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM, teacherAM], (err, results) => {
         if (err) {
             console.error('Error fetching statistics:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Μη πιστοποιημένος' });
         }
 
         res.json({ success: true, data: results[0] });
@@ -889,10 +889,10 @@ app.get('/generate-announcement/:id', (req, res) => {
     db.query(checkSupervisorQuery, [thesisId, teacherAM], (err, results) => {
         if (err) {
             console.error("Error checking supervisor:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            return res.status(500).json({ success: false, message: "Σφάλμα" });
         }
         if (results.length === 0) {
-            return res.status(403).json({ success: false, message: "You are not the supervisor of this thesis." });
+            return res.status(403).json({ success: false, message: "Δεν είστε ο υπεύθυνος αυτής της διπλωματικής." });
         }
 
         // Fetch the thesis details including presentation details
@@ -908,7 +908,7 @@ app.get('/generate-announcement/:id', (req, res) => {
                 return res.status(500).json({ success: false, message: "Internal Server Error" });
             }
             if (results.length === 0) {
-                return res.status(404).json({ success: false, message: "Thesis not found." });
+                return res.status(404).json({ success: false, message: "Δεν βρέθηκε διπλωματική." });
             }
 
             const thesis = results[0];
@@ -943,7 +943,7 @@ app.get('/get-profile-st', (req, res) => {
     const studentAm = req.session.user?.am;
 
     if (!studentAm) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -955,11 +955,11 @@ app.get('/get-profile-st', (req, res) => {
     db.query(query, [studentAm], (err, results) => {
         if (err) {
             console.error('Error fetching profile:', err);
-            return res.status(500).json({ success: false, message: 'Database error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα βάσης' });
         }
 
         if (results.length === 0) {
-            return res.json({ success: false, message: 'No profile found for the student.' });
+            return res.json({ success: false, message: 'Δεν βρέθηκε φοιτητής για την διπλωματική.' });
         }
 
         return res.json({ success: true, profile: results[0] });
@@ -972,7 +972,7 @@ app.get('/get-active-theses', (req, res) => {
 
     if (!secretaryAM) {
         console.error('User is not authenticated or session is invalid');
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -994,7 +994,7 @@ app.get('/get-active-theses', (req, res) => {
     db.query(query, (err, results) => {
         if (err) {
             console.error('Error fetching active theses:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα' });
         }
         res.json({ success: true, data: results });
     });
@@ -1023,7 +1023,7 @@ app.get('/get-grades/:thesis_id', (req, res) => {
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
         if (results.length === 0) {
-            return res.status(403).json({ success: false, message: "You are not a committee member for this thesis." });
+            return res.status(403).json({ success: false, message: "Δεν είστε μέλος Τριμελούς." });
         }
 
         // Ανάκτηση βαθμών από Grades
@@ -1041,14 +1041,14 @@ app.get('/get-grades/:thesis_id', (req, res) => {
             }
 
             if (gradeResults.length === 0) {
-                return res.json({ success: false, message: "No grades available yet." });
+                return res.json({ success: false, message: "Δεν υπάρχουν βαθμολογίες ακόμη." });
             }
 
             // Υπολογισμός τελικού βαθμού
             let avgGrade = gradeResults.reduce((sum, g) => sum + parseFloat(g.grade), 0) / gradeResults.length;
             let finalGrade = avgGrade * 0.85;
             let bonus = 0;
-            let bonusMessage = "No bonus applied.";
+            let bonusMessage = "Δεν παίρνει βαθμό bonus έγκαιρης παράδοσης.";
 
             // Έλεγχος αν υπάρχει bonus
             const timeQuery = `
@@ -1065,7 +1065,7 @@ app.get('/get-grades/:thesis_id', (req, res) => {
                 }
 
                 if (timeResults.length === 0 || !timeResults[0].final_submission_date) {
-                    return res.json({ success: false, message: "No submission date available." });
+                    return res.json({ success: false, message: "Μη διαθέσιμη ημερομηνίας παράδοσης." });
                 }
 
                 const assignedDate = new Date(timeResults[0].assigned_date);
@@ -1075,7 +1075,7 @@ app.get('/get-grades/:thesis_id', (req, res) => {
                 if (diffYears <= 1.5) {
                     bonus = 1.5;
                     finalGrade += bonus;
-                    bonusMessage = "Bonus 1.5 points applied for early submission!";
+                    bonusMessage = "1.5 μονάδα βαθμός έγκαιρης περάτωσης !";
                 }
 
                 //  Ενημέρωση final_grade στον Grades
@@ -1085,8 +1085,8 @@ app.get('/get-grades/:thesis_id', (req, res) => {
 
                 db.query(updateFinalGradeQuery, [finalGrade.toFixed(2), thesis_id], (err, result) => {
                     if (err) {
-                        console.error("Error updating final grade:", err);
-                        return res.status(500).json({ success: false, message: "Internal Server Error" });
+                        console.error("Σφάλμα ανανέωησης τελικής βαθμολογίας:", err);
+                        return res.status(500).json({ success: false, message: "Σφάλμα" });
                     }
 
                     res.json({ 
@@ -1109,7 +1109,7 @@ app.get('/get-theses-status', (req, res) => {
     const studentAm = req.session.user.am;
 
     if (!studentAm) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη πιστοποιημένος' });
     }
 
     const query = `
@@ -1161,7 +1161,7 @@ app.get('/get-thesis-id', (req, res) => {
     db.query(query, [studentAm], (err, results) => {
         if (err) {
             console.error('Error fetching thesis_id:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα' });
         }
 
         if (results.length === 0) {
@@ -1292,7 +1292,7 @@ app.get('/exam-report/:thesis_id', (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ success: false, message: 'Thesis not found' });
+            return res.status(404).json({ success: false, message: 'Δεν βρέθηκε διπλωματική' });
         }
 
         const examReport = results[0];
@@ -1314,7 +1314,7 @@ app.post('/add-thesis', (req, res) => {
     const teacher_am = req.session.user.am;
 
     if (!req.files || !req.files.file) {
-        return res.status(400).json({ success: false, message: 'No file uploaded.' });
+        return res.status(400).json({ success: false, message: 'Δεν μεταφορτώθηκε αρχείο.' });
     }
 
     const pdfFile = req.files.file;
@@ -1350,7 +1350,7 @@ app.post('/add-thesis', (req, res) => {
                     return res.status(500).json({ success: false, message: 'Internal Server Error' });
                 }
                 
-                res.json({ success: true, message: 'Thesis added successfully!' });
+                res.json({ success: true, message: 'Επιτυχής καταχώρηση Διπλωματικής!' });
             });
         });
     });
@@ -1368,7 +1368,7 @@ app.post('/update-thesis', (req, res) => {
         pdfFile.mv(path.join(__dirname, pdfPath), (err) => {
             if (err) {
                 console.error('Error uploading file:', err);
-                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return res.status(500).json({ success: false, message: 'Σφάλμα' });
             }
         });
     }
@@ -1405,7 +1405,7 @@ app.post('/update-thesis', (req, res) => {
                 return res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
 
-            res.json({ success: true, message: 'Thesis updated successfully!' });
+            res.json({ success: true, message: 'Επιτυχής ανανέωση διπλωματικής!' });
         });
     });
 });
@@ -1469,7 +1469,7 @@ app.post('/cancel-assignment/:id', (req, res) => {
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
         if (results.length === 0) {
-            return res.status(403).json({ success: false, message: 'Only the supervisor can cancel the assignment' });
+            return res.status(403).json({ success: false, message: 'Μόνο ο Επιβλέπων μπορεί να ακυρώσει την ανάθεση' });
         }
 
         // Cancel the assignment
@@ -1484,7 +1484,7 @@ app.post('/cancel-assignment/:id', (req, res) => {
                 return res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
 
-            res.json({ success: true, message: "Assignment cancelled successfully!" });
+            res.json({ success: true, message: "Η ανάθεση ακυρώθηκε επιτυχώς!" });
         });
     });
 });
@@ -1524,7 +1524,7 @@ app.post('/accept-invitation/:id', (req, res) => {
             checkAndUpdateThesisStatus(thesis_id);
         });
 
-        res.json({ success: true, message: 'Invitation accepted successfully!' });
+        res.json({ success: true, message: 'Επιτυχής αποδοχή πρόσκλησης!' });
     });
 });
 
@@ -1547,7 +1547,7 @@ app.post('/reject-invitation/:id', (req, res) => {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
             return;
         }
-        res.json({ success: true, message: 'Invitation rejected successfully!' });
+        res.json({ success: true, message: 'Η πρόσκληση έχει απορριφθεί!' });
     });
 });
 
@@ -1569,7 +1569,7 @@ app.post('/add-note', (req, res) => {
             console.error('Error adding note:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-        res.json({ success: true, message: 'Note added successfully!' });
+        res.json({ success: true, message: 'Επιτυχής προσθήκη σημείωσης!' });
     });
 });
 
@@ -1579,7 +1579,7 @@ app.get('/get-notes/:thesis_id', (req, res) => {
     const teacher_am = req.session.user.am;
 
     if (!teacher_am) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη εξουσιοδοτημένος' });
     }
 
     const query = `
@@ -1590,7 +1590,7 @@ app.get('/get-notes/:thesis_id', (req, res) => {
     db.query(query, [thesis_id, teacher_am], (err, results) => {
         if (err) {
             console.error('Error fetching notes:', err);
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα' });
         }
         res.json({ success: true, data: results });
     });
@@ -1613,7 +1613,7 @@ app.post('/change-status/:id', (req, res) => {
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
         if (results.length === 0) {
-            return res.status(403).json({ success: false, message: "You are not the supervisor of this thesis." });
+            return res.status(403).json({ success: false, message: "Δεν είστε ο υπεύθυνος." });
         }
 
         // Change the status of the thesis
@@ -1625,10 +1625,10 @@ app.post('/change-status/:id', (req, res) => {
         db.query(changeStatusQuery, [thesisId], (err) => {
             if (err) {
                 console.error("Error changing status:", err);
-                return res.status(500).json({ success: false, message: "Internal Server Error" });
+                return res.status(500).json({ success: false, message: "Σφάλμα" });
             }
 
-            res.json({ success: true, message: "Status changed successfully!" });
+            res.json({ success: true, message: "Επιτυχής αλλαγή κατάστασης" });
         });
     });
 });
@@ -1639,7 +1639,7 @@ app.post('/submit-grade', (req, res) => {
     const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη εξουσιοδοτημένος' });
     }
 
     // Check if the current teacher is a member of the committee
@@ -1653,7 +1653,7 @@ app.post('/submit-grade', (req, res) => {
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
         if (results.length === 0) {
-            return res.status(403).json({ success: false, message: "You are not a member of the committee for this thesis." });
+            return res.status(403).json({ success: false, message: "Δεν είστε μέλος της τριμελούς." });
         }
 
         // Check if the teacher has already submitted a grade
@@ -1667,7 +1667,7 @@ app.post('/submit-grade', (req, res) => {
                 return res.status(500).json({ success: false, message: "Internal Server Error" });
             }
             if (gradeResults.length > 0) {
-                return res.status(400).json({ success: false, message: "You have already submitted a grade for this thesis." });
+                return res.status(400).json({ success: false, message: "Υπάρχει ήδη καταχωρημένος βαθμός." });
             }
 
             // Insert the grade
@@ -1680,7 +1680,7 @@ app.post('/submit-grade', (req, res) => {
                     console.error("Error submitting grade:", err);
                     return res.status(500).json({ success: false, message: "Internal Server Error" });
                 }
-                res.json({ success: true, message: 'Grade submitted successfully!' });
+                res.json({ success: true, message: 'Επιτυχής καταχώρηση βαθμού!' });
             });
         });
     });
@@ -1693,7 +1693,7 @@ app.post('/update-grade', (req, res) => {
     const teacherAM = req.session.user.am;
 
     if (!teacherAM) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη εξουσιοδοτημένος' });
     }
 
     const updateGradeQuery = `
@@ -1707,7 +1707,7 @@ app.post('/update-grade', (req, res) => {
             console.error("Error updating grade:", err);
             return res.status(500).json({ success: false, message: "Internal Server Error" });
         }
-        res.json({ success: true, message: 'Grade updated successfully!' });
+        res.json({ success: true, message: 'Επιτυχής ανανέωση βαθμολογίας!' });
     });
 });
 
@@ -1716,7 +1716,7 @@ app.post('/update-grade', (req, res) => {
 // Διαδρομή για εισαγωγή JSON δεδομένων
 app.post('/import-json', (req, res) => {
     if (!req.files || !req.files.jsonFile) {
-        return res.status(400).send('No file uploaded.');
+        return res.status(400).send('Δεν μεταφορτώθηκε αρχείο.');
     }
 
     try {
@@ -1752,22 +1752,22 @@ app.post('/import-json', (req, res) => {
         db.query(insertStudents, [studentData], (err) => {
             if (err) {
                 console.error('Error inserting students:', err);
-                return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                return res.status(500).json({ success: false, message: 'Σφάλμα' });
             }
 
             // Εκτέλεση ερωτήματος για εισαγωγή διδασκόντων
             db.query(insertTeachers, [teacherData], (err) => {
                 if (err) {
                     console.error('Error inserting teachers:', err);
-                    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+                    return res.status(500).json({ success: false, message: 'Σφάλμα' });
                 }
 
-                res.json({ success: true, message: 'Data imported successfully!' });
+                res.json({ success: true, message: 'Επιτυχής μεταφόρτωση δεδομένων!' });
             });
         });
     } catch (error) {
         console.error('Error processing JSON file:', error);
-        res.status(400).send('Invalid JSON file.');
+        res.status(400).send('Λανθασμένο JSON αρχείο.');
     }
 });
     
@@ -1784,7 +1784,7 @@ app.post('/invite-teacher', (req, res) => {
         }
 
         if (result.length === 0) {
-            return res.status(404).json({ success: false, message: 'Thesis not found' });
+            return res.status(404).json({ success: false, message: 'Δεν βρέθηκαν διπλωματικές' });
         }
 
         let query;
@@ -1816,7 +1816,7 @@ app.post('/invite-teacher', (req, res) => {
                 return res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
 
-            res.json({ success: true, message: 'Teacher invited successfully!' });
+            res.json({ success: true, message: 'Επιτυχής πρόσκληση διδάσκοντα!' });
         });
     });
 });
@@ -1835,14 +1835,14 @@ app.post('/erase-assignment/:id', (req, res) => {
             console.error('Error erasing assignment:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-        res.json({ success: true, message: 'Assignment erased successfully!' });
+        res.json({ success: true, message: 'Επιτυχής αναίρεση ανάθεσης!' });
     });
 });
     
 app.post('/set-presentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         console.error('No files were uploaded.');
-        return res.status(400).json({ success: false, message: 'No files were uploaded.' });
+        return res.status(400).json({ success: false, message: 'Δεν μεταφορτώθηκαν αρχεία.' });
     }
 
     const thesisDraft = req.files.thesisDraft;
@@ -1857,12 +1857,12 @@ app.post('/set-presentation', (req, res) => {
 
     if (!thesisId) {
         console.error('Thesis ID is required.');
-        return res.status(400).json({ success: false, message: 'Thesis ID is required.' });
+        return res.status(400).json({ success: false, message: 'Χρειαζόμαστε το Thesis ID .' });
     }
 
     if (!studentAm) {
         console.error('Student AM is required.');
-        return res.status(400).json({ success: false, message: 'Student AM is required.' });
+        return res.status(400).json({ success: false, message: 'Χρειαζόμασρε το Student AM .' });
     }
 
     const getTitleQuery = 'SELECT title FROM Theses WHERE thesis_id = ?';
@@ -1874,7 +1874,7 @@ app.post('/set-presentation', (req, res) => {
 
         if (results.length === 0) {
             console.error('Thesis not found.');
-            return res.status(404).json({ success: false, message: 'Thesis not found.' });
+            return res.status(404).json({ success: false, message: 'Δεν βρέθηκε διπλωματική.' });
         }
 
         const thesisTitle = results[0].title.replace(/[^a-z0-9]/gi, '_').toLowerCase(); 
@@ -1900,7 +1900,7 @@ app.post('/set-presentation', (req, res) => {
                     console.error('Error updating thesis draft path:', err);
                     return res.status(500).json({ success: false, message: 'Internal Server Error' });
                 }
-                res.json({ success: true, message: 'Thesis draft uploaded successfully!', path: relativePath });
+                res.json({ success: true, message: 'Επιτυχής μεταφόρτωση πρόχειρου αρχείου διπλωματικής!', path: relativePath });
             });
         });
     });
@@ -2033,7 +2033,7 @@ app.post('/update-profile-st', (req, res) => {
     const { home_address, email, mobile_phone, landline_phone } = req.body;
 
     if (!studentAm) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη εξουσιοδοτημένος' });
     }
 
     const query = `
@@ -2051,7 +2051,7 @@ app.post('/update-profile-st', (req, res) => {
                 return res.status(500).json({ success: false, message: 'Database error' });
             }
 
-            return res.json({ success: true, message: 'Profile updated successfully' });
+            return res.json({ success: true, message: 'Επιτυχής ανανέωση προφίλ' });
         }
     );
 });
@@ -2061,7 +2061,7 @@ app.put('/submit-repository-link', (req, res) => {
     const { thesis_id, repository_link } = req.body;
 
     if (!studentAm) {
-        return res.status(401).json({ success: false, message: 'Not authenticated' });
+        return res.status(401).json({ success: false, message: 'Μη εξουσιοδοτημένος'});
     }
 
     const query = `
@@ -2073,10 +2073,10 @@ app.put('/submit-repository-link', (req, res) => {
     db.query(query, [repository_link, thesis_id, studentAm], (err, result) => {
         if (err) {
             console.error('Error updating repository link:', err);
-            return res.status(500).json({ success: false, message: 'Error updating repository link' });
+            return res.status(500).json({ success: false, message: 'Σφάλμα ανανέωσης συνδέσμου' });
         }
 
-        res.json({ success: true, message: 'Repository link updated successfully' });
+        res.json({ success: true, message: 'Σφάλμα ανανέωσης συνδέσμου' });
     });
 });
 
@@ -2119,11 +2119,11 @@ app.delete('/delete-thesis/:id', (req, res) => {
                     return;
                 }
                 if (result.affectedRows === 0) {
-                    res.status(404).json({ success: false, message: 'Thesis not found' });
+                    res.status(404).json({ success: false, message: 'Δεν βρέθηκαν διπλωματικές' });
                     return;
                 }
 
-                res.json({ success: true, message: 'Thesis deleted successfully!' });
+                res.json({ success: true, message: 'Η διπλωματική διαγράφηκε επιτυχώς!' });
             });
         });
     });

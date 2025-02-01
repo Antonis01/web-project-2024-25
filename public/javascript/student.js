@@ -12,7 +12,7 @@ function fetchThesisSt() {
                 <div class="thesis-details">
                   <strong>Τίτλος Θέματος:</strong> ${thesis.title || "Χωρίς Τίτλο"}<br>
                   <strong>Σύνοψη:</strong> ${thesis.summary || "Χωρίς Περιγραφή"}<br>
-                  <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
+                  <strong>PDF:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">Προβολή PDF</a><br>
                   <strong>Κατάσταση:</strong> ${thesis.status || "Χωρίς Κατάσταση"}<br>
                   <strong>Επιβλέπων Καθηγητής:</strong> ${thesis.teacher_name || "Χωρίς Δεδομένα"}<br>
                   <strong>Μέλος Τριμελούς Επιτροπής:</strong> ${thesis.teacher_name2 || "Χωρίς Δεδομένα"}<br>
@@ -208,7 +208,7 @@ function getThesisID() {
             }
         })
         .catch(error => {
-            console.error('Error fetching thesis ID:', error);
+            console.error('Error fetching thesis IDs:', error);
             return null;
         });
 }
@@ -254,17 +254,17 @@ function presentationElements() {
 
     uploadForm.innerHTML = `
         <input type="file" id="pdfFileInput" accept="application/pdf" class="upload-input">
-        <textarea id="additionalLinks" placeholder="Enter additional links" class="upload-textarea"></textarea>
+        <textarea id="additionalLinks" placeholder="Προσθήκη επιπλέον συνδέσμων" class="upload-textarea"></textarea>
         <input type="date" id="examDate" class="upload-input">
         <input type="time" id="examTime" class="upload-input">
         <select id="examType" class="upload-select">
-            <option value="">Select Exam Type</option>
-            <option value="in-person">In-Person</option>
-            <option value="online">Online</option>
+            <option value="">Επίλεξε τρόπο παρουσίασης</option>
+            <option value="in-person">Δια ζώσης</option>
+            <option value="online">Διαδικτυακά</option>
         </select>
         <textarea id="examLocation" placeholder="Enter exam location" class="upload-textarea" style="display: none;"></textarea>
         <textarea id="examLink" placeholder="Enter exam link" class="upload-textarea" style="display: none;"></textarea>
-        <button type="button" class="upload-button" onclick="uploadPresentationData()">Upload Data</button>
+        <button type="button" class="upload-button" onclick="uploadPresentationData()">Mεταφόρτωση</button>
     `;
 
     form.appendChild(uploadForm);
@@ -285,7 +285,7 @@ function uploadPresentationData() {
     const file = pdfFileInput.files[0];
 
     if (!file) {
-        alert('Please select a PDF file to upload.');
+        alert('Παρακαλώ επιλέξτε αρχείο για μεταφόρτωση.');
         return;
     }
 
@@ -311,11 +311,11 @@ function uploadPresentationData() {
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.success ? 'Data uploaded successfully!' : 'Error uploading data: ' + data.message);
+            alert(data.success ? 'Τα δεδομένα μεταφορτωθηκαν επιτυχώς!' : 'Σφάλμα κατά την μεταφόρτωση: ' + data.message);
         })
         .catch(error => {
             console.error('Error uploading data:', error);
-            alert('Error uploading data.');
+            alert('Σφάλμα κατά την μεταφόρτωση.');
         });
     });
 }
@@ -328,8 +328,8 @@ function showRepositoryLinkForm() {
 
     uploadForm.innerHTML = `
         <input type="text" id="repositoryLink" placeholder="Enter repository link" class="upload-input">
-        <button type="button" class="upload-button" onclick="submitRepositoryLink()">Submit Link</button>
-        <button type="button" class="upload-button" onclick="viewExamReport()">View Exam Report</button>
+        <button type="button" class="upload-button" onclick="submitRepositoryLink()">Προσθήκη συνδέσμου</button>
+        <button type="button" class="upload-button" onclick="viewExamReport()">Προβολή αναφοράς εξέτασης</button>
     `;
 
     form.appendChild(uploadForm);
@@ -356,7 +356,7 @@ function submitRepositoryLink() {
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.success ? 'Repository link submitted successfully!' : 'Error submitting repository link: ' + data.message);
+            alert(data.success ? 'Επιτυχής καταχώρηση συνδέσμου!' : 'Αποτυχία καταχώρησης συνδέσμου: ' + data.message);
         })
         .catch(error => {
             console.error('Error submitting repository link:', error);
@@ -384,7 +384,7 @@ function thesesCompleted() {
     completedForm.className = 'completed-form';
 
     completedForm.innerHTML = `
-        <button type="button" class="upload-button" onclick="viewExamReport()">View Exam Report</button>
+        <button type="button" class="upload-button" onclick="viewExamReport()">Προβολή αναφοράς εξέτασης</button>
     `;
     form.appendChild(completedForm);
 

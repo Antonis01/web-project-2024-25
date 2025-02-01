@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Main Page</title>
+    <title>Kύρια Σελίδα Καθηγητή</title>
     <link rel="stylesheet" type="text/css" href="/public/css/global.css">
 </head>
 <body>
     <div class="topBar">
-        <div class="title">Teacher Main Page</div>
+        <div class="title">Κύρια Σελίδα Καθηγητή</div>
         <div class="buttonContainer">
             <div id="burgerMenu" class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
             <div class="dropdownMenu" id="dropdownMenu">
@@ -20,7 +20,7 @@
                 <button class="dropdownButton" onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
                 <button class="dropdownButton" onclick="toggleElement('activeTheses')">Ενεργές Αναθέσεις</button>
                 <button class="dropdownButton" onclick="toggleElement('invitationList')">Προσκλήσεις</button>
-                <button class="dropdownButton" onclick="logout()">Logout</button>
+                <button class="dropdownButton" onclick="logout()">Αποσύνδεση</button>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
         <button onclick="toggleElement('formStatistics')">Στατιστικά</button>
         <button onclick="toggleElement('dipolamaticsManagement')">Διαχείρηση Διπλωματικών</button>
         <button onclick="toggleElement('activeTheses')">Ενεργές Αναθέσεις</button>
-        <button onclick="logout()">Logout</button>
+        <button onclick="logout()">Αποσύνδεση</button>
     </div>
 
     <div id="thesesAddView" class="forms" style="display:none; position: relative";>
@@ -122,8 +122,8 @@
         </select>
         <div class="center-button">
             <button type="button" onclick="searchThesesList()">Αναζήτηση</button>
-            <button type="button" onclick="exportTheses('csv')">Export CSV</button>
-            <button type="button" onclick="exportTheses('json')">Export JSON</button>
+            <button type="button" onclick="exportTheses('csv')">Εξαγωγή CSV</button>
+            <button type="button" onclick="exportTheses('json')">Εξαγωγή JSON</button>
         </div>
         <ul id="diplomaListItems">
             <!-- Dynamically populated list of diplomas -->
@@ -146,7 +146,7 @@
                 <!-- Dynamically populated list of invitations -->
             </tbody>
         </table>
-        <button type="button" onclick="loadInvitations()">Update Invite List</button>
+        <button type="button" onclick="loadInvitations()">Ανανέωση Λίστας Προσκλήσεων</button>
     </div>
     
     <div id="formStatistics" class="forms" style="display:none; position: relative">
@@ -192,16 +192,16 @@
             <label for="editFile">Αρχείο PDF:</label>
             <input type="file" id="editFile" name="file" accept=".pdf"><br><br>
             
-            <label for="editTeacherAM">Teacher AM:</label>
+            <label for="editTeacherAM">AM Καθηγητή:</label>
             <input type="number" id="editTeacherAM" name="teacher_am" required><br><br>
             
-            <label for="editStudentAM">Student AM:</label>
+            <label for="editStudentAM">AM Φοιτητή:</label>
             <input type="number" id="editStudentAM" name="student_am"><br><br>
             
-            <label for="editFinalSubmissionDate">Final Submission Date:</label>
+            <label for="editFinalSubmissionDate">Τελική Ημερομηνία Υποβολής:</label>
             <input type="date" id="editFinalSubmissionDate" name="final_submission_date"><br><br>
             
-            <label for="editStatus">Status:</label>
+            <label for="editStatus">Κατάσταση:</label>
             <select id="editStatus" name="status" required>
                 <option value="Υπό Ανάθεση">Υπό Ανάθεση</option>
                 <option value="Ενεργή">Ενεργή</option>

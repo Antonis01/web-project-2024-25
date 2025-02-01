@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Main Page</title>
+    <title>Κύρια Σελίδα Φοιτητή</title>
     <link rel="stylesheet" type="text/css" href="/public/css/global.css">
 </head>
 <body>
     <div class="topBar">
-        <div class="title">Student Main Page</div>
+        <div class="title">Κύρια Σελίδα Φοιτητή</div>
             <div class="buttonContainer">
                 <div id="burgerMenu" class="burgerMenu" onclick="toggleElement('dropdownMenu', 'flex')">&#9776;</div>
                 <div class="dropdownMenu" id="dropdownMenu">
                     <button class="dropdownButton" onclick="toggleElement('topicDiplomatic')">Θέμα Διπλωματικής</button>
                     <button class="dropdownButton" onclick="toggleElement('editProfile')">Επεξεργασία Προφίλ</button>
                     <button class="dropdownButton" id="statusAction" onclick="toggleElement('diploManagement')">Διαχείρηση Διπλωματικής</button>
-                    <button class="dropdownButton" onclick="logout()">Logout</button>
+                    <button class="dropdownButton" onclick="logout()">Αποσύνδεση</button>
             </div>
         </div>  
     </div>
@@ -25,7 +25,7 @@
                     <button class="dropdownButton" onclick="toggleElement('topicDiplomatic')">Θέμα Διπλωματικής</button>
                     <button class="dropdownButton" onclick="toggleElement('editProfile')">Επεξεργασία Προφίλ</button>
                     <button class="dropdownButton" id="statusAction" onclick="toggleElement('diploManagement')">Διαχείρηση Διπλωματικής</button>
-                    <button class="dropdownButton" onclick="logout()">Logout</button>
+                    <button class="dropdownButton" onclick="logout()">Aποσύνδεση</button>
     </div>
 
     <div id="topicDiplomatic" class="forms" style="display:none; position: relative";>

@@ -35,28 +35,28 @@ function fetchTheses() {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <div class="thesis-title">
-                            <strong>Title:</strong> ${thesis.title}
-                            <button onclick="toggleDetails(this)">Show details</button>
+                            <strong>Tίτλος:</strong> ${thesis.title}
+                            <button onclick="toggleDetails(this)">Προβολή Λεπτομερειών</button>
                         </div>
                         <div class="thesis-details" style="display: none;">
-                            <strong>Summary:</strong> ${thesis.summary}<br>
-                            <strong>Status:</strong> ${thesis.status}<br>
-                            <strong>Teacher AM:</strong> ${thesis.teacher_am}<br>
-                            <strong>Student AM:</strong> ${thesis.student_am}<br>
-                            <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                            <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
-                            <button onclick="editThesis(${thesis.thesis_id})">Edit</button>
+                            <strong>Σύνοψη:</strong> ${thesis.summary}<br>
+                            <strong>Κατάσταση:</strong> ${thesis.status}<br>
+                            <strong>AM Καθηγητή:</strong> ${thesis.teacher_am}<br>
+                            <strong>AM Φοιτητή:</strong> ${thesis.student_am}<br>
+                            <strong>Τελική Ημερομηνία Υποβολής:</strong> ${thesis.final_submission_date}<br>
+                            <strong>PDF:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">Προβολή PDF</a><br>
+                            <button onclick="editThesis(${thesis.thesis_id})">Επεξεργασία</button>
                         </div>
                     `;
                     thesesList.appendChild(listItem);
                 });
             } else {
-                alert('Error fetching theses: ' + data.message);
+                alert('Σφάλμα κατά την ανάκτηση των διπλωματικών εργασιών.: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while fetching the theses.');
+            alert('Σφάλμα');
         });
 }
 
@@ -64,10 +64,10 @@ function toggleDetails(button) {
     const thesisDetails = button.closest('.thesis-title').nextElementSibling;
     if (thesisDetails.style.display === 'none' || thesisDetails.style.display === '') {
         thesisDetails.style.display = 'block';
-        button.textContent = 'Hide details';
+        button.textContent = 'Aπόκρυψη λεπτομερειών';
     } else {
         thesisDetails.style.display = 'none';
-        button.textContent = 'Show details';
+        button.textContent = 'Εμφάνιση λεπτομερειών';
     }
 }
 
@@ -109,12 +109,12 @@ function editThesis(thesisId) {
                 document.getElementById('editStatus').value = thesis.status;
                 document.getElementById('editThesisFormContainer').style.display = 'block';
             } else {
-                alert('Error fetching thesis: ' + data.message);
+                alert('Σφάλμα κατά την ανάκτηση των διπλωματικών εργασιών.: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while fetching the thesis.');
+            alert('Σφάλμα κατά την ανάκτηση των διπλωματικών εργασιών.');
         });
 }
 
@@ -130,39 +130,39 @@ document.getElementById('editThesisForm').addEventListener('submit', function(ev
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Theses and Committee updated successfully!');
+            alert('Επιτυχές Ενημέρωση!');
             document.getElementById('editThesisFormContainer').style.display = 'none';
             fetchTheses(); // Refresh the list of theses
         } else {
-            alert('Error updating theses or the commitee: ' + data.message);
+            alert('Σφάλμα κατά την ενημέρωση ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating the theses or the commitee.');
+        alert('Σφάλμα κατά την ενημέρωση.');
     });
 });
 
 function deleteThesis() {
     const thesisId = document.getElementById('editThesisId').value;
     
-    if (confirm('Are you sure you want to delete this thesis?')) {
+    if (confirm('Είστε σίγουρος ότι θέλετε να ακυρώσετε την Διπλωματική;')) {
         fetch(`/delete-thesis/${thesisId}`, {
             method: 'DELETE'
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Theses deleted successfully!');
+                alert('Επιτυχής διαγραφή της διπλωματικής!');
                 document.getElementById('editThesisFormContainer').style.display = 'none';
                 fetchTheses(); // Refresh the list of theses
             } else {
-                alert('Error deleting thesis: ' + data.message);
+                alert('Σφάλμα κατά την διαγραφή: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while deleting the thesis.');
+            alert('Σφάλμα κατά την διαγραφή.');
         });
     }
 }
@@ -199,14 +199,14 @@ function fetchActiveTheses() {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <div class="thesis-title">
-                            <strong>Title:</strong> ${thesis.title}
+                            <strong>Tίτλος:</strong> ${thesis.title}
                             <button onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση Ανάθεσης</button>
                         </div>
                     `;
                     activeThesesList.appendChild(listItem);
                 });
             } else {
-                activeThesesList.innerHTML = 'No active theses found.';
+                activeThesesList.innerHTML = 'Δεν βρέθηκαν ενεργές διπλωματικές.';
             }
         });
 }
@@ -225,7 +225,7 @@ function fetchActiveThesesSection() {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <div class="thesis-title">
-                            <strong>Title:</strong> ${thesis.title}
+                            <strong>Tίτλος:</strong> ${thesis.title}
                             <button onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση Ανάθεσης</button>
                         </div>
                     `;
@@ -239,15 +239,15 @@ function fetchActiveThesesSection() {
 
 // Cancel assignment
 function cancelAssignment(thesisId) {
-    if (confirm('Are you sure you want to cancel this assignment?')) {
+    if (confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την ανάθεση;')) {
         sendRequest(`/cancel-assignment/${thesisId}`, 'POST')
             .then(response => {
                 if (response.success) {
-                    alert('Assignment cancelled successfully!');
+                    alert('Eπιτυχής ακύρωση ανάθεσης!');
                     fetchActiveTheses(); // Refresh the list of active theses
                     fetchActiveThesesSection(); // Refresh the list of active theses in the new section
                 } else {
-                    alert('Error cancelling assignment: ' + response.message);
+                    alert('Σφάλμα κατά την ακύρωση: ' + response.message);
                 }
             });
     }
@@ -306,7 +306,7 @@ const debounceSearchThesis = debounce(function() {
                     resultsContainer.appendChild(resultItem);
                 });
             } else {
-                resultsContainer.innerHTML = "No results found.";
+                resultsContainer.innerHTML = "Δεν βρέθηκαν αποτελέσματα.";
             }
         })
         .catch(error => {
@@ -341,7 +341,7 @@ const debounceSearchStudentByAm = debounce(function() {
                     suggestionsContainer.appendChild(suggestionItem);
                 });
             } else {
-                suggestionsContainer.innerHTML = "No results found.";
+                suggestionsContainer.innerHTML = "Δεν βρέθηκαν αποτελέσματα.";
             }
         });
 }, 300);
@@ -372,12 +372,12 @@ const debounceSearchStudentByName = debounce(function() {
                     suggestionsContainer.appendChild(suggestionItem);
                 });
             } else {
-                suggestionsContainer.innerHTML = "No results found.";
+                suggestionsContainer.innerHTML = "Δεν βρέθηκαν απορελέσματα.";
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            document.getElementById("studentNameSuggestions").innerHTML = "An error occurred while searching.";
+            document.getElementById("studentNameSuggestions").innerHTML = "Σφάλμα κατά την αναζήτηση.";
         });
 }, 300);
 
@@ -388,21 +388,21 @@ function assignTheses() {
     console.log('Assigning thesis:', thesisId, 'to student:', studentAm); // Add this line
 
     if (!thesisId || !studentAm) {
-        alert('Please select a thesis and a student.');
+        alert('Επίλεξε Διπλωματική και Φοιτητή.');
         return;
     }
 
     sendRequest('/assign-theses', 'POST', { thesisId, studentAm })
         .then(response => {
             if (response.success) {
-                alert('Thesis assigned successfully');
+                alert('Η ανάθεση πραγματοποιήθηκε επιτυχώς');
             } else {
-                alert('Error assigning thesis: ' + response.message);
+                alert('Σφάλμα κατά την ανάθεση: ' + response.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while assigning the thesis.');
+            alert('Σφάλμα κατά την ανάθεση.');
         });
 }
 
@@ -420,21 +420,21 @@ function searchThesesList() {
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
                     <div class="thesis-title">
-                        <strong>Title:</strong> ${theses.title}
-                        <button onclick="toggleDetails(this)">Show details</button>
+                        <strong>Τίτλος:</strong> ${theses.title}
+                        <button onclick="toggleDetails(this)">Εμφάνιση λεπτομερειών</button>
                     </div>
                     <div class="thesis-details" style="display: none;">
-                        <strong>Summary:</strong> ${theses.summary}<br>
-                        <strong>Status:</strong> ${theses.status}<br>
-                        <strong>Student AM:</strong> ${theses.student_am}<br>
-                        <strong>Final Submission Date:</strong> ${theses.final_submission_date}<br>
-                        <strong>Instructor Name:</strong> ${theses.teacher_name}<br>
-                        <strong>Role:</strong> ${theses.role}<br>
-                        <strong>Instructor2 Name:</strong> ${theses.teacher2_name}<br>
-                        <strong>Role2:</strong> ${theses.role2}<br>
-                        <strong>Instructor3 Name:</strong> ${theses.teacher3_name}<br>
-                        <strong>Role3:</strong> ${theses.role3}<br>
-                        <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${theses.pdf_path}', this.parentElement)">View PDF</a><br>
+                        <strong>Σύνοψη:</strong> ${theses.summary}<br>
+                        <strong>Κατάσταση:</strong> ${theses.status}<br>
+                        <strong>AM Φοιτητή:</strong> ${theses.student_am}<br>
+                        <strong>Τελική Ημερομηνία Υποβολής:</strong> ${theses.final_submission_date}<br>
+                        <strong>Όνομα 1ου καθηγητή:</strong> ${theses.teacher_name}<br>
+                        <strong>Ρόλος:</strong> ${theses.role}<br>
+                        <strong>Όνομα 2ου καθηγητή:</strong> ${theses.teacher2_name}<br>
+                        <strong>Ρόλος:</strong> ${theses.role2}<br>
+                        <strong>Όνομα 3ου καθηγητή:</strong> ${theses.teacher3_name}<br>
+                        <strong>Ρόλος:</strong> ${theses.role3}<br>
+                        <strong>PDF:</strong> <a href="#" onclick="viewPDF('/${theses.pdf_path}', this.parentElement)">Προβολή PDF</a><br>
                     </div>
                 `;
                 diplomaListItems.appendChild(listItem);
@@ -488,8 +488,8 @@ function exportTheses(format) {
             a.remove();
         })
         .catch(error => {
-            console.error('Error exporting theses:', error);
-            alert('An error occurred while exporting the theses.');
+            console.error('Σφάλμα κατά την εξαγωγή:', error);
+            alert('Σφάλμα κατά την εξαγωγή.');
         });
 }
 function loadInvitations() {
@@ -575,30 +575,30 @@ function fetchThesesForManagement() {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <div class="thesis-title">
-                            <strong>Title:</strong> ${thesis.title}
+                            <strong>Τίτλος:</strong> ${thesis.title}
                             <div class="button-container">
-                                <button class="action-button" onclick="toggleDetails(this)">Show details</button>
-                                ${thesis.committee.some(member => member.role === 'Επιβλέπων' && member.teacher_am === data.teacher_am) ? `<button class="action-button" onclick="cancelAssignment(${thesis.thesis_id})">Cancel Assignment</button>` : ''}
+                                <button class="action-button" onclick="toggleDetails(this)">Εμφάνιση λεπτομερειών</button>
+                                ${thesis.committee.some(member => member.role === 'Επιβλέπων' && member.teacher_am === data.teacher_am) ? `<button class="action-button" onclick="cancelAssignment(${thesis.thesis_id})">Ακύρωση</button>` : ''}
                             </div>
                         </div>
                         <div class="thesis-details" style="display: none;">
-                            <strong>Summary:</strong> ${thesis.summary}<br>
-                            <strong>Status:</strong> ${thesis.status}<br>
+                            <strong>Σύνοψη:</strong> ${thesis.summary}<br>
+                            <strong>Κατάσταση:</strong> ${thesis.status}<br>
                             <strong>Student AM:</strong> ${thesis.student_am}<br>
-                            <strong>Final Submission Date:</strong> ${thesis.final_submission_date}<br>
-                            <strong>PDF Path:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">View PDF</a><br>
+                            <strong>Τελική Ημερομηνία Υποβολής:</strong> ${thesis.final_submission_date}<br>
+                            <strong>PDF:</strong> <a href="#" onclick="viewPDF('/${thesis.pdf_path}', this.parentElement)">Προβολή PDF</a><br>
                             ${thesis.status === 'Υπό Ανάθεση' ? `
                             <div class="committee-details">
-                                <strong>Committee Members:</strong>
+                                <strong>Μέλη Τριμελούς:</strong>
                                 <ul>
                                     ${thesis.committee.map(member => `
                                         <li>
-                                            <strong>Teacher:</strong> ${member.teacher_name}<br>
+                                            <strong>Καθηγητής:</strong> ${member.teacher_name}<br>
                                             <strong>AM:</strong> ${member.teacher_am}<br>
-                                            <strong>Role:</strong> ${member.role}<br>
-                                            <strong>Invitation Date:</strong> ${member.invitation_date}<br>
-                                            <strong>Response:</strong> ${member.response}<br>
-                                            <strong>Response Date:</strong> ${member.response_date}<br>
+                                            <strong>Ρόλος:</strong> ${member.role}<br>
+                                            <strong>Ημερομηνία Πρόσκλησης :</strong> ${member.invitation_date}<br>
+                                            <strong>Απάντηση:</strong> ${member.response}<br>
+                                            <strong>Ημερομηνία Απάντησης:</strong> ${member.response_date}<br>
                                         </li>
                                     `).join('')}
                                 </ul>
@@ -608,7 +608,7 @@ function fetchThesesForManagement() {
                                 <h3>Σημειώσεις</h3>
                                 <form id="addNoteForm-${thesis.thesis_id}" onsubmit="addNoteHandler(event, ${thesis.thesis_id})">
                                     <textarea id="noteText-${thesis.thesis_id}" maxlength="300" placeholder="Add your note here..."></textarea>
-                                    <button type="submit">Add Note</button>
+                                    <button type="submit">Προσθήκη Σημείωσης</button>
                                 </form>
                                 <ul id="notesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of notes -->
@@ -619,20 +619,20 @@ function fetchThesesForManagement() {
                             </div>` : ''}
                             ${thesis.status === 'Υπό Εξέταση' ? `
                             <div class="draft-section">
-                                <h3>Draft Text</h3>
+                                <h3>Πρόχειρο Κείμενο</h3>
                                 <p>${thesis.draft_text}</p>
                             </div>
                             ${thesis.presentation_date && thesis.presentation_time && (thesis.presentation_location || thesis.presentation_link) ? `
                             <div class="announcement-section">
-                                <button onclick="generateAnnouncement(${thesis.thesis_id})">Generate Announcement</button>
+                                <button onclick="generateAnnouncement(${thesis.thesis_id})">Δημιουργία Ανακοίνωσης</button>
                                 <div id="announcementText-${thesis.thesis_id}" class="announcement-text"></div>
                             </div>` : ''}
                             <div class="grades-section">
-                                <h3>Grades</h3>
-                                <input type="number" id="gradeInput-${thesis.thesis_id}" placeholder="Enter your grade">
-                                <button onclick="submitGrade(${thesis.thesis_id})">Submit Grade</button>
-                                <button onclick="fetchGrades(${thesis.thesis_id})">View Submitted Grades</button>
-                                <button onclick="updateGrade(${thesis.thesis_id})">Update Grade</button>
+                                <h3>Βαθμολογίες</h3>
+                                <input type="number" id="gradeInput-${thesis.thesis_id}" placeholder="Προσθήκη Βαθμολογίας">
+                                <button onclick="submitGrade(${thesis.thesis_id})">Υποβολή Βαθμολογίας</button>
+                                <button onclick="fetchGrades(${thesis.thesis_id})">Προβολή καταχωρημένων βαθμολογιών</button>
+                                <button onclick="updateGrade(${thesis.thesis_id})">Ανανέωση Βαθμολογίας</button>
                                 <ul id="gradesList-${thesis.thesis_id}">
                                     <!-- Dynamically populated list of grades -->
                                 </ul>
@@ -689,7 +689,7 @@ function submitGrade(thesisId) {
     const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
 
     if (!grade) {
-        alert('Please enter a grade.');
+        alert('Παρακαλώ πρόσθεσε βαθμολογία.');
         return;
     }
 
@@ -701,15 +701,15 @@ function submitGrade(thesisId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Grade submitted successfully!');
+            alert('Επιτυχής καταχώρηση βαθμολογίας!');
             fetchGrades(thesisId); // Refresh the list of grades
         } else {
-            alert('Error submitting grade: ' + data.message);
+            alert('Σφάλμα κατά την καταχώρηση: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while submitting the grade.');
+        alert('Σφάλμα κατα την καταχώρηση.');
     });
 }
 
@@ -720,7 +720,7 @@ function updateGrade(thesisId) {
     const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
 
     if (!grade) {
-        alert('Please enter a grade.');
+        alert('Παρακαλώ καταχωρήστε βαθμό.');
         return;
     }
 
@@ -732,15 +732,15 @@ function updateGrade(thesisId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Grade updated successfully!');
+            alert('Επιτυχής ανανέωση βαθμολογίας!');
             fetchGrades(thesisId); // Refresh the list of grades
         } else {
-            alert('Error updating grade: ' + data.message);
+            alert('Σφάλμα : ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating the grade.');
+        alert('Σφάλμα κατα την ανανέωση.');
     });
 }
 
@@ -758,21 +758,21 @@ function fetchGrades(thesisId) {
             if (data.success) {
                 data.grades.forEach(grade => {
                     const listItem = document.createElement('li');
-                    listItem.innerHTML = `<strong>Teacher:</strong> ${grade.teacher_name} - <strong>Grade:</strong> ${grade.grade}`;
+                    listItem.innerHTML = `<strong>Καθηγητής:</strong> ${grade.teacher_name} - <strong>Βαθμός:</strong> ${grade.grade}`;
                     gradesList.appendChild(listItem);
                 });
 
                 finalGradeDiv.innerHTML = `
-                    <h4>Final Grade: ${data.final_grade}</h4>
+                    <h4>Τελικός Βαθμός: ${data.final_grade}</h4>
                     <p>${data.bonusMessage}</p>
                 `;
             } else {
-                alert('Error fetching grades: ' + data.message);
+                alert('Σφάλμα κατά την προσκόμιση: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while fetching the grades.');
+            alert('Σφάλμα κατά την προσκόμιση.');
         });
 }
 
@@ -785,7 +785,7 @@ function addNoteHandler(event, thesisId) {
     const noteText = document.getElementById(`noteText-${thesisId}`).value.trim();
 
     if (noteText.length > 300) {
-        alert('Note text cannot exceed 300 characters.');
+        alert('Υπέρβαση ορίου λέξεων.');
         return;
     }
 
@@ -797,16 +797,16 @@ function addNoteHandler(event, thesisId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Note added successfully!');
+            alert('Επιτυχής καταχώρηση σημείωσης!');
             document.getElementById(`noteText-${thesisId}`).value = ''; // Clear the input field
             fetchNotes(thesisId); // Refresh the list of notes
         } else {
-            alert('Error adding note: ' + data.message);
+            alert('Σφάλμα: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while adding the note.');
+        alert('Σφάλμα κατά την προσθήλη σημείωσης.');
     });
 }
 
@@ -832,12 +832,12 @@ function fetchNotes(thesisId) {
                     notesList.appendChild(listItem);
                 });
             } else {
-                alert('Error fetching notes: ' + data.message);
+                alert('Σφάλμα: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while fetching the notes.');
+            alert('Σφάλμα.');
         });
 }
 
@@ -851,15 +851,15 @@ function changeStatus(thesisId, newStatus) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Status changed successfully!');
+            alert('Επιτυχής αλλαγή κατάστασης!');
             fetchThesesForManagement(); // Refresh the list of theses
         } else {
-            alert('Error changing status: ' + data.message);
+            alert('Σφάλμα κατά την αλλαγή: ' + data.message);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while changing the status.');
+        console.error('Σφάλμα:', error);
+        alert('Σφάλμα κατά την αλλαγή κατάστασης.');
     });
 }
 
@@ -879,7 +879,7 @@ function showPendingTheses() {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <div class="thesis-title">
-                            <strong>Title:</strong> ${thesis.title}
+                            <strong>Τίτλος:</strong> ${thesis.title}
                             <button onclick="eraseAssignment(${thesis.thesis_id})">Αναίρεση Ανάθεσης</button>
                         </div>
                     `;
@@ -887,33 +887,33 @@ function showPendingTheses() {
                 });
                 toggleElement('pendingTheses');
             } else {
-                pendingThesesList.innerHTML = 'No pending theses found.';
+                pendingThesesList.innerHTML = 'Δεν βρέθηκαν εκκρεμείς διπλωματικές.';
             }
         })
         .catch(error => {
             console.error('Error fetching pending theses:', error);
-            alert('An error occurred while fetching the pending theses.');
+            alert('Δεν βρέθηκαν εκκρεμείς διπλωματικές.');
         });
 }
 
 // Function to erase assignment
 function eraseAssignment(thesisId) {
-    if (confirm('Are you sure you want to erase this assignment?')) {
+    if (confirm('Είσαι σίγουρος ότι θέλεις να αναιρέσεις την διπλωματική?')) {
         fetch(`/erase-assignment/${thesisId}`, {
             method: 'POST'
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Assignment erased successfully!');
+                alert('Η ανάθεση αναιρέθηκε επιτυχώς!');
                 showPendingTheses(); // Refresh the list of pending theses
             } else {
-                alert('Error erasing assignment: ' + data.message);
+                alert('Σφάλμα κατά την αναίρεση: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while erasing the assignment.');
+            alert('Σφάλμα κατά την αναίρεση.');
         });
     }
 }
