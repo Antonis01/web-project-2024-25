@@ -128,3 +128,13 @@ CREATE TABLE Presentations (
     repository_link VARCHAR(255),
     FOREIGN KEY (thesis_id) REFERENCES Theses(thesis_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX idx_roles ON roles (roles);
+
+CREATE INDEX idx_teachers ON Teachers (role_id, teacher_username, email);
+
+CREATE INDEX idx_students ON Students (role_id, student_username, email);
+
+CREATE INDEX idx_secretary ON Secretary (role_id, secretary_username);
+
+CREATE INDEX idx_theses ON Theses (teacher_am, student_am);
