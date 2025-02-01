@@ -345,7 +345,7 @@ function submitRepositoryLink() {
         }
 
         fetch('/submit-repository-link', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
