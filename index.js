@@ -24,14 +24,38 @@ const app = express();
 // Use bodyParser to parse JSON data
 app.use(bodyParser.json()); 
 
-// Serve static files from the public directory
-app.use('/public', express.static(path.join(__dirname, 'public')));
-
+// Serve static files with caching headers
+app.use('/public', express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache');
+        } else if (path.endsWith('.css') || path.endsWith('.js')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
+        } else if (path.endsWith('.jpg') || path.endsWith('.png') || path.endsWith('.gif')) {
+            res.setHeader('Cache-Control', 'public, max-age=604800'); // 1 week
+        }
+    }
+}));
 // Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static files from the uploads directory with caching headers for PDF files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.pdf')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
+        }
+    }
+}));
+
+// Serve static files from the theses_drafts directory with caching headers for PDF files
+app.use('/theses_drafts', express.static(path.join(__dirname, 'theses_drafts'), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.pdf')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
+        }
+    }
+}));
 
 app.use(express.json());
-
 app.use(fileUpload());
 
 // Set EJS as the view engine
