@@ -1876,9 +1876,8 @@ app.post('/set-presentation', (req, res) => {
             return res.status(404).json({ success: false, message: 'Δεν βρέθηκε διπλωματική.' });
         }
 
-        const thesisTitle = results[0].title.replace(/[^a-z0-9]/gi, '_').toLowerCase(); 
         const currentDate = new Date().toISOString().split('T')[0]; 
-        const fileName = `${thesisTitle}_${studentAm}_${currentDate}.pdf`;
+        const fileName = `${studentAm}_${currentDate}.pdf`;
         const uploadDir = 'theses_drafts';
         const uploadPath = path.join(__dirname, uploadDir, fileName);
         const relativePath = path.join(uploadDir, fileName);
