@@ -2084,6 +2084,6 @@ app.delete('/delete-thesis/:id', (req, res) => {
 
 const server = http.createServer(app);
 
-server.listen(8080, () => {
+server.listen(8080, '0.0.0.0', () => {
     console.log('Server is listening on http://localhost:8080');
 });
