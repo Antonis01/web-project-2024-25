@@ -17,6 +17,7 @@ const MySQLStore = require('express-mysql-session')(session);
 const { Parser } = require('json2csv');
 const xml2js = require('xml2js');
 const fileUpload = require('express-fileupload');
+const { format } = require('date-fns');
 
 const app = express();
 
@@ -1111,11 +1112,13 @@ app.get('/get-thesis-id', (req, res) => {
 
 // Route handler for fetching announcements
 app.get('/announcements', (req, res) => {
-    const { startDate, endDate, format } = req.query;
+    const { format: responseFormat } = req.query;
+    const currentDate = new Date();
+    const nextYear = new Date(currentDate);
+    nextYear.setFullYear(currentDate.getFullYear() + 1);
 
-    if (!startDate || !endDate) {
-        return res.status(400).json({ success: false, message: 'Missing startDate or endDate' });
-    }
+    const formattedCurrentDate = currentDate.toISOString().split('T')[0];
+    const formattedNextYear = nextYear.toISOString().split('T')[0];
 
     const query = `
         SELECT 
@@ -1135,13 +1138,17 @@ app.get('/announcements', (req, res) => {
         WHERE Presentations.presentation_date BETWEEN ? AND ?
     `;
 
-    db.query(query, [startDate, endDate], (err, results) => {
+    db.query(query, [formattedCurrentDate, formattedNextYear], (err, results) => {
         if (err) {
             console.error('Error fetching announcements:', err);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
 
-        if (format === 'xml') {
+        results.forEach(announcement => {
+            announcement.presentation_date = format(new Date(announcement.presentation_date), 'yyyy-MM-dd');
+        });
+
+        if (responseFormat === 'xml') {
             const builder = new xml2js.Builder();
             const xml = builder.buildObject({ announcements: results });
             res.header('Content-Type', 'application/xml');
