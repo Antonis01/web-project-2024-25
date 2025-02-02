@@ -35,7 +35,7 @@
     <script src="/public/javascript/topbar_buttons.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('/announcements?startDate=2023-01-01&endDate=2023-12-31&format=json')
+            fetch('/announcements?startDate=2025-01-01&endDate=2025-12-31&format=json')
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('announcementsContainer');
@@ -48,9 +48,7 @@
                                 <p>Φοιτητής: ${announcement.student_name}</p>
                                 <p>Ημερομηνία παρουσίασης: ${announcement.presentation_date}</p>
                                 <p>Ώρα: ${announcement.presentation_time}</p>
-                                <p>Τρόπος παρουσίασης: ${announcement.presentation_type}</p>
-                                <p>Τοποθεσία : ${announcement.presentation_location}</p>
-                                ${announcement.presentation_type === 'online' ? `<p>Link: <a href="${announcement.presentation_link}">${announcement.presentation_link}</a></p>` : ''}
+                                <p>${announcement.presentation_type === 'online' ? `Link: <a href="${announcement.presentation_detail}">${announcement.presentation_detail}</a>` : `Τοποθεσία: ${announcement.presentation_detail}`}</p>
                             `;
                             container.appendChild(div);
                         });
