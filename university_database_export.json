@@ -1,0 +1,108 @@
+[
+{"type":"header","version":"5.2.1","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"university"},
+{"type":"table","name":"Assignments","database":"university","data":
+[
+{"assignment_id":"1","thesis_id":"2","student_am":"10433999","assigned_date":"2025-02-01","status":"Οριστική","gs_number_assignment":null},
+{"assignment_id":"2","thesis_id":"3","student_am":"10434000","assigned_date":"2025-02-02","status":"Οριστική","gs_number_assignment":null},
+{"assignment_id":"3","thesis_id":"4","student_am":"10434001","assigned_date":"2025-02-02","status":"Οριστική","gs_number_assignment":null},
+{"assignment_id":"4","thesis_id":"5","student_am":"10434002","assigned_date":"2025-02-02","status":"Οριστική","gs_number_assignment":"1"},
+{"assignment_id":"5","thesis_id":"6","student_am":"10434003","assigned_date":"2025-02-02","status":"Οριστική","gs_number_assignment":null}
+]
+}
+,{"type":"table","name":"Committees","database":"university","data":
+[
+{"committee_id":"2","thesis_id":"2","teacher_am":"1","role":"Επιβλέπων","response":"Αποδοχή","invitation_date":"2025-02-01","response_date":"2025-02-01","teacher_am2":"7","role2":"Μέλος","response2":"Αποδοχή","invitation_date2":"2025-02-01","response_date2":"2025-02-01","teacher_am3":"8","role3":"Μέλος","response3":"Αποδοχή","invitation_date3":"2025-02-01","response_date3":"2025-02-01"},
+{"committee_id":"3","thesis_id":"3","teacher_am":"7","role":"Επιβλέπων","response":"Αποδοχή","invitation_date":"2025-02-02","response_date":"2025-02-02","teacher_am2":"1","role2":"Μέλος","response2":"Αποδοχή","invitation_date2":"2025-02-02","response_date2":"2025-02-02","teacher_am3":"8","role3":"Μέλος","response3":"Αποδοχή","invitation_date3":"2025-02-02","response_date3":"2025-02-02"},
+{"committee_id":"4","thesis_id":"4","teacher_am":"8","role":"Επιβλέπων","response":"Αποδοχή","invitation_date":"2025-02-02","response_date":"2025-02-02","teacher_am2":"1","role2":"Μέλος","response2":"Αποδοχή","invitation_date2":"2025-02-02","response_date2":"2025-02-02","teacher_am3":"7","role3":"Μέλος","response3":"Αποδοχή","invitation_date3":"2025-02-02","response_date3":"2025-02-02"},
+{"committee_id":"5","thesis_id":"5","teacher_am":"1","role":"Επιβλέπων","response":"Αποδοχή","invitation_date":"2025-02-02","response_date":"2025-02-02","teacher_am2":"7","role2":"Μέλος","response2":"Αποδοχή","invitation_date2":"2025-02-02","response_date2":"2025-02-02","teacher_am3":"8","role3":"Μέλος","response3":"Αποδοχή","invitation_date3":"2025-02-02","response_date3":"2025-02-02"},
+{"committee_id":"6","thesis_id":"6","teacher_am":"9","role":"Επιβλέπων","response":"Αποδοχή","invitation_date":"2025-02-02","response_date":"2025-02-02","teacher_am2":"1","role2":"Μέλος","response2":"Αποδοχή","invitation_date2":"2025-02-02","response_date2":"2025-02-02","teacher_am3":"10","role3":"Μέλος","response3":"Αποδοχή","invitation_date3":"2025-02-02","response_date3":"2025-02-02"}
+]
+}
+,{"type":"table","name":"Grades","database":"university","data":
+[
+{"grade_id":"1","thesis_id":"2","teacher_am":"7","grade":"7.00","criteria":null},
+{"grade_id":"2","thesis_id":"2","teacher_am":"1","grade":"9.00","criteria":null},
+{"grade_id":"3","thesis_id":"2","teacher_am":"8","grade":"8.50","criteria":null},
+{"grade_id":"4","thesis_id":"3","teacher_am":"1","grade":"7.00","criteria":null},
+{"grade_id":"5","thesis_id":"3","teacher_am":"7","grade":"5.00","criteria":null},
+{"grade_id":"6","thesis_id":"3","teacher_am":"8","grade":"3.00","criteria":null},
+{"grade_id":"7","thesis_id":"4","teacher_am":"8","grade":"4.00","criteria":null},
+{"grade_id":"8","thesis_id":"4","teacher_am":"1","grade":"9.00","criteria":null},
+{"grade_id":"9","thesis_id":"4","teacher_am":"7","grade":"1.00","criteria":null},
+{"grade_id":"10","thesis_id":"6","teacher_am":"9","grade":"7.00","criteria":null},
+{"grade_id":"11","thesis_id":"6","teacher_am":"1","grade":"6.00","criteria":null},
+{"grade_id":"12","thesis_id":"6","teacher_am":"10","grade":"10.00","criteria":null}
+]
+}
+,{"type":"table","name":"Notes","database":"university","data":
+[
+{"note_id":"1","thesis_id":"2","teacher_am":"1","content":"test note","created_at":"2025-02-01 20:07:13"},
+{"note_id":"2","thesis_id":"3","teacher_am":"7","content":"test test test","created_at":"2025-02-02 13:26:54"},
+{"note_id":"3","thesis_id":"4","teacher_am":"8","content":"τεεεεστ","created_at":"2025-02-02 13:54:09"},
+{"note_id":"4","thesis_id":"6","teacher_am":"9","content":"test","created_at":"2025-02-02 21:05:19"}
+]
+}
+,{"type":"table","name":"Presentations","database":"university","data":
+[
+{"presentation_id":"1","thesis_id":"2","presentation_date":"2025-08-05","presentation_time":"13:00:00","presentation_type":"online","presentation_location":"","presentation_link":"example.com","theses_pdf_draft_path":"theses_drafts\/______________________________________________________________________________10433999_2025-02-01.pdf","additional_links":"example.com","repository_link":"example.com"},
+{"presentation_id":"2","thesis_id":"3","presentation_date":"2025-05-28","presentation_time":"20:00:00","presentation_type":"online","presentation_location":"","presentation_link":"example.com","theses_pdf_draft_path":"theses_drafts\/____________________________________________________________________10434000_2025-02-02.pdf","additional_links":"example.com","repository_link":"example.com"},
+{"presentation_id":"4","thesis_id":"4","presentation_date":"2025-06-11","presentation_time":"17:00:00","presentation_type":"in-person","presentation_location":"room 1","presentation_link":"","theses_pdf_draft_path":"theses_drafts\/___________________________________________________10434001_2025-02-02.pdf","additional_links":"example.com","repository_link":"example.com"},
+{"presentation_id":"5","thesis_id":"6","presentation_date":"2025-06-25","presentation_time":"20:00:00","presentation_type":"online","presentation_location":"","presentation_link":"example.com","theses_pdf_draft_path":"theses_drafts\/10434003_2025-02-02.pdf","additional_links":"example.com","repository_link":"example.com"}
+]
+}
+,{"type":"table","name":"roles","database":"university","data":
+[
+{"id":"1","roles":"teacher"},
+{"id":"2","roles":"student"},
+{"id":"3","roles":"secretary"}
+]
+}
+,{"type":"table","name":"Secretary","database":"university","data":
+[
+{"secretary_am":"123123123","role_id":"3","secretary_username":"secretary","secretary_password":"1234"}
+]
+}
+,{"type":"table","name":"sessions","database":"university","data":
+[
+
+]
+}
+,{"type":"table","name":"Students","database":"university","data":
+[
+{"student_am":"99","role_id":"2","student_username":"john_","student_password":"password1234","student_name":"John D","email":"john.d@example.com","home_address":"1233 Main St","mobile_phone":"12345467890","landline_phone":"69876543210"},
+{"student_am":"10433999","role_id":"2","student_username":"10433999","student_password":"1234","student_name":"Makis Makopoulos","email":"test@students.upatras.gr","home_address":"test 43 ","mobile_phone":"6939096979","landline_phone":"2610333000"},
+{"student_am":"10434000","role_id":"2","student_username":"10434000","student_password":"1234","student_name":"John Lennon","email":"st10434000@upnet.gr","home_address":"Ermou 18, Athens 10431","mobile_phone":"6970001112","landline_phone":"2610123456"},
+{"student_am":"10434001","role_id":"2","student_username":"10434001","student_password":"1234","student_name":"Petros Verikokos","email":"st10434001@upnet.gr","home_address":"Adrianou 20, Thessaloniki 54248","mobile_phone":"6970001112","landline_phone":"2610778899"},
+{"student_am":"10434002","role_id":"2","student_username":"10434002","student_password":"1234","student_name":"test name","email":"st10434002@upnet.gr","home_address":"str 1, patra 26222","mobile_phone":"6912345678","landline_phone":"2610123456"},
+{"student_am":"10434003","role_id":"2","student_username":"10434003","student_password":"1234","student_name":"Robert Smith","email":"st10434003@upnet.gr","home_address":"Fascination 17, London 1989","mobile_phone":"6902051989","landline_phone":"2610251989"},
+{"student_am":"10434004","role_id":"2","student_username":"10434004","student_password":"1234","student_name":"Rex Tyrannosaurus","email":"st10434004@upnet.gr","home_address":"Cretaceous 2, Laramidia 54321","mobile_phone":"6911231234","landline_phone":"2610432121"},
+{"student_am":"10434005","role_id":"2","student_username":"10434005","student_password":"1234","student_name":"Paul Mescal","email":"st10434005@upnet.gr","home_address":"Smith Str. 33, New York 59","mobile_phone":"unknown","landline_phone":"unknown"},
+{"student_am":"10434006","role_id":"2","student_username":"10434006","student_password":"1234","student_name":"Pedro Pascal","email":"st10434006@upnet.gr","home_address":"Johnson 90, New York 70","mobile_phone":"unknown","landline_phone":"unknown"},
+{"student_am":"10434007","role_id":"2","student_username":"10434007","student_password":"1234","student_name":"David Gilmour","email":"st10434007@upnet.gr","home_address":"Sortef 29, New York 26","mobile_phone":"unknown","landline_phone":"unknown"},
+{"student_am":"10434008","role_id":"2","student_username":"10434008","student_password":"1234","student_name":"Lana Del Rey","email":"st10434008@upnet.gr","home_address":"Groove Str. 23, Los Angeles 1","mobile_phone":"unknown","landline_phone":"unknown"},
+{"student_am":"10434009","role_id":"2","student_username":"10434009","student_password":"1234","student_name":"Stevie Nicks","email":"st10434009@upnet.gr","home_address":"Magic Str. 8, New Orleans 35","mobile_phone":"67","landline_phone":"56"},
+{"student_am":"10434010","role_id":"2","student_username":"10434010","student_password":"1234","student_name":"Margaret Qualley","email":"st10434010@upnet.gr","home_address":"Substance Str. 25, Los Angeles 7","mobile_phone":"90","landline_phone":"67"}
+]
+}
+,{"type":"table","name":"Teachers","database":"university","data":
+[
+{"teacher_am":"1","role_id":"1","teacher_username":"1","teacher_password":"1234","teacher_name":"Andreas Komninos","email":"akomninos@ceid.upatras.gr"},
+{"teacher_am":"7","role_id":"1","teacher_username":"7","teacher_password":"1234","teacher_name":"Vasilis Foukaras","email":"vasfou@ceid.upatras.gr"},
+{"teacher_am":"8","role_id":"1","teacher_username":"8","teacher_password":"1234","teacher_name":"Basilis Karras","email":"karras@nterti.com"},
+{"teacher_am":"9","role_id":"1","teacher_username":"9","teacher_password":"1234","teacher_name":"Eleni Voyiatzaki","email":"eleni@ceid.gr"},
+{"teacher_am":"10","role_id":"1","teacher_username":"10","teacher_password":"1234","teacher_name":"Andrew Hozier Byrne","email":"hozier@ceid.upatras.gr"},
+{"teacher_am":"11","role_id":"1","teacher_username":"11","teacher_password":"1234","teacher_name":"Nikos Korobos","email":"nikos.korobos12@gmail.com"},
+{"teacher_am":"20013","role_id":"1","teacher_username":"George_best","teacher_password":"password4565","teacher_name":"George Best","email":"george.smith@example.com"}
+]
+}
+,{"type":"table","name":"Theses","database":"university","data":
+[
+{"thesis_id":"2","title":"Βελτίωση της Ιδιωτικότητας στο Υπολογιστικό Νέφος με Ομομορφική Κρυπτογράφηση","summary":"Η εργασία αυτή διερευνά την εφαρμογή της ομομορφικής κρυπτογράφησης για την εκτέλεση υπολογισμών σε κρυπτογραφημένα δεδομένα σε περιβάλλοντα νέφους. Συζητά υπάρχοντα κρυπτογραφικά σχήματα, αξιολογεί την απόδοσή τους και προτείνει βελτιστοποιήσεις για πρακτική υλοποίηση.","pdf_path":"uploads\/sample theses.pdf","status":"Περατωμένη","teacher_am":"1","student_am":"10433999","final_submission_date":"2025-09-25","gs_number":null,"gs_year":null,"cancellation_reason":null,"final_grade":"8.44"},
+{"thesis_id":"3","title":"Μία Τυπική Προσέγγιση για την Ανάλυση Πρωτοκόλλων Ασφάλειας Δικτύων","summary":"Η έρευνα αυτή επικεντρώνεται στη χρήση τυπικών μεθόδων για την επαλήθευση της ασφάλειας πρωτοκόλλων δικτύου. Εφαρμόζει τεχνικές ελέγχου μοντέλων και αποδείξεων θεωρημάτων για την αναγνώριση ευπαθειών σε ευρέως χρησιμοποιούμενα πρωτόκολλα, όπως τα TLS και IPsec.","pdf_path":"uploads\/sample theses.pdf","status":"Περατωμένη","teacher_am":"7","student_am":"10434000","final_submission_date":"2025-08-26","gs_number":null,"gs_year":null,"cancellation_reason":null,"final_grade":"5.75"},
+{"thesis_id":"4","title":"Βελτιστοποίηση Αλγορίθμων Γράφων για Μεγάλα Δίκτυα","summary":"Η διπλωματική αυτή εργασία εξετάζει αποδοτικές υλοποιήσεις βασικών αλγορίθμων γράφων, όπως ο συντομότερος δρόμος και το ελάχιστο εκτεταμένο δέντρο, για μεγάλης κλίμακας δίκτυα. Προτείνει παράλληλες και κατανεμημένες τεχνικές για τη βελτίωση της κλιμάκωσης και της απόδοσης.","pdf_path":"uploads\/sample theses.pdf","status":"Περατωμένη","teacher_am":"8","student_am":"10434001","final_submission_date":"2025-08-20","gs_number":null,"gs_year":null,"cancellation_reason":null,"final_grade":"5.47"},
+{"thesis_id":"5","title":"Σύστημα Ανίχνευσης Εισβολών σε Δίκτυα IoT με Μηχανική Μάθηση","summary":"Η εργασία παρουσιάζει ένα καινοτόμο σύστημα ανίχνευσης εισβολών, το οποίο χρησιμοποιεί μηχανική μάθηση για την αναγνώριση κακόβουλων δραστηριοτήτων σε δίκτυα IoT. Αξιολογεί διαφορετικούς ταξινομητές και τεχνικές επιλογής χαρακτηριστικών για τη βελτίωση της ακρίβειας και τη μείωση των ψευδών θετικών.","pdf_path":"uploads\/sample theses.pdf","status":"Ακυρωμένη","teacher_am":"1","student_am":"10434002","final_submission_date":"2025-08-29","gs_number":"1","gs_year":"6","cancellation_reason":"test","final_grade":null},
+{"thesis_id":"6","title":"Διαχείριση Ψηφιακής Ταυτότητας με Blockchain: Προκλήσεις και Λύσεις","summary":"Η μελέτη αυτή διερευνά τη χρήση της τεχνολογίας blockchain για τη βελτίωση της διαχείρισης ψηφιακής ταυτότητας. Αξιολογεί υπάρχοντα πλαίσια ταυτότητας, προτείνει ένα αποκεντρωμένο μοντέλο και συζητά τις επιπτώσεις του στην ασφάλεια και την ιδιωτικότητα.","pdf_path":"uploads\/sample theses.pdf","status":"Περατωμένη","teacher_am":"9","student_am":"10434003","final_submission_date":"2025-10-01","gs_number":null,"gs_year":null,"cancellation_reason":null,"final_grade":"8.02"}
+]
+}
+]

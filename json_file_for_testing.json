@@ -1,0 +1,25 @@
+{
+    "students": [
+        {
+            "student_am": 99,
+            "role_id": 2,
+            "student_username": "john_",
+            "student_password": "password1234",
+            "student_name": "John D",
+            "email": "john.d@example.com",
+            "home_address": "1233 Main St",
+            "mobile_phone": "12345467890",
+            "landline_phone": "69876543210"
+        }
+    ],
+    "teachers": [
+        {
+            "teacher_am": 20013,
+            "role_id": 1,
+            "teacher_username": "George_best",
+            "teacher_password": "password4565",
+            "teacher_name": "George Best",
+            "email": "george.smith@example.com"
+        }
+    ]
+}
