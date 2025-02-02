@@ -31,17 +31,17 @@ app.use('/public', express.static(path.join(__dirname, 'public'), {
             res.setHeader('Cache-Control', 'no-cache');
         } else if (path.endsWith('.css') || path.endsWith('.js')) {
             res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
-        } else if (path.endsWith('.jpg') || path.endsWith('.png') || path.endsWith('.gif')) {
+        } else if (path.endsWith('.jpg') || path.endsWith('.png')) {
             res.setHeader('Cache-Control', 'public, max-age=604800'); // 1 week
         }
     }
 }));
-// Serve static files from the uploads directory
+
 // Serve static files from the uploads directory with caching headers for PDF files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
     setHeaders: (res, filePath) => {
         if (filePath.endsWith('.pdf')) {
-            res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
         }
     }
 }));
@@ -50,7 +50,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 app.use('/theses_drafts', express.static(path.join(__dirname, 'theses_drafts'), {
     setHeaders: (res, filePath) => {
         if (filePath.endsWith('.pdf')) {
-            res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
         }
     }
 }));
