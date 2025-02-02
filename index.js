@@ -817,16 +817,15 @@ app.get('/get-statistics-grades', (req, res) => {
 
     const query = `
         SELECT 
-            AVG(CASE WHEN c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων' THEN g.grade ELSE NULL END) AS avgGrade1,
+            AVG(CASE WHEN c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων' THEN t.final_grade ELSE NULL END) AS avgGrade1,
             AVG(CASE WHEN (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR 
-                        (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN g.grade ELSE NULL END) AS avgGrade2,
+                        (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN t.final_grade ELSE NULL END) AS avgGrade2,
             AVG(CASE WHEN (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
                         (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
-                        (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN g.grade ELSE NULL END) AS avgGradeTotal
-        FROM Grades g
-        JOIN Theses t ON g.thesis_id = t.thesis_id
+                        (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος') THEN t.final_grade ELSE NULL END) AS avgGradeTotal
+        FROM Theses t
         JOIN Committees c ON t.thesis_id = c.thesis_id
-        WHERE 
+        WHERE
             (c.teacher_am = ? AND c.response = 'Αποδοχή' AND c.role = 'Επιβλέπων') OR
             (c.teacher_am2 = ? AND c.response2 = 'Αποδοχή' AND c.role2 = 'Μέλος') OR
             (c.teacher_am3 = ? AND c.response3 = 'Αποδοχή' AND c.role3 = 'Μέλος')

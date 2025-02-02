@@ -329,7 +329,7 @@ function showRepositoryLinkForm() {
     uploadForm.innerHTML = `
         <input type="text" id="repositoryLink" placeholder="Enter repository link" class="upload-input">
         <button type="button" class="upload-button" onclick="submitRepositoryLink()">Προσθήκη συνδέσμου</button>
-        <button type="button" class="upload-button" onclick="viewExamReport()">Προβολή αναφοράς εξέτασης</button>
+        <button type="button" class="upload-button" onclick="viewExamReport()">Προβολή πρακτικού εξέτασης</button>
     `;
 
     form.appendChild(uploadForm);
@@ -384,7 +384,7 @@ function thesesCompleted() {
     completedForm.className = 'completed-form';
 
     completedForm.innerHTML = `
-        <button type="button" class="upload-button" onclick="viewExamReport()">Προβολή αναφοράς εξέτασης</button>
+        <button type="button" class="upload-button" onclick="viewExamReport()">Προβολή πρακτικού εξέτασης</button>
     `;
     form.appendChild(completedForm);
 

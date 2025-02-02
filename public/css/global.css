@@ -225,7 +225,7 @@ input[type="password"] {
     max-width: 300px;
 }
 
-.button-container {
+.button-container-stats {
     display: flex;
     justify-content: space-between; 
     gap: 10px; 
