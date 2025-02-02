@@ -50,7 +50,6 @@ CREATE TABLE Theses (
     teacher_am INT,
     student_am INT,
     final_submission_date DATE DEFAULT NULL,
-    theses_pdf_draft_path VARCHAR(255),
     gs_number INT DEFAULT NULL,
     gs_year INT DEFAULT NULL,
     cancellation_reason TEXT DEFAULT NULL,
