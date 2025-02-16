@@ -1,3 +1,4 @@
+// Erotima s1
 function fetchActiveTheses() {
     fetch('/get-active-theses')
         .then(response => response.json())
@@ -34,13 +35,16 @@ function fetchActiveTheses() {
         });
 }
 
+// Erotima s1
 function toggleDetails(button) {
     const details = button.parentElement.nextElementSibling;
     details.style.display = details.style.display === 'none' ? 'block' : 'none';
 }
 
+// Erotima s1
 document.addEventListener('DOMContentLoaded', fetchActiveTheses);
 
+// Erotima s2
 async function uploadJSON() {
   const jsonFileInput = document.getElementById('jsonFile');
   if (!jsonFileInput.files.length) {
@@ -70,6 +74,7 @@ async function uploadJSON() {
   }
 }
 
+// Erotima s3
 function fetchTheses() {
     const selectedStatus = document.getElementById('statusFilter').value;
     fetch(`/api/theses?status=${encodeURIComponent(selectedStatus)}`)
@@ -83,6 +88,7 @@ function fetchTheses() {
         });
 }
 
+// Erotima s3
 function displayTheses(theses) {
     const thesesList = document.getElementById('thesesList');
     thesesList.innerHTML = '';
@@ -123,6 +129,7 @@ function displayTheses(theses) {
     });
 }
 
+// Erotima s3
 function completeThesis(thesisId) {
     if (!confirm("Είστε σίγουροι ότι θέλετε να ολοκληρώσετε αυτή τη διπλωματική;")) return;
 
@@ -172,7 +179,7 @@ function completeThesis(thesisId) {
         });
 }
 
-
+// Erotima s3
 function submitGsNumberAssignment(thesisId) {
     const gsNumberAssignment = document.getElementById(`gsNumberAssignment_${thesisId}`).value.trim();
 
@@ -200,8 +207,7 @@ function submitGsNumberAssignment(thesisId) {
     });
 }
 
-
-
+// Erotima s3
 function cancelThesis(thesisId) {
     const gsNumber = document.getElementById(`cancelGsNumber_${thesisId}`).value;
     const gsYear = document.getElementById(`cancelGsYear_${thesisId}`).value;
@@ -226,6 +232,7 @@ function cancelThesis(thesisId) {
       });
 }
 
+// Erotima s3
 function completeThesis(thesisId) {
     if (!confirm("Είστε σίγουροι ότι θέλετε να ολοκληρώσετε αυτή τη διπλωματική;")) return;
 

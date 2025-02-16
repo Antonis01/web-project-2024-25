@@ -1,3 +1,4 @@
+// Erotima f1
 function fetchThesisSt() {
     fetch('/get-thesis-st')
         .then(response => response.json())
@@ -33,6 +34,7 @@ function fetchThesisSt() {
         });
 }
 
+// view PDF
 function viewPDF(pdfPath, container) {
     const existingViewer = container.querySelector('.pdf-viewer');
     if (existingViewer) {
@@ -50,7 +52,7 @@ function viewPDF(pdfPath, container) {
     }
 }
 
- 
+// Erotima f2
 function fetchProfileSt() {
     fetch('/get-profile-st')
         .then(response => response.json())
@@ -79,6 +81,7 @@ function fetchProfileSt() {
         });
 }
 
+// Erotima f2
 function saveProfileSt() {
     const homeAddress = document.getElementById("home_address").value;
     const email = document.getElementById("email").value;
@@ -112,6 +115,7 @@ function saveProfileSt() {
         });
 }
 
+// Erotima f3
 function thesesStatus(){
     return fetch('/get-theses-status')
         .then(response => response.json())
@@ -129,6 +133,7 @@ function thesesStatus(){
         });
 }
 
+// Erotima f3
 document.getElementById("diploManagement").addEventListener("click", function(event){
     thesesStatus().then(statuses => {
         if (statuses.includes('Υπό Ανάθεση')) {
@@ -147,6 +152,7 @@ document.getElementById("diploManagement").addEventListener("click", function(ev
     });
 });
 
+// Erotima f3
 function inviteTeacher() {
     fetch('/get-teacher-info')
         .then(response => response.json())
@@ -196,6 +202,7 @@ function inviteTeacher() {
         })
 }
 
+// Erotima f3
 function getThesisID() {
     return fetch('/get-thesis-id')
         .then(response => response.json())
@@ -213,6 +220,7 @@ function getThesisID() {
         });
 }
 
+// Erotima f3
 function sendInvitation(teacherAm) {
     getThesisID().then(thesisID => {
 
@@ -246,6 +254,7 @@ function sendInvitation(teacherAm) {
     });
 }
 
+// Erotima f3
 function presentationElements() {
     const form = document.getElementById('presentationForm');
 
@@ -280,6 +289,7 @@ function presentationElements() {
 
 }
 
+// Erotima f3
 function uploadPresentationData() {
     const pdfFileInput = document.getElementById('pdfFileInput');
     const file = pdfFileInput.files[0];
@@ -320,6 +330,7 @@ function uploadPresentationData() {
     });
 }
 
+// Erotima f3
 function showRepositoryLinkForm() {
     const form = document.getElementById('presentationForm');
 
@@ -335,6 +346,7 @@ function showRepositoryLinkForm() {
     form.appendChild(uploadForm);
 }
 
+// Erotima f3
 function submitRepositoryLink() {
     const repositoryLink = document.getElementById('repositoryLink').value;
 
@@ -364,6 +376,8 @@ function submitRepositoryLink() {
         });
     });
 }
+
+// Erotima f3
 function viewExamReport() {
     getThesisID().then(thesisID => {
         if (!thesisID) {
@@ -377,6 +391,7 @@ function viewExamReport() {
     });
 }
 
+// Erotima f3
 function thesesCompleted() {
     const form = document.getElementById('completedTheses');
 

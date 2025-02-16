@@ -1,3 +1,5 @@
+// Erotima 5
+
 let chart;
 
 function setCanvasSize() {

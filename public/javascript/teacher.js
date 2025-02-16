@@ -1,3 +1,4 @@
+// Erotima 1 prosthiki
 document.getElementById('topicForm').addEventListener('submit', function(event) {
     event.preventDefault();
     
@@ -23,6 +24,7 @@ document.getElementById('topicForm').addEventListener('submit', function(event) 
     });
 });
 
+// Erotima 1 provoli theseon
 function fetchTheses() {
     fetch('/get-theses')
         .then(response => response.json())
@@ -33,7 +35,7 @@ function fetchTheses() {
 
                 data.data.forEach(thesis => {
                     const listItem = document.createElement('li');
-                    listItem.innerHTML = `
+                    listItem.innerHTML = `w
                         <div class="thesis-title">
                             <strong>Tίτλος:</strong> ${thesis.title}
                             <button onclick="toggleDetails(this)">Προβολή Λεπτομερειών</button>
@@ -60,6 +62,7 @@ function fetchTheses() {
         });
 }
 
+// Erotima 1, Erotima 3, Erotima 6 provoli leptomereion
 function toggleDetails(button) {
     const thesisDetails = button.closest('.thesis-title').nextElementSibling;
     if (thesisDetails.style.display === 'none' || thesisDetails.style.display === '') {
@@ -73,14 +76,12 @@ function toggleDetails(button) {
 
 document.addEventListener('DOMContentLoaded', fetchTheses);
 
+// pdf viewer function
 function viewPDF(pdfPath, container) {
-    // Check if the PDF viewer already exists
     const existingViewer = container.querySelector('.pdf-viewer');
     if (existingViewer) {
-        // If it exists, remove it
         existingViewer.remove();
     } else {
-        // If it doesn't exist, create a new PDF viewer
         const pdfViewer = document.createElement('iframe');
         pdfViewer.src = pdfPath;
         pdfViewer.width = '100%';
@@ -94,6 +95,7 @@ function viewPDF(pdfPath, container) {
     }
 }
 
+// Erotima 1 view edit form
 function editThesis(thesisId) {
     fetch(`/get-thesis/${thesisId}`)
         .then(response => response.json())
@@ -118,6 +120,7 @@ function editThesis(thesisId) {
         });
 }
 
+// Erotima 1 edit update form
 document.getElementById('editThesisForm').addEventListener('submit', function(event) {
     event.preventDefault();
     
@@ -143,6 +146,7 @@ document.getElementById('editThesisForm').addEventListener('submit', function(ev
     });
 });
 
+// Erotima 1 delete
 function deleteThesis() {
     const thesisId = document.getElementById('editThesisId').value;
     
@@ -167,6 +171,7 @@ function deleteThesis() {
     }
 }
 
+// Erotima 1 cancel edit
 function cancelEdit() {
     document.getElementById('editThesisFormContainer').style.display = 'none';
 }
@@ -237,6 +242,7 @@ function fetchActiveThesesSection() {
         });
 }
 
+// Erotima 6
 // Cancel assignment
 function cancelAssignment(thesisId) {
     if (confirm('Είσαι σίγουρος ότι θέλεις να ακυρώσεις την ανάθεση;')) {
@@ -257,6 +263,7 @@ function cancelAssignment(thesisId) {
 document.addEventListener('DOMContentLoaded', fetchActiveTheses);
 document.addEventListener('DOMContentLoaded', fetchActiveThesesSection);
 
+// Erotima 2
 // Debounce function to delay the search request
 function debounce(func, delay) {
     let debounceTimer;
@@ -268,6 +275,7 @@ function debounce(func, delay) {
     };
 }
 
+// Erotima 2
 // Toggle search fields based on selected search type
 function toggleSearchFields() {
     const searchType = document.getElementById("searchType").value;
@@ -280,6 +288,7 @@ function toggleSearchFields() {
     }
 }
 
+// Erotima 2
 // Search thesis with debounce
 const debounceSearchThesis = debounce(function() {
     const subject = document.getElementById("subject").value.trim();
@@ -315,6 +324,7 @@ const debounceSearchThesis = debounce(function() {
         });
 }, 300);
 
+// Erotima 2
 // Search student by AM with debounce
 const debounceSearchStudentByAm = debounce(function() {
     const am = document.getElementById("studentAM").value.trim();
@@ -346,6 +356,7 @@ const debounceSearchStudentByAm = debounce(function() {
         });
 }, 300);
 
+// Erotima 2
 // Search student by name with debounce
 const debounceSearchStudentByName = debounce(function() {
     const studentName = document.getElementById("studentName").value.trim();
@@ -381,6 +392,7 @@ const debounceSearchStudentByName = debounce(function() {
         });
 }, 300);
 
+// Erotima 2
 function assignTheses() {
     const thesisId = document.getElementById('thesisId').value;
     const studentAm = document.getElementById('hiddenStudentId').value;
@@ -406,6 +418,7 @@ function assignTheses() {
         });
 }
 
+// Erotima 3
 function searchThesesList() {
     const statusFilter = document.getElementById('statusFilter').value;
     const roleFilter = document.getElementById('roleFilter').value;
@@ -446,32 +459,7 @@ function searchThesesList() {
         });
 }
 
-app.get("/search-student", (req, res) => {
-    const { studentId, studentName } = req.query;
-    let query = '';
-    let queryParams = [];
-
-    if (studentId) {
-        query = 'SELECT am AS student_id FROM Students WHERE am LIKE ?';
-        queryParams = [`%${studentId}%`];
-    } else if (studentName) {
-        query = 'SELECT student_name FROM Students WHERE student_name LIKE ?';
-        queryParams = [`%${studentName}%`];
-    } else {
-        res.status(400).json({ success: false, message: 'Missing search parameter' });
-        return;
-    }
-
-    db.query(query, queryParams, (err, results) => {
-        if (err) {
-            console.error("Error searching student:", err);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
-        }
-
-        res.json({ success: true, data: results });
-    });
-});
-
+// Erotima 3
 function exportTheses(format) {
     const statusFilter = document.getElementById('statusFilter').value;
     const roleFilter = document.getElementById('roleFilter').value;
@@ -492,6 +480,8 @@ function exportTheses(format) {
             alert('Σφάλμα κατά την εξαγωγή.');
         });
 }
+
+// Erotima 4
 function loadInvitations() {
     fetch('/get-invitations')
         .then(response => response.json())
@@ -538,6 +528,7 @@ function loadInvitations() {
         .catch(err => console.error('Error loading invitations:', err));
 }
 
+// Erotima 4
 function handleInvitationResponse(committeeId, action) {
     console.log(`Processing ${action} for committee ID: ${committeeId}`);
     
@@ -559,6 +550,8 @@ function handleInvitationResponse(committeeId, action) {
     .catch(err => console.error(`Error processing ${action} invitation:`, err));
 }
 
+
+// Erotima 6
 function fetchThesesForManagement() {
     const statusFilter = document.getElementById('statusFilterManagement').value;
 
@@ -682,8 +675,7 @@ function generateAnnouncement(thesisId) {
         });
 }
 
-// Function to submit a grade
-// Συνάρτηση για υποβολή βαθμού
+// Erotima 6
 // Function to submit a grade
 function submitGrade(thesisId) {
     const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
@@ -713,8 +705,7 @@ function submitGrade(thesisId) {
     });
 }
 
-
-
+// Erotima 6
 // Function to update a grade
 function updateGrade(thesisId) {
     const grade = document.getElementById(`gradeInput-${thesisId}`).value.trim();
@@ -744,6 +735,7 @@ function updateGrade(thesisId) {
     });
 }
 
+// Erotima 6
 // Function to fetch and display grades
 function fetchGrades(thesisId) {
     fetch(`/get-grades/${thesisId}`)
@@ -778,7 +770,7 @@ function fetchGrades(thesisId) {
 
 
 
-
+// Erotima 6
 // Function to add a note
 function addNoteHandler(event, thesisId) {
     event.preventDefault();
@@ -810,6 +802,7 @@ function addNoteHandler(event, thesisId) {
     });
 }
 
+// Erotima 6
 // Function to fetch and display notes for a specific thesis
 function fetchNotes(thesisId) {
     fetch(`/get-notes/${thesisId}`)
@@ -841,6 +834,7 @@ function fetchNotes(thesisId) {
         });
 }
 
+// Erotima 6
 // Function to change the status of a thesis
 function changeStatus(thesisId, newStatus) {
     fetch(`/change-status/${thesisId}`, {
@@ -866,6 +860,7 @@ function changeStatus(thesisId, newStatus) {
 // Fetch theses for management when the page loads
 document.addEventListener('DOMContentLoaded', fetchThesesForManagement);
 
+// Erotima 2
 // Function to show pending theses
 function showPendingTheses() {
     fetch('/get-pending-theses')
@@ -896,6 +891,7 @@ function showPendingTheses() {
         });
 }
 
+// Erotima 2
 // Function to erase assignment
 function eraseAssignment(thesisId) {
     if (confirm('Είσαι σίγουρος ότι θέλεις να αναιρέσεις την διπλωματική?')) {

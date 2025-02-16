@@ -192,6 +192,7 @@ app.post('/logout', (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
+// Erotima 3
 // Middleware function to get the teacher id from the session
 // It's used in the /search-theses get request
 function getTeacherId(req, res, next) {
@@ -208,6 +209,7 @@ function getTeacherId(req, res, next) {
     });
 }
 
+// Erotima 4
 // Middleware function to update the thesis status
 // to 'Ενεργή' if all committee members have accepted
 function checkAndUpdateThesisStatus(thesis_id) {
@@ -338,6 +340,7 @@ app.get('/private/secretary/:filename', isAuthenticated, (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
+// Erotima 1 gia view edit form
 app.get('/get-thesis/:id', (req, res) => {
     const query = 'SELECT * FROM Theses WHERE thesis_id = ?';
     console.log("get-thesis test111111111111111111111111111111");
@@ -355,7 +358,8 @@ app.get('/get-thesis/:id', (req, res) => {
     });
 });
 
-// Route handler for fetching theses by partial title
+// Erotima 2
+// Route handler for fetching theses by title
 app.get('/search-theses/:title', (req, res) => {
     const query = 'SELECT * FROM Theses WHERE title LIKE ? AND student_am IS NULL';
     const searchTerm = `%${req.params.title}%`;
@@ -374,10 +378,11 @@ app.get('/search-theses/:title', (req, res) => {
     });
 });
 
+// Erotima 1 provoli theseon
+// Erotima 6
 app.get('/get-theses', (req, res) => {
     const statusFilter = req.query.status;
     const teacherAM = req.session.user.am;
-
     if (!teacherAM) {
         return res.status(401).json({ success: false, message: 'Not authenticated' });
     }
@@ -454,6 +459,7 @@ app.get('/get-theses', (req, res) => {
     });
 });
 
+// Erotima 2
 // Route handler for searching students
 app.get("/search-student", (req, res) => {
     const { am, studentName } = req.query;
@@ -489,6 +495,7 @@ app.get("/search-student", (req, res) => {
     });
 });
 
+// Erotima 3
 // Searching theses by the logged in teacher
 app.get('/search-theses', getTeacherId, (req, res) => {
     const statusFilter = req.query.status;
@@ -534,6 +541,7 @@ app.get('/search-theses', getTeacherId, (req, res) => {
     });
 });
 
+// Erotima 3
 // Export theses to CSV or JSON
 app.get('/export-theses', getTeacherId, (req, res) => {
     const statusFilter = req.query.status;
@@ -598,7 +606,6 @@ app.get('/export-theses', getTeacherId, (req, res) => {
     });
 });
      
-
 // Route handler for fetching active theses
 app.get('/active-theses', (req, res) => {
     const query = `
@@ -617,6 +624,7 @@ app.get('/active-theses', (req, res) => {
     });
 });
 
+// Erotima 4
 app.get('/get-invitations', (req, res) => {
     const teacherAM = req.session.user.am;
 
@@ -644,6 +652,7 @@ app.get('/get-invitations', (req, res) => {
     });
 });
 
+// Erotima f1
 app.get('/get-thesis-st', (req, res) => {
     const studentAm = req.session.user.am; 
     if (!studentAm) {
@@ -704,6 +713,7 @@ app.get('/get-thesis-st', (req, res) => {
     });
 });
 
+// Erotima 5
 app.get('/get-statistics-time', (req, res) => {
     const teacherAM = req.session.user.am;
 
@@ -833,6 +843,7 @@ app.get('/get-statistics-time', (req, res) => {
     });
 });
 
+// Erotima 5
 app.get('/get-statistics-grades', (req, res) => {
     const teacherAM = req.session.user.am;
 
@@ -867,6 +878,7 @@ app.get('/get-statistics-grades', (req, res) => {
     });
 });
 
+// Erotima 5
 app.get('/get-statistics-count', (req, res) => {
     const teacherAM = req.session.user.am;
 
@@ -900,6 +912,7 @@ app.get('/get-statistics-count', (req, res) => {
     });
 });
 
+// Erotima f2
 app.get('/get-profile-st', (req, res) => {
     const studentAm = req.session.user?.am;
 
@@ -927,6 +940,7 @@ app.get('/get-profile-st', (req, res) => {
     });
 });
 
+// Erotima s1
 app.get('/get-active-theses', (req, res) => {
     const statusFilter = ['Ενεργή', 'Υπό Εξέταση']; // Καταστάσεις που θέλουμε
     const secretaryAM = req.session.user.am; // Αναγνωριστικό Γραμματείας
@@ -961,9 +975,8 @@ app.get('/get-active-theses', (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for fetching grades for a specific thesis
-
-// Route handler για ανάκτηση βαθμών και τελικού βαθμού
 app.get('/get-grades/:thesis_id', (req, res) => {
     const thesis_id = req.params.thesis_id;
     const teacherAM = req.session.user ? req.session.user.am : null;
@@ -1062,10 +1075,7 @@ app.get('/get-grades/:thesis_id', (req, res) => {
     });
 });
 
-
-
-
-
+// Erotima f3
 app.get('/get-theses-status', (req, res) => {
     const studentAm = req.session.user.am;
 
@@ -1095,6 +1105,7 @@ app.get('/get-theses-status', (req, res) => {
     });
 });
 
+// Erotima f3
 app.get('/get-teacher-info', (req, res) => {
     const query = 'SELECT teacher_name, teacher_am, email FROM Teachers';
     
@@ -1110,6 +1121,7 @@ app.get('/get-teacher-info', (req, res) => {
     });
 });
 
+// Erotima f3
 app.get('/get-thesis-id', (req, res) => {
     const studentAm = req.session.user.am;
 
@@ -1183,6 +1195,7 @@ app.get('/announcements', (req, res) => {
     });
 });
 
+// Erotima 2
 app.get('/get-pending-theses', (req, res) => {
     const query = `
         SELECT thesis_id, title 
@@ -1198,6 +1211,7 @@ app.get('/get-pending-theses', (req, res) => {
     });
 });
 
+// Erotima s3
 app.get('/api/theses', (req, res) => {
     const statusFilter = req.query.status;
 
@@ -1228,6 +1242,7 @@ app.get('/api/theses', (req, res) => {
     });
 });
 
+// Erotima f3
 app.get('/exam-report/:thesis_id', (req, res) => {
     const thesisId = req.params.thesis_id;
     const studentAm = req.session.user.am;
@@ -1278,6 +1293,7 @@ app.get('/exam-report/:thesis_id', (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
+// Erotima 1 prosthiki
 // Route handler for the add-thesis form
 app.post('/add-thesis', (req, res) => {
     const { title, description } = req.body;
@@ -1287,6 +1303,7 @@ app.post('/add-thesis', (req, res) => {
         return res.status(400).json({ success: false, message: 'Δεν μεταφορτώθηκε αρχείο.' });
     }
 
+    // upload pdf file to server in the uploads directory
     const pdfFile = req.files.file;
     const pdfPath = `uploads/${pdfFile.name}`;
 
@@ -1326,6 +1343,7 @@ app.post('/add-thesis', (req, res) => {
     });
 });
 
+// Erotima 1 edit update form
 // Route handler for updating a thesis
 app.post('/update-thesis', (req, res) => {
     const { thesis_id, title, description, teacher_am, student_am, final_submission_date, status } = req.body;
@@ -1380,6 +1398,7 @@ app.post('/update-thesis', (req, res) => {
     });
 });
 
+// Erotima 2
 // Assign a thesis to a student
 app.post("/assign-theses", (req, res) => {
     const { thesisId, studentAm } = req.body;
@@ -1423,6 +1442,7 @@ app.post("/assign-theses", (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for cancelling an assignment
 app.post('/cancel-assignment/:id', (req, res) => {
     const thesisId = req.params.id;
@@ -1459,6 +1479,7 @@ app.post('/cancel-assignment/:id', (req, res) => {
     });
 });
 
+// Erotima 4
 app.post('/accept-invitation/:id', (req, res) => {
     const committeeId = req.params.id;
     const teacherAM = req.session.user.am;
@@ -1498,6 +1519,7 @@ app.post('/accept-invitation/:id', (req, res) => {
     });
 });
 
+// Erotima 4
 app.post('/reject-invitation/:id', (req, res) => {
     const committeeId = req.params.id;
     const teacherAM = req.session.user.am;
@@ -1521,6 +1543,7 @@ app.post('/reject-invitation/:id', (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for adding a note
 app.post('/add-note', (req, res) => {
     const { thesis_id, content } = req.body;
@@ -1543,6 +1566,7 @@ app.post('/add-note', (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for retrieving notes for a specific thesis
 app.get('/get-notes/:thesis_id', (req, res) => {
     const thesis_id = req.params.thesis_id;
@@ -1566,6 +1590,7 @@ app.get('/get-notes/:thesis_id', (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for changing the status of a thesis
 app.post('/change-status/:id', (req, res) => {
     const thesisId = req.params.id;
@@ -1603,6 +1628,7 @@ app.post('/change-status/:id', (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for submitting a grade
 app.post('/submit-grade', (req, res) => {
     const { thesis_id, grade } = req.body;
@@ -1656,8 +1682,8 @@ app.post('/submit-grade', (req, res) => {
     });
 });
 
+// Erotima 6
 // Route handler for updating a grade
-// ✔️ Update Grade
 app.post('/update-grade', (req, res) => {
     const { thesis_id, grade } = req.body;
     const teacherAM = req.session.user.am;
@@ -1682,7 +1708,7 @@ app.post('/update-grade', (req, res) => {
 });
 
 
-
+// Erotima s2
 // Διαδρομή για εισαγωγή JSON δεδομένων
 app.post('/import-json', (req, res) => {
     if (!req.files || !req.files.jsonFile) {
@@ -1741,6 +1767,7 @@ app.post('/import-json', (req, res) => {
     }
 });
     
+// Erotima f3
 app.post('/invite-teacher', (req, res) => {
     const { thesis_id, teacher_am, role } = req.body;
 
@@ -1791,6 +1818,7 @@ app.post('/invite-teacher', (req, res) => {
     });
 });
 
+// Erotima 2
 app.post('/erase-assignment/:id', (req, res) => {
     const thesisId = req.params.id;
 
@@ -1808,7 +1836,8 @@ app.post('/erase-assignment/:id', (req, res) => {
         res.json({ success: true, message: 'Επιτυχής αναίρεση ανάθεσης!' });
     });
 });
-    
+
+// Erotima f3
 app.post('/set-presentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         console.error('No files were uploaded.');
@@ -1883,6 +1912,7 @@ app.post('/set-presentation', (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
+// Erotima s3
 // Route to approve a thesis (Ενεργή)
 app.put('/api/assignment/gs_number', (req, res) => { 
     const { thesis_id, gs_number_assignment } = req.body;
@@ -1913,8 +1943,7 @@ app.put('/api/assignment/gs_number', (req, res) => {
     });
 });
 
-
-
+// Erotima s3
 app.put('/api/thesis/cancel', (req, res) => {
     const { thesis_id, gs_number, gs_year, cancellation_reason } = req.body;
 
@@ -1937,6 +1966,7 @@ app.put('/api/thesis/cancel', (req, res) => {
     });
 });
 
+// Erotima s3
 app.put('/api/theses/complete', (req, res) => {
     const { thesis_id } = req.body;
 
@@ -1994,9 +2024,7 @@ app.put('/api/theses/complete', (req, res) => {
     });
 });
 
-
-
-
+// Erotima f2
 app.post('/update-profile-st', (req, res) => {
     const studentAm = req.session.user?.am; // Αναγνωριστικό φοιτητή από το session
     const { home_address, email, mobile_phone, landline_phone } = req.body;
@@ -2025,6 +2053,7 @@ app.post('/update-profile-st', (req, res) => {
     );
 });
 
+// Erotima f3
 app.put('/submit-repository-link', (req, res) => {
     const studentAm = req.session.user.am;
     const { thesis_id, repository_link } = req.body;
@@ -2057,6 +2086,7 @@ app.put('/submit-repository-link', (req, res) => {
 -------------------------------------------------------------------------------------
 */
 
+// Erotima 1 delete theses
 // Delete the theses 
 app.delete('/delete-thesis/:id', (req, res) => {
     const thesisId = req.params.id;
